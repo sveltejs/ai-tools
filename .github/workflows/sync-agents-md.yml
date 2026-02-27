@@ -14,7 +14,7 @@ permissions:
 jobs:
   sync-agents:
     # prevents this action from running on forks
-    if: github.repository == 'sveltejs/mcp'
+    if: github.repository == 'sveltejs/ai-tools'
     name: Sync AGENTS.md to OpenCode Package and Docs
     runs-on: ubuntu-latest
     steps:

@@ -68,7 +68,7 @@ for (const skill_name of skill_dirs) {
 
 ${frontmatter.description}
 
-<a href="https://github.com/sveltejs/mcp/releases?q=${frontmatter.name}" target="_blank" rel="noopener noreferrer">Open Releases page</a>
+<a href="https://github.com/sveltejs/ai-tools/releases?q=${frontmatter.name}" target="_blank" rel="noopener noreferrer">Open Releases page</a>
 
 <details>
 	<summary>View skill content</summary>

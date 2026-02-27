@@ -4,16 +4,16 @@
 	"type": "module",
 	"license": "MIT",
 	"mcpName": "dev.svelte/mcp",
-	"homepage": "https://github.com/sveltejs/mcp#readme",
+	"homepage": "https://github.com/sveltejs/ai-tools#readme",
 	"bugs": {
-		"url": "https://github.com/sveltejs/mcp/issues"
+		"url": "https://github.com/sveltejs/ai-tools/issues"
 	},
 	"bin": {
 		"svelte-mcp": "./dist/index.mjs"
 	},
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/sveltejs/mcp.git",
+		"url": "git+https://github.com/sveltejs/ai-tools.git",
 		"path": "packages/mcp-stdio"
 	},
 	"files": [
