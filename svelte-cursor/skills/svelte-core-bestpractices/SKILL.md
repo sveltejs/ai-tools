@@ -14,9 +14,6 @@ Objects and arrays (`$state({...})` or `$state([...])`) are made deeply reactive
 To compute something from state, use `$derived` rather than `$effect`:
 
 ```js
-// @errors: 2451
-let num = 0;
-// ---cut---
 // do this
 let square = $derived(num * num);
 

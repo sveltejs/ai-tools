@@ -63,13 +63,6 @@ Svelte will do as much asynchronous work as it can in parallel. For example if y
 This does not apply to sequential `await` expressions inside your `<script>` or inside async functions — these run like any other asynchronous JavaScript. An exception is that independent `$derived` expressions will update independently, even though they will run sequentially when they are first created:
 
 ```js
-async function one() {
-	return 1;
-}
-async function two() {
-	return 2;
-}
-// ---cut---
 // these will run sequentially the first time,
 // but will update independently
 let a = $derived(await one());
@@ -87,10 +80,6 @@ After the contents of a boundary have resolved for the first time and have repla
 You can also use [`settled()`](svelte#settled) to get a promise that resolves when the current update is complete:
 
 ```js
-let color = 'red';
-let answer = -1;
-let updating = false;
-// ---cut---
 import { tick, settled } from 'svelte';
 
 async function onclick() {
