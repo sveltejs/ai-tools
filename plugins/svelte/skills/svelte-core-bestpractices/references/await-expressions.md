@@ -4,16 +4,16 @@ As of Svelte 5.36, you can use the `await` keyword inside your components in thr
 - inside `$derived(...)` declarations
 - inside your markup
 
-This feature is currently experimental, and you must opt in by adding the `experimental.async` option wherever you configure Svelte, usually `svelte.config.js`:
+This feature is currently experimental, and you must opt in by adding the `experimental.async` option wherever you [configure](/docs/kit/configuration) Svelte, usually `svelte.config.js`:
 
 ```js
 /// file: svelte.config.js
 export default {
 	compilerOptions: {
 		experimental: {
-			async: true,
-		},
-	},
+			async: true
+		}
+	}
 };
 ```
 
@@ -34,8 +34,8 @@ When an `await` expression depends on a particular piece of state, changes to th
 	}
 </script>
 
-<input type="number" bind:value={a} />
-<input type="number" bind:value={b} />
+<input type="number" bind:value={a}>
+<input type="number" bind:value={b}>
 
 <p>{a} + {b} = {await add(a, b)}</p>
 ```
@@ -55,7 +55,8 @@ Updates can overlap — a fast update will be reflected in the UI while an earli
 Svelte will do as much asynchronous work as it can in parallel. For example if you have two `await` expressions in your markup...
 
 ```svelte
-<p>{await one()}</p><p>{await two()}</p>
+<p>{await one()}</p>
+<p>{await two()}</p>
 ```
 
 ...both functions will run at the same time, as they are independent expressions, even though they are _visually_ sequential.
@@ -63,12 +64,8 @@ Svelte will do as much asynchronous work as it can in parallel. For example if y
 This does not apply to sequential `await` expressions inside your `<script>` or inside async functions — these run like any other asynchronous JavaScript. An exception is that independent `$derived` expressions will update independently, even though they will run sequentially when they are first created:
 
 ```js
-async function one() {
-	return 1;
-}
-async function two() {
-	return 2;
-}
+async function one() { return 1; }
+async function two() { return 2; }
 // ---cut---
 // these will run sequentially the first time,
 // but will update independently
@@ -80,11 +77,11 @@ let b = $derived(await two());
 
 ## Indicating loading states
 
-To render placeholder UI, you can wrap content in a `<svelte:boundary>` with a pending snippet. This will be shown when the boundary is first created, but not for subsequent updates, which are globally coordinated.
+To render placeholder UI, you can wrap content in a `<svelte:boundary>` with a [`pending`](svelte-boundary#Properties-pending) snippet. This will be shown when the boundary is first created, but not for subsequent updates, which are globally coordinated.
 
-After the contents of a boundary have resolved for the first time and have replaced the `pending` snippet, you can detect subsequent async work with `$effect.pending()`. This is what you would use to display a "we're asynchronously validating your input" spinner next to a form field, for example.
+After the contents of a boundary have resolved for the first time and have replaced the `pending` snippet, you can detect subsequent async work with [`$effect.pending()`]($effect#$effect.pending). This is what you would use to display a "we're asynchronously validating your input" spinner next to a form field, for example.
 
-You can also use `settled()` to get a promise that resolves when the current update is complete:
+You can also use [`settled()`](svelte#settled) to get a promise that resolves when the current update is complete:
 
 ```js
 let color = 'red';
@@ -114,7 +111,7 @@ async function onclick() {
 
 ## Error handling
 
-Errors in `await` expressions will bubble to the nearest error boundary.
+Errors in `await` expressions will bubble to the nearest [error boundary](svelte-boundary).
 
 ## Server-side rendering
 
@@ -136,7 +133,7 @@ If a `<svelte:boundary>` with a `pending` snippet is encountered during SSR, tha
 
 ## Forking
 
-The `fork(...)` API, added in 5.42, makes it possible to run `await` expressions that you _expect_ to happen in the near future. This is mainly intended for frameworks like SvelteKit to implement preloading when (for example) users signal an intent to navigate.
+The [`fork(...)`](svelte#fork) API, added in 5.42, makes it possible to run `await` expressions that you _expect_ to happen in the near future. This is mainly intended for frameworks like SvelteKit to implement preloading when (for example) users signal an intent to navigate.
 
 ```svelte
 <script>
@@ -172,13 +169,13 @@ The `fork(...)` API, added in 5.42, makes it possible to run `await` expressions
 		// in case `pending` didn't exist
 		// (if it did, this is a no-op)
 		open = true;
-	}}>open menu</button
->
+	}}
+>open menu</button>
 
 {#if open}
 	<!-- any async work inside this component will start
 	     as soon as the fork is created -->
-	<Menu onclose={() => (open = false)} />
+	<Menu onclose={() => open = false} />
 {/if}
 ```
 
@@ -188,4 +185,4 @@ As an experimental feature, the details of how `await` is handled (and related A
 
 ## Breaking changes
 
-Effects run in a slightly different order when the `experimental.async` option is `true`. Specifically, _block_ effects like `{#if ...}` and `{#each ...}` now run before an `$effect.pre` or `beforeUpdate` in the same component, which means that in very rare situations it is possible to update a block that should no longer exist, but only if you update state inside an effect, which you should avoid.
+Effects run in a slightly different order when the `experimental.async` option is `true`. Specifically, _block_ effects like `{#if ...}` and `{#each ...}` now run before an `$effect.pre` or `beforeUpdate` in the same component, which means that in very rare situations.
