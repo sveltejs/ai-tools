@@ -119,7 +119,7 @@ Within the template, snippets are values just like any other. As such, they can 
 	const fruits = [
 		{ name: 'apples', qty: 5, price: 2 },
 		{ name: 'bananas', qty: 10, price: 1 },
-		{ name: 'cherries', qty: 20, price: 0.5 }
+		{ name: 'cherries', qty: 20, price: 0.5 },
 	];
 </script>
 
@@ -192,7 +192,7 @@ You can declare snippet props as being optional. You can either use optional cha
 
 ```svelte
 <script>
-    let { children } = $props();
+	let { children } = $props();
 </script>
 
 {@render children?.()}
@@ -202,13 +202,13 @@ You can declare snippet props as being optional. You can either use optional cha
 
 ```svelte
 <script>
-    let { children } = $props();
+	let { children } = $props();
 </script>
 
 {#if children}
-    {@render children()}
+	{@render children()}
 {:else}
-    fallback content
+	fallback content
 {/if}
 ```
 
@@ -241,7 +241,7 @@ We can tighten things up further by declaring a generic, so that `data` and `row
 	let {
 		data,
 		children,
-		row
+		row,
 	}: {
 		data: T[];
 		children: Snippet;

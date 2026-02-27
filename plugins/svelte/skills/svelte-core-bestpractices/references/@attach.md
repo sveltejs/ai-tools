@@ -48,9 +48,7 @@ A useful pattern is for a function, such as `tooltip` in this example, to _retur
 
 <input bind:value={content} />
 
-<button {@attach tooltip(content)}>
-	Hover me
-</button>
+<button {@attach tooltip(content)}> Hover me </button>
 ```
 
 Since the `tooltip(content)` expression runs inside an [effect]($effect), the attachment will be destroyed and recreated whenever `content` changes. The same thing would happen for any state read _inside_ the attachment function when it first runs. (If this isn't what you want, see [Controlling when attachments re-run](#Controlling-when-attachments-re-run).)
@@ -127,9 +125,7 @@ This allows you to create _wrapper components_ that augment elements (demo:
 
 <input bind:value={content} />
 
-<Button {@attach tooltip(content)}>
-	Hover me
-</Button>
+<Button {@attach tooltip(content)}>Hover me</Button>
 ```
 
 ## Controlling when attachments re-run

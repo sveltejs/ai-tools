@@ -11,9 +11,9 @@ This feature is currently experimental, and you must opt in by adding the `exper
 export default {
 	compilerOptions: {
 		experimental: {
-			async: true
-		}
-	}
+			async: true,
+		},
+	},
 };
 ```
 
@@ -34,8 +34,8 @@ When an `await` expression depends on a particular piece of state, changes to th
 	}
 </script>
 
-<input type="number" bind:value={a}>
-<input type="number" bind:value={b}>
+<input type="number" bind:value={a} />
+<input type="number" bind:value={b} />
 
 <p>{a} + {b} = {await add(a, b)}</p>
 ```
@@ -55,8 +55,7 @@ Updates can overlap — a fast update will be reflected in the UI while an earli
 Svelte will do as much asynchronous work as it can in parallel. For example if you have two `await` expressions in your markup...
 
 ```svelte
-<p>{await one()}</p>
-<p>{await two()}</p>
+<p>{await one()}</p><p>{await two()}</p>
 ```
 
 ...both functions will run at the same time, as they are independent expressions, even though they are _visually_ sequential.
@@ -64,8 +63,12 @@ Svelte will do as much asynchronous work as it can in parallel. For example if y
 This does not apply to sequential `await` expressions inside your `<script>` or inside async functions — these run like any other asynchronous JavaScript. An exception is that independent `$derived` expressions will update independently, even though they will run sequentially when they are first created:
 
 ```js
-async function one() { return 1; }
-async function two() { return 2; }
+async function one() {
+	return 1;
+}
+async function two() {
+	return 2;
+}
 // ---cut---
 // these will run sequentially the first time,
 // but will update independently
@@ -169,13 +172,13 @@ The [`fork(...)`](svelte#fork) API, added in 5.42, makes it possible to run `awa
 		// in case `pending` didn't exist
 		// (if it did, this is a no-op)
 		open = true;
-	}}
->open menu</button>
+	}}>open menu</button
+>
 
 {#if open}
 	<!-- any async work inside this component will start
 	     as soon as the fork is created -->
-	<Menu onclose={() => open = false} />
+	<Menu onclose={() => (open = false)} />
 {/if}
 ```
 
