@@ -16,7 +16,7 @@ permissions:
 jobs:
   sync-cursor:
     # prevents this action from running on forks
-    if: github.repository == 'sveltejs/mcp'
+    if: github.repository == 'sveltejs/ai-tools'
     name: Sync Cursor Plugin from Sources of Truth
     runs-on: ubuntu-latest
     steps:

@@ -14,7 +14,7 @@ permissions:
 jobs:
   update-docs:
     # prevents this action from running on forks
-    if: github.repository == 'sveltejs/mcp'
+    if: github.repository == 'sveltejs/ai-tools'
     name: Update Prompt Documentation
     runs-on: ubuntu-latest
     steps:

@@ -15,7 +15,7 @@ jobs:
     permissions:
       contents: write
     # prevents this action from running on forks
-    if: github.repository == 'sveltejs/mcp'
+    if: github.repository == 'sveltejs/ai-tools'
     name: Release Svelte Code Writer Skill
     runs-on: ubuntu-latest
     steps:
