@@ -1,23 +1,44 @@
-name: Release Svelte Code Writer Skill
+name: Release Svelte Skills
 
 on:
   push:
     branches:
       - main
     paths:
-      - 'plugins/svelte/skills/svelte-code-writer/**'
+      - 'plugins/svelte/skills/**'
   workflow_dispatch:
 
 permissions: {}
 
 jobs:
+  detect-skills:
+    permissions:
+      contents: read
+    if: github.repository == 'sveltejs/ai-tools'
+    name: Detect changed skills
+    runs-on: ubuntu-latest
+    outputs:
+      skills: ${{ steps.find-skills.outputs.skills }}
+    steps:
+      - name: checkout
+        uses: actions/checkout@v6
+
+      - name: Find all skills
+        id: find-skills
+        run: |
+          skills=$(ls -d plugins/svelte/skills/*/ | xargs -I {} basename {} | jq -R -s -c 'split("\n") | map(select(length > 0))')
+          echo "skills=$skills" >> $GITHUB_OUTPUT
+
   release:
+    needs: detect-skills
+    if: needs.detect-skills.outputs.skills != '[]'
     permissions:
       contents: write
-    # prevents this action from running on forks
-    if: github.repository == 'sveltejs/ai-tools'
-    name: Release Svelte Code Writer Skill
+    name: Release ${{ matrix.skill }}
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        skill: ${{ fromJson(needs.detect-skills.outputs.skills) }}
     steps:
       - name: checkout
         uses: actions/checkout@v6
@@ -29,17 +50,17 @@ jobs:
       - name: Create zip
         run: |
           cd plugins/svelte/skills
-          zip -r svelte-code-writer.zip svelte-code-writer/
+          zip -r ${{ matrix.skill }}.zip ${{ matrix.skill }}/
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: svelte-code-writer-v${{ steps.version.outputs.version }}
-          name: Svelte Code Writer Skill v${{ steps.version.outputs.version }}
+          tag_name: ${{ matrix.skill }}-v${{ steps.version.outputs.version }}
+          name: ${{ matrix.skill }} v${{ steps.version.outputs.version }}
           body: |
-            Automated release of the Svelte Code Writer skill.
+            Automated release of the ${{ matrix.skill }} skill.
 
-            This release was triggered by changes to the `plugins/svelte/skills/svelte-code-writer/` directory.
-          files: plugins/svelte/skills/svelte-code-writer.zip
+            This release was triggered by changes to the `plugins/svelte/skills/${{ matrix.skill }}/` directory.
+          files: plugins/svelte/skills/${{ matrix.skill }}.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
