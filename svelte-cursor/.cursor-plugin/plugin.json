@@ -1,0 +1,9 @@
+{
+	"name": "svelte",
+	"description": "A plugin for all things related to Svelte development, MCP, skills, and more.",
+	"version": "1.0.0",
+	"author": {
+		"name": "Svelte"
+	},
+	"keywords": ["svelte", "sveltekit", "mcp", "autofixer"]
+}

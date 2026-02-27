@@ -14,7 +14,7 @@ permissions:
 jobs:
   sync-skills:
     # prevents this action from running on forks
-    if: github.repository == 'sveltejs/mcp'
+    if: github.repository == 'sveltejs/ai-tools'
     name: Sync Skills to OpenCode Package and Update Docs
     runs-on: ubuntu-latest
     steps:

@@ -5,7 +5,7 @@
 	"description": "The official Svelte MCP server providing docs and autofixing tools for Svelte development",
 	"repository": {
 		"id": "1054419133",
-		"url": "https://github.com/sveltejs/mcp",
+		"url": "https://github.com/sveltejs/ai-tools",
 		"subfolder": "packages/mcp-stdio",
 		"source": "github"
 	},

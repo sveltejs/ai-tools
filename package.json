@@ -26,7 +26,8 @@
 		"release": "pnpm --filter @sveltejs/mcp run build && changeset publish",
 		"changeset:version": "changeset version && pnpm --filter @sveltejs/mcp run update:version && git add --all",
 		"sync-opencode-skills": "rm -rf packages/opencode/skills && cp -r plugins/svelte/skills packages/opencode/skills",
-		"sync-agents-md": "rm -f packages/opencode/instructions/opencode-agents.md && rm -f documentation/docs/10-introduction/.generated/agents.md && mkdir -p packages/opencode/instructions && mkdir -p documentation/docs/10-introduction/.generated && cp instructions/AGENTS.md packages/opencode/instructions/opencode-agents.md && cp instructions/AGENTS.md documentation/docs/10-introduction/.generated/agents.md"
+		"sync-agents-md": "rm -f packages/opencode/instructions/opencode-agents.md && rm -f documentation/docs/10-introduction/.generated/agents.md && mkdir -p packages/opencode/instructions && mkdir -p documentation/docs/10-introduction/.generated && cp instructions/AGENTS.md packages/opencode/instructions/opencode-agents.md && cp instructions/AGENTS.md documentation/docs/10-introduction/.generated/agents.md",
+		"sync-cursor-plugin": "node scripts/sync-cursor-plugin.ts"
 	},
 	"keywords": [
 		"svelte",
