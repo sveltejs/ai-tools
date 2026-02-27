@@ -34,8 +34,6 @@ jobs:
     if: needs.detect-skills.outputs.skills != '[]'
     permissions:
       contents: write
-    # prevents this action from running on forks
-    if: github.repository == 'sveltejs/ai-tools'
     name: Release ${{ matrix.skill }}
     runs-on: ubuntu-latest
     strategy:
