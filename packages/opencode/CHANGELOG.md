@@ -1,5 +1,11 @@
 # @sveltejs/opencode
 
+## 0.1.4
+
+### Patch Changes
+
+- feat: `svelte-core-bestpractices` skill ([#162](https://github.com/sveltejs/ai-tools/pull/162))
+
 ## 0.1.3
 
 ### Patch Changes
