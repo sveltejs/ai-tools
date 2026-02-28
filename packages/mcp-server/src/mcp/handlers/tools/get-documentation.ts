@@ -91,16 +91,56 @@ export async function get_documentation_handler({
 		}
 	});
 
-	const has_any_success = results.some((result) => result.success);
-	let final_text = results.map((r) => r.content).join('\n\n---\n\n');
+	const successes = results.filter((r) => r.success);
+	const failed_sections = sections.filter(
+		(s) =>
+			!available_sections.some(
+				(a) => a.title.toLowerCase() === s.toLowerCase() || a.slug === s || a.url === s,
+			),
+	);
 
-	if (!has_any_success) {
-		const formatted_sections = await format_sections_list();
-
-		final_text += `\n\n---\n\n${SECTIONS_LIST_INTRO}\n\n${formatted_sections}\n\n${SECTIONS_LIST_OUTRO}`;
+	if (successes.length > 0 && failed_sections.length === 0) {
+		return successes.map((r) => r.content).join('\n\n---\n\n');
 	}
 
-	return final_text;
+	const parts: string[] = [];
+
+	if (successes.length > 0) {
+		parts.push(successes.map((r) => r.content).join('\n\n---\n\n'));
+	}
+
+	const fuzzy_results = failed_sections.map((requested) => {
+		const lower = requested.toLowerCase();
+		const matches = available_sections.filter(
+			(a) =>
+				a.title.toLowerCase().includes(lower) ||
+				a.slug.includes(lower) ||
+				lower.includes(a.slug.split('/').pop() ?? '') ||
+				a.use_cases.toLowerCase().includes(lower),
+		);
+		return { requested, matches };
+	});
+
+	const has_fuzzy = fuzzy_results.some((r) => r.matches.length > 0);
+
+	// Full list only when no successes and no fuzzy matches
+	if (successes.length === 0 && !has_fuzzy) {
+		const formatted_sections = await format_sections_list();
+		parts.push(`${SECTIONS_LIST_INTRO}\n\n${formatted_sections}\n\n${SECTIONS_LIST_OUTRO}`);
+	}
+
+	// Similar results then errors
+	for (const { requested, matches } of fuzzy_results) {
+		if (matches.length > 0) {
+			const match_list = matches.map((m) => `- title: ${m.title}, section: ${m.slug}`).join('\n');
+			parts.push(
+				`${matches.length} similar result${matches.length > 1 ? 's' : ''} for "${requested}":\n${match_list}`,
+			);
+		}
+		parts.push(`Section not found: "${requested}".`);
+	}
+
+	return parts.join('\n\n---\n\n');
 }
 
 export function get_documentation(server: SvelteMcp) {
