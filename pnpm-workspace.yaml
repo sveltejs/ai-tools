@@ -46,7 +46,7 @@ catalogs:
     '@types/estree': ^1.0.8
     '@types/node': ^24.3.1
     '@valibot/to-json-schema': ^1.5.0
-    '@vercel/analytics': ^1.5.0
+    '@vercel/analytics': ^2.0.0
     dotenv: ^17.2.3
     node-resolve-ts: ^1.0.2
     publint: ^0.3.13
