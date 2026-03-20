@@ -2,6 +2,7 @@ import type { Plugin } from '@opencode-ai/plugin';
 import { readdir } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { agents } from './agents.js';
 import { get_mcp_config } from './config.js';
 
 const current_dir = dirname(fileURLToPath(import.meta.url));
@@ -72,105 +73,44 @@ export const svelte_plugin: Plugin = async (ctx) => {
 				}
 			}
 			if (mcp_config.subagent?.enabled !== false) {
-				// we add the editor subagent that will be used when editing Svelte files to prevent wasting context on the main agent
-				const default_config: (typeof input.agent)[string] = {
-					color: '#ff3e00',
-					mode: 'subagent',
-					prompt: `You are a Svelte 5 expert responsible for writing, editing, and validating Svelte components and modules. You have access to the Svelte MCP server which provides documentation and code analysis tools. Always use the tools from the svelte MCP server to fetch documentation with \`get_documentation\` and validating the code with \`svelte_autofixer\`. If the autofixer returns any issue or suggestions try to solve them.
+				for (const [agent_name, agent_data] of Object.entries(agents)) {
+					// we add the editor subagent that will be used when editing Svelte files to prevent wasting context on the main agent
+					const default_config: (typeof input.agent)[string] = {
+						color: '#ff3e00',
+						mode: 'subagent',
+						prompt: agent_data.prompt,
+						description: agent_data.description,
+						permission: {
+							bash: 'ask',
+							edit: 'allow',
+							webfetch: 'ask',
+						},
+						tools: {
+							[`${svelte_mcp_name}_*`]: true,
+						},
+					};
 
-If the MCP tools are not available you can use the \`svelte-code-writer\` skill to learn how to use the \`@sveltejs/mcp\` cli to access the same tools.
+					// Get per-agent config from svelte.json (if any)
+					const agent_config = mcp_config.subagent?.agents?.[agent_name];
 
-If the skill is not available you can run \`npx @sveltejs/mcp@latest -y --help\` to learn how to use it.
-
-## Available MCP Tools
-
-### 1. list-sections
-
-Lists all available Svelte 5 and SvelteKit documentation sections with titles and paths. Use this first to discover what documentation is available.
-
-### 2. get-documentation
-
-Retrieves full documentation for specified sections. Accepts a single section name or an array of section names. Use after \`list-sections\` to fetch relevant docs for the task at hand.
-
-**Example sections:** \`$state\`, \`$derived\`, \`$effect\`, \`$props\`, \`$bindable\`, \`snippets\`, \`routing\`, \`load functions\`
-
-### 3. svelte-autofixer
-
-Analyzes Svelte code and returns suggestions to fix issues. Pass the component code directly to this tool. It will detect common mistakes like:
-
-- Using \`$effect\` instead of \`$derived\` for computations
-- Missing cleanup in effects
-- Svelte 4 syntax (\`on:click\`, \`export let\`, \`<slot>\`)
-- Missing keys in \`{#each}\` blocks
-- And more
-
-## Workflow
-
-When invoked to work on a Svelte file:
-
-### 1. Gather Context (if needed)
-
-If you're uncertain about Svelte 5 syntax or patterns, use the MCP tools:
-
-1. Call \`list-sections\` to see available documentation
-2. Call \`get-documentation\` with relevant section names
-
-### 2. Read the Target File
-
-Read the file to understand the current implementation.
-
-### 3. Make Changes
-
-Apply edits following Svelte 5 best practices:
-
-### 4. Validate Changes
-
-After editing, ALWAYS call \`svelte-autofixer\` with the updated code to check for issues.
-
-### 5. Fix Any Issues
-
-If the autofixer reports problems, fix them and re-validate until no issues remain.
-
-## Output Format
-
-After completing your work, provide:
-
-1. Summary of changes made
-2. Any issues found and fixed by the autofixer
-3. Recommendations for further improvements (if any)
-`,
-					description:
-						'Specialized Svelte 5 code editor. MUST BE USED PROACTIVELY when creating, editing, or reviewing any .svelte file or .svelte.ts/.svelte.js module and MUST use the tools from the MCP server or the `svelte-code-writer` skill if they are available. Fetches relevant documentation and validates code using the Svelte MCP server tools.',
-					permission: {
-						bash: 'ask',
-						edit: 'allow',
-						webfetch: 'ask',
-					},
-					tools: {
-						[`${svelte_mcp_name}_*`]: true,
-					},
-				};
-
-				// Get per-agent config from svelte.json (if any)
-				const svelte_file_editor_config = mcp_config.subagent?.agents?.['svelte-file-editor'];
-
-				// Configure agent from svelte.json only
-				// Priority: svelte.json agent config > defaults
-				input.agent['svelte-file-editor'] = {
-					...default_config,
-					...(svelte_file_editor_config?.model !== undefined && {
-						model: svelte_file_editor_config.model,
-					}),
-					...(svelte_file_editor_config?.temperature !== undefined && {
-						temperature: svelte_file_editor_config.temperature,
-					}),
-					...(svelte_file_editor_config?.maxSteps !== undefined && {
-						maxSteps: svelte_file_editor_config.maxSteps,
-					}),
-					...(svelte_file_editor_config?.top_p !== undefined && {
-						top_p: svelte_file_editor_config.top_p,
-					}),
-				};
+					// Configure agent from svelte.json only
+					// Priority: svelte.json agent config > defaults
+					input.agent[agent_name] = {
+						...default_config,
+						...(agent_config?.model !== undefined && {
+							model: agent_config.model,
+						}),
+						...(agent_config?.temperature !== undefined && {
+							temperature: agent_config.temperature,
+						}),
+						...(agent_config?.maxSteps !== undefined && {
+							maxSteps: agent_config.maxSteps,
+						}),
+						...(agent_config?.top_p !== undefined && {
+							top_p: agent_config.top_p,
+						}),
+					};
+				}
 			}
 		},
 	};

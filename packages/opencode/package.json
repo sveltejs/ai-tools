@@ -14,6 +14,7 @@
 	"files": [
 		"index.ts",
 		"config.ts",
+		"agents.ts",
 		"instructions",
 		"skills"
 	],
