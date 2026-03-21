@@ -3,7 +3,7 @@ import path from 'node:path';
 
 const OPENCODE_PKG_DIR = './packages/opencode';
 const TOOLS_DIR = './tools';
-const DOCS_AGENTS_DIR = './documentation/docs/10-introduction/.generated';
+const DOCS_AGENTS_DIR = './documentation/docs/20-instructions/.generated';
 
 /**
  * Sync skills from tools/ to opencode package (direct copy)

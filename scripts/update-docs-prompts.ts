@@ -29,6 +29,6 @@ ${await module.generate_for_docs()}
 `;
 }
 
-const generated_dir = './documentation/docs/30-capabilities/.generated';
+const generated_dir = './documentation/docs/30-mcp/.generated';
 await fs.mkdir(generated_dir, { recursive: true });
 await fs.writeFile(path.join(generated_dir, 'prompts.md'), content.trim() + '\n');

@@ -22,6 +22,7 @@
 		"generate-summaries": "pnpm --filter @sveltejs/mcp-server run generate-summaries",
 		"generate-prompt-docs": "node --import node-resolve-ts/register scripts/update-docs-prompts.ts",
 		"generate-skill-docs": "node --import node-resolve-ts/register scripts/update-docs-skills.ts",
+		"generate-subagent-docs": "cp ./tools/agents/svelte-file-editor.md ./documentation/docs/20-instructions/.generated/agents.md",
 		"debug:generate-summaries": "pnpm --filter @sveltejs/mcp-server run debug:generate-summaries",
 		"release": "pnpm --filter @sveltejs/mcp run build && changeset publish",
 		"changeset:version": "changeset version && pnpm --filter @sveltejs/mcp run update:version && git add --all",
