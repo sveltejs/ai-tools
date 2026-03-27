@@ -26,8 +26,8 @@ catalogs:
       specifier: ^9.36.0
       version: 9.39.2
     '@types/eslint-scope':
-      specifier: ^8.3.2
-      version: 8.4.0
+      specifier: ^9.0.0
+      version: 9.1.0
     '@typescript-eslint/parser':
       specifier: ^8.44.0
       version: 8.54.0
@@ -377,7 +377,7 @@ importers:
         version: 2.50.1(@sveltejs/vite-plugin-svelte@6.2.4(svelte@5.48.4)(vite@7.3.1(@types/node@24.10.9)(yaml@2.8.2)))(svelte@5.48.4)(typescript@5.9.3)(vite@7.3.1(@types/node@24.10.9)(yaml@2.8.2))
       '@types/eslint-scope':
         specifier: catalog:lint
-        version: 8.4.0
+        version: 9.1.0
       '@types/estree':
         specifier: catalog:tooling
         version: 1.0.8
@@ -2077,14 +2077,9 @@ packages:
   '@types/deep-eql@4.0.2':
     resolution: {integrity: sha512-c9h9dVVMigMPc4bwTvC5dxqtqJZwQPePsWjPlpSOnojbor6pGqdk541lfA7AqFQr5pB1BRdq0juY9db81BwyFw==}
 
-  '@types/eslint-scope@8.4.0':
-    resolution: {integrity: sha512-RhVLLrJB96ufa3O58HBsOd4IVVaYN7gBIn7K9fxHQBB++AJYOWNQcevpHDIVVw6YD0Ycup/XodUlZ3ZntVrqhA==}
-
-  '@types/eslint@9.6.1':
-    resolution: {integrity: sha512-FXx2pKgId/WyYo2jXw63kk7/+TY7u7AziEJxJAnSFzHlqTAS3Ync6SvgYAN/k4/PQpnnVuzoMuVnByKK2qp0ag==}
-
-  '@types/esrecurse@4.3.1':
-    resolution: {integrity: sha512-xJBAbDifo5hpffDBuHl0Y8ywswbiAp/Wi7Y/GtAgSlZyIABppyurxVueOPE8LUQOxdlgi6Zqce7uoEpqNTeiUw==}
+  '@types/eslint-scope@9.1.0':
+    resolution: {integrity: sha512-ZdRd/C3bTObl4fZ6d7iXN2AVv20waMU2tPy1W24e6ECLbB8T9fBxtONKZUpIpYHShMVk6cDNP9QMVw7Qdqsd/w==}
+    deprecated: This is a stub types definition. eslint-scope provides its own type definitions, so you do not need this installed.
 
   '@types/estree@1.0.8':
     resolution: {integrity: sha512-dWHzHa2WqEXI/O1E9OjrocMTKJl2mSrEolh1Iomrv6U+JuNwaHXsXx9bLu5gG7BUWFIN0skIQJQ/L1rIex4X6w==}
@@ -6046,19 +6041,9 @@ snapshots:
 
   '@types/deep-eql@4.0.2': {}
 
-  '@types/eslint-scope@8.4.0':
+  '@types/eslint-scope@9.1.0':
     dependencies:
-      '@types/eslint': 9.6.1
-      '@types/esrecurse': 4.3.1
-      '@types/estree': 1.0.8
-      eslint-visitor-keys: 5.0.0
-
-  '@types/eslint@9.6.1':
-    dependencies:
-      '@types/estree': 1.0.8
-      '@types/json-schema': 7.0.15
-
-  '@types/esrecurse@4.3.1': {}
+      eslint-scope: 8.4.0
 
   '@types/estree@1.0.8': {}
 
