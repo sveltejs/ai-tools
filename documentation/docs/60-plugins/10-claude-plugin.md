@@ -1,5 +1,5 @@
 ---
-title: Overview
+title: Claude code
 ---
 
 The open source [repository](https://github.com/sveltejs/ai-tools) containing the code for the MCP server is also a Claude Code Marketplace plugin.
