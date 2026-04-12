@@ -53,7 +53,7 @@ jobs:
           zip -r ${{ matrix.skill }}.zip ${{ matrix.skill }}/
 
       - name: Create Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ matrix.skill }}-v${{ steps.version.outputs.version }}
           name: ${{ matrix.skill }} v${{ steps.version.outputs.version }}
