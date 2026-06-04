@@ -1,17 +1,11 @@
 import ts_parser from '@typescript-eslint/parser';
+import type * as eslint from 'eslint';
 import type { CallExpression, Identifier } from 'estree';
-import type { Reference, Variable } from 'eslint-scope';
 import { parseForESLint as svelte_eslint_parse } from 'svelte-eslint-parser';
 import { runes } from '../constants.js';
 
-type Scope = {
-	variables?: Variable[];
-	references?: Reference[];
-	childScopes?: Scope[];
-};
-type ScopeManager = {
-	globalScope: Scope;
-};
+type Scope = eslint.Scope.Scope;
+type ScopeManager = eslint.Scope.ScopeManager;
 
 function collect_scopes(scope: Scope, acc: Scope[] = []) {
 	acc.push(scope);
@@ -27,12 +21,12 @@ export function parse(code: string, file_path: string) {
 		parser: { ts: ts_parser, typescript: ts_parser },
 	});
 	let all_scopes: Scope[] | undefined;
-	let all_variables: Variable[] | undefined;
-	let all_references: Reference[] | undefined;
+	let all_variables: eslint.Scope.Variable[] | undefined;
+	let all_references: eslint.Scope.Reference[] | undefined;
 
 	function get_all_scopes() {
 		if (!all_scopes) {
-			all_scopes = collect_scopes(parsed.scopeManager!.globalScope);
+			all_scopes = collect_scopes(parsed.scopeManager!.globalScope!);
 		}
 		return all_scopes;
 	}
