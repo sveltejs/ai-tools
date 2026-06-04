@@ -12,7 +12,6 @@ catalogs:
   lint:
     '@eslint/compat': ^2.0.0
     '@eslint/js': ^9.36.0
-    '@types/eslint-scope': ^8.3.2
     '@typescript-eslint/parser': ^8.44.0
     '@typescript-eslint/types': ^8.44.0
     eslint: ^9.36.0
