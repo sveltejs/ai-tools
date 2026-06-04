@@ -1,5 +1,11 @@
 # @sveltejs/mcp
 
+## 0.1.24
+
+### Patch Changes
+
+- chore: support declaration tags ([#222](https://github.com/sveltejs/ai-tools/pull/222))
+
 ## 0.1.23
 
 ### Patch Changes
