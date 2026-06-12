@@ -2,12 +2,8 @@ import { dev } from '$app/environment';
 import { http_transport } from '$lib/mcp/index.js';
 import { redirect } from '@sveltejs/kit';
 import { track } from '@vercel/analytics/server';
-import {
-	VERSION
-} from 'svelte/compiler';
 
 export async function handle({ event, resolve }) {
-	console.log(VERSION);
 	if (event.request.method === 'GET') {
 		const accept = event.request.headers.get('accept');
 		if (accept) {
