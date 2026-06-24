@@ -58,7 +58,7 @@ Alternatively, create or edit `~/.copilot/mcp-config.json` and add the following
 
 ## Antigravity CLI
 
-To include the remote MCP version in Antigravity CLI, create or edit `~/.gemini/config/mcp_config.json` and add the following configuration:
+To use the remote MCP version in Antigravity CLI, create or edit `~/.gemini/config/mcp_config.json` and add the following configuration:
 
 ```json
 {
