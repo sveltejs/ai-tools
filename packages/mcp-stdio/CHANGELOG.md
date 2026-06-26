@@ -1,5 +1,11 @@
 # @sveltejs/mcp
 
+## 0.1.25
+
+### Patch Changes
+
+- fix: better wording for `desired_svelte_version` ([`59dcbff`](https://github.com/sveltejs/ai-tools/commit/59dcbff136a91efad5a0e978e8208e1b1d277f97))
+
 ## 0.1.24
 
 ### Patch Changes
