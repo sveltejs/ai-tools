@@ -25,7 +25,7 @@ function get_autofixer_schema(stdio: boolean) {
 		desired_svelte_version: v.pipe(
 			v.union([v.string(), v.number()]),
 			v.description(
-				'The desired svelte version...if possible read this from the package.json of the user project, otherwise use some hint from the wording (if the user asks for runes it wants version 5). Default to 5 in case of doubt.',
+				'The desired major svelte version as an integer (must be 4 or 5)...if possible read this from the package.json of the user project, otherwise use some hint from the wording (if the user asks for runes it wants version 5). Default to 5 in case of doubt.',
 			),
 		),
 		async: v.pipe(
