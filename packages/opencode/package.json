@@ -14,6 +14,7 @@
 	"files": [
 		"index.ts",
 		"config.ts",
+		"tui.tsx",
 		"agents.ts",
 		"instructions",
 		"skills"
@@ -22,6 +23,10 @@
 		"./server": {
 			"types": "./index.ts",
 			"import": "./index.ts"
+		},
+		"./tui": {
+			"types": "./tui.tsx",
+			"import": "./tui.tsx"
 		}
 	},
 	"repository": {
@@ -35,9 +40,33 @@
 	"dependencies": {
 		"valibot": "catalog:tooling"
 	},
+	"peerDependencies": {
+		"@opentui/core": ">=0.4.3",
+		"@opentui/keymap": ">=0.4.3",
+		"@opentui/solid": ">=0.4.3",
+		"solid-js": ">=1.9.12"
+	},
+	"peerDependenciesMeta": {
+		"@opentui/core": {
+			"optional": true
+		},
+		"@opentui/keymap": {
+			"optional": true
+		},
+		"@opentui/solid": {
+			"optional": true
+		},
+		"solid-js": {
+			"optional": true
+		}
+	},
 	"devDependencies": {
-		"@opencode-ai/plugin": "catalog:ai",
+		"@opencode-ai/plugin": "catalog:opencode",
+		"@opentui/core": "catalog:opencode",
+		"@opentui/keymap": "catalog:opencode",
+		"@opentui/solid": "catalog:opencode",
 		"@valibot/to-json-schema": "catalog:tooling",
-		"@types/node": "catalog:tooling"
+		"@types/node": "catalog:tooling",
+		"solid-js": "catalog:opencode"
 	}
 }
