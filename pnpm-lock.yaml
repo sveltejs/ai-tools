@@ -15,21 +15,6 @@ catalogs:
     '@modelcontextprotocol/inspector':
       specifier: ^0.19.0
       version: 0.19.0
-    '@opencode-ai/plugin':
-      specifier: 1.17.9
-      version: 1.17.9
-    '@opentui/core':
-      specifier: ^0.4.3
-      version: 0.4.3
-    '@opentui/keymap':
-      specifier: ^0.4.3
-      version: 0.4.3
-    '@opentui/solid':
-      specifier: ^0.4.3
-      version: 0.4.3
-    solid-js:
-      specifier: 1.9.12
-      version: 1.9.12
   lint:
     '@eslint/compat':
       specifier: ^2.0.0
@@ -73,6 +58,22 @@ catalogs:
     typescript-eslint:
       specifier: ^8.44.0
       version: 8.54.0
+  opencode:
+    '@opencode-ai/plugin':
+      specifier: 1.17.9
+      version: 1.17.9
+    '@opentui/core':
+      specifier: ^0.4.3
+      version: 0.4.3
+    '@opentui/keymap':
+      specifier: ^0.4.3
+      version: 0.4.3
+    '@opentui/solid':
+      specifier: ^0.4.3
+      version: 0.4.3
+    solid-js:
+      specifier: 1.9.12
+      version: 1.9.12
   svelte:
     '@sveltejs/adapter-vercel':
       specifier: ^6.0.0
@@ -401,16 +402,16 @@ importers:
         version: 1.2.0(typescript@5.9.3)
     devDependencies:
       '@opencode-ai/plugin':
-        specifier: catalog:ai
+        specifier: catalog:opencode
         version: 1.17.9(@opentui/core@0.4.3(typescript@5.9.3)(web-tree-sitter@0.25.10))(@opentui/keymap@0.4.3(@opentui/solid@0.4.3(solid-js@1.9.12)(typescript@5.9.3)(web-tree-sitter@0.25.10))(react@18.3.1)(solid-js@1.9.12)(typescript@5.9.3)(web-tree-sitter@0.25.10))(@opentui/solid@0.4.3(solid-js@1.9.12)(typescript@5.9.3)(web-tree-sitter@0.25.10))
       '@opentui/core':
-        specifier: catalog:ai
+        specifier: catalog:opencode
         version: 0.4.3(typescript@5.9.3)(web-tree-sitter@0.25.10)
       '@opentui/keymap':
-        specifier: catalog:ai
+        specifier: catalog:opencode
         version: 0.4.3(@opentui/solid@0.4.3(solid-js@1.9.12)(typescript@5.9.3)(web-tree-sitter@0.25.10))(react@18.3.1)(solid-js@1.9.12)(typescript@5.9.3)(web-tree-sitter@0.25.10)
       '@opentui/solid':
-        specifier: catalog:ai
+        specifier: catalog:opencode
         version: 0.4.3(solid-js@1.9.12)(typescript@5.9.3)(web-tree-sitter@0.25.10)
       '@types/node':
         specifier: catalog:tooling
@@ -419,7 +420,7 @@ importers:
         specifier: catalog:tooling
         version: 1.5.0(valibot@1.2.0(typescript@5.9.3))
       solid-js:
-        specifier: catalog:ai
+        specifier: catalog:opencode
         version: 1.9.12
 
 packages:
@@ -2055,7 +2056,6 @@ packages:
   '@svitejs/changesets-changelog-github-compact@1.2.0':
     resolution: {integrity: sha512-08eKiDAjj4zLug1taXSIJ0kGL5cawjVCyJkBb6EWSg5fEPX6L+Wtr0CH2If4j5KYylz85iaZiFlUItvgJvll5g==}
     engines: {node: ^14.13.1 || ^16.0.0 || >=18}
-    deprecated: unmaintained
 
   '@tmcp/adapter-valibot@0.1.5':
     resolution: {integrity: sha512-9P2wrVYPngemNK0UvPb/opC722/jfd09QxXmme1TRp/wPsl98vpSk/MXt24BCMqBRv4Dvs0xxJH4KHDcjXW52Q==}
@@ -3626,7 +3626,6 @@ packages:
   node-domexception@1.0.0:
     resolution: {integrity: sha512-/jKZoMpw0F8GRwl4/eLROPA3cfcXtLApP0QzLmUT/HuPCZWyB7IY9ZrMeKw2O/nFIqPQB3PVM9aYm0F312AXDQ==}
     engines: {node: '>=10.5.0'}
-    deprecated: Use your platform's native DOMException instead
 
   node-fetch@2.7.0:
     resolution: {integrity: sha512-c4FRfUm/dbcWZ7U+1Wq0AwCyFL+3nt2bEw05wfxSz+DWpWsitgmSgYmy2dQdWyKC1694ELPqMs/YzUSNozLt8A==}
@@ -4292,7 +4291,6 @@ packages:
   tar@7.5.7:
     resolution: {integrity: sha512-fov56fJiRuThVFXD6o6/Q354S7pnWMJIVlDBYijsTNx6jKSE4pvrDTs6lUnmGvNyfJwFQQwWy3owKz1ucIhveQ==}
     engines: {node: '>=18'}
-    deprecated: Old versions of tar are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
 
   term-size@2.2.1:
     resolution: {integrity: sha512-wK0Ri4fOGjv/XPy8SBHZChl8CM7uMc5VML7SqiQ0zG7+J5Vr+RMQDoHa2CNT6KHUnTGIXH34UDMkPzAUyapBZg==}

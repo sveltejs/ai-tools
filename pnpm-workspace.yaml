@@ -72,4 +72,4 @@ minimumReleaseAgeExclude:
   - svelte-check
   - esm-env
 
-useNodeVersion: 22.19.0
+useNodeVersion: 22.22.2
