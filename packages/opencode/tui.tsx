@@ -42,11 +42,12 @@ async function save_config(path: string, config: Config) {
 	await writeFile(path, `${JSON.stringify(config, null, '\t')}\n`, 'utf8');
 }
 
-const display = (value: unknown, fallback = 'default') =>
-	value === undefined ? fallback : String(value);
+function display(value: unknown, fallback = 'default') {
+	return value === undefined ? fallback : String(value);
+}
 
 const tui: TuiPlugin = async (api) => {
-	const open_scope = () => {
+	function open_scope() {
 		if (!api.state.path.directory) {
 			api.ui.toast({
 				variant: 'warning',
@@ -73,9 +74,9 @@ const tui: TuiPlugin = async (api) => {
 				onSelect={(option) => void open_config(option.value)}
 			/>
 		));
-	};
+	}
 
-	const open_config = async (scope: Scope) => {
+	async function open_config(scope: Scope) {
 		const path = config_path(api, scope);
 		let config: Config;
 		try {
@@ -91,7 +92,7 @@ const tui: TuiPlugin = async (api) => {
 		const original_config = structuredClone(config);
 		let current_option: string | undefined;
 
-		const persist = async (show_toast = true) => {
+		async function persist(show_toast = true) {
 			try {
 				await save_config(path, config);
 				if (show_toast)
@@ -99,9 +100,9 @@ const tui: TuiPlugin = async (api) => {
 			} catch {
 				api.ui.toast({ variant: 'error', message: 'Failed to save Svelte configuration' });
 			}
-		};
+		}
 
-		const prompt_agent_number = (key: 'temperature' | 'top_p' | 'maxSteps', label: string) => {
+		function prompt_agent_number(key: 'temperature' | 'top_p' | 'maxSteps', label: string) {
 			const agent = config.subagent?.agents?.[agent_name];
 			api.ui.dialog.replace(() => (
 				<api.ui.DialogPrompt
@@ -123,9 +124,9 @@ const tui: TuiPlugin = async (api) => {
 					}}
 				/>
 			));
-		};
+		}
 
-		const open_agent = () => {
+		function open_agent() {
 			const agent = config.subagent?.agents?.[agent_name];
 			api.ui.dialog.replace(() => (
 				<api.ui.DialogSelect<string>
@@ -169,17 +170,20 @@ const tui: TuiPlugin = async (api) => {
 					}}
 				/>
 			));
-		};
+		}
 
-		const open_menu = () => {
+		function open_menu() {
 			const skills = config.skills?.enabled;
 			const selected_skills = new Set(
 				Array.isArray(skills) ? skills : skills === false ? [] : skill_names,
 			);
 			const all_skills_selected = skill_names.every((name) => selected_skills.has(name));
-			const checked = (value: boolean | undefined) => (value !== false ? '[x]' : '[ ]');
-			const radio = (value: 'remote' | 'local') =>
-				(config.mcp?.type ?? 'remote') === value ? '(*)' : '( )';
+			function checked(value: boolean | undefined) {
+				return value !== false ? '[x]' : '[ ]';
+			}
+			function radio(value: 'remote' | 'local') {
+				return (config.mcp?.type ?? 'remote') === value ? '(*)' : '( )';
+			}
 			api.ui.dialog.replace(() => (
 				<api.ui.DialogSelect<string>
 					title={`Svelte plugin (${scope})`}
@@ -250,7 +254,11 @@ const tui: TuiPlugin = async (api) => {
 						}
 						if (option.value.startsWith('skill:')) {
 							const name = option.value.slice('skill:'.length);
-							selected_skills.has(name) ? selected_skills.delete(name) : selected_skills.add(name);
+							if (selected_skills.has(name)) {
+								selected_skills.delete(name);
+							} else {
+								selected_skills.add(name);
+							}
 							config.skills = { enabled: [...selected_skills] };
 						}
 						await persist(false);
@@ -258,10 +266,10 @@ const tui: TuiPlugin = async (api) => {
 					}}
 				/>
 			));
-		};
+		}
 
 		open_menu();
-	};
+	}
 
 	api.keymap.registerLayer({
 		commands: [
