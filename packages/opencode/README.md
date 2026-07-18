@@ -15,6 +15,17 @@ Add `@sveltejs/opencode` to your OpenCode config (either global or local):
 
 That's it! You now have the Svelte MCP server and the file editor subagent configured automatically.
 
+To configure the plugin from OpenCode's TUI, also add the package to `tui.json`:
+
+```json
+{
+	"$schema": "https://opencode.ai/tui.json",
+	"plugin": ["@sveltejs/opencode"]
+}
+```
+
+Run `/svelte-plugin` or choose **Configure Svelte plugin** from the command palette. The dialog lets you choose project or global scope before editing the available options, and guides you through finite choices such as built-in skills.
+
 ## Features
 
 ### Svelte MCP Server
