@@ -1,5 +1,11 @@
 # @sveltejs/opencode
 
+## 0.1.10
+
+### Patch Changes
+
+- feat: add tui opencode plugin ([#231](https://github.com/sveltejs/ai-tools/pull/231))
+
 ## 0.1.9
 
 ### Patch Changes
