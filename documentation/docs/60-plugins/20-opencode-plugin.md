@@ -34,7 +34,7 @@ The package also includes a TUI plugin for configuring these features interactiv
 }
 ```
 
-Restart OpenCode, then run `/svelte-plugin` or select **Configure Svelte plugin** from the command palette. Choose whether to edit the project or global configuration, then use the checkboxes and radio options to configure the plugin. Changes are saved automatically, and **Revert changes** restores the values from when the dialog was opened.
+Restart OpenCode, then run `/svelte-plugin` or select 'Configure Svelte plugin' from the command palette. Choose whether to edit the project or global configuration, then use the checkboxes and radio options to configure the plugin. Changes are saved automatically, and 'Revert changes' restores the values from when the dialog was opened.
 
 ## Configuration
 
