@@ -50,8 +50,8 @@ catalogs:
       specifier: ^3.4.2
       version: 3.8.1
     prettier-plugin-svelte:
-      specifier: ^3.3.3
-      version: 3.4.1
+      specifier: ^4.0.0
+      version: 4.1.1
     svelte-eslint-parser:
       specifier: ^1.7.1
       version: 1.7.1
@@ -210,7 +210,7 @@ importers:
         version: 3.8.1
       prettier-plugin-svelte:
         specifier: catalog:lint
-        version: 3.4.1(prettier@3.8.1)(svelte@5.56.1(@typescript-eslint/types@8.54.0))
+        version: 4.1.1(prettier@3.8.1)(svelte@5.56.1(@typescript-eslint/types@8.54.0))
       publint:
         specifier: catalog:tooling
         version: 0.3.17
@@ -277,7 +277,7 @@ importers:
         version: 3.8.1
       prettier-plugin-svelte:
         specifier: catalog:lint
-        version: 3.4.1(prettier@3.8.1)(svelte@5.56.1(@typescript-eslint/types@8.54.0))
+        version: 4.1.1(prettier@3.8.1)(svelte@5.56.1(@typescript-eslint/types@8.54.0))
       svelte:
         specifier: catalog:svelte
         version: 5.56.1(@typescript-eslint/types@8.54.0)
@@ -3870,11 +3870,12 @@ packages:
     resolution: {integrity: sha512-vkcDPrRZo1QZLbn5RLGPpg/WmIQ65qoWWhcGKf/b5eplkkarX0m9z8ppCat4mlOqUsWpyNuYgO3VRyrYHSzX5g==}
     engines: {node: '>= 0.8.0'}
 
-  prettier-plugin-svelte@3.4.1:
-    resolution: {integrity: sha512-xL49LCloMoZRvSwa6IEdN2GV6cq2IqpYGstYtMT+5wmml1/dClEoI0MZR78MiVPpu6BdQFfN0/y73yO6+br5Pg==}
+  prettier-plugin-svelte@4.1.1:
+    resolution: {integrity: sha512-wXvbXMjSvb4C9ENWTHXyd+ihakKCsJ6rJhLP6/8HFNj4GkZr48jqL9PoKsl2sk7SyCZRTnJ7O2TTowUpOxP/KA==}
+    engines: {node: '>=20'}
     peerDependencies:
       prettier: ^3.0.0
-      svelte: ^3.2.0 || ^4.0.0-next.0 || ^5.0.0-next.0
+      svelte: ^5.0.0
 
   prettier@2.8.8:
     resolution: {integrity: sha512-tdN8qQGvNjw4CHbY+XXk0JgCXn9QiF21a55rBe5LJAU+kDyC4WQn4+awm2Xfk2lQMk5fKup9XgzTZtGkjBdP9Q==}
@@ -8185,7 +8186,7 @@ snapshots:
 
   prelude-ls@1.2.1: {}
 
-  prettier-plugin-svelte@3.4.1(prettier@3.8.1)(svelte@5.56.1(@typescript-eslint/types@8.54.0)):
+  prettier-plugin-svelte@4.1.1(prettier@3.8.1)(svelte@5.56.1(@typescript-eslint/types@8.54.0)):
     dependencies:
       prettier: 3.8.1
       svelte: 5.56.1(@typescript-eslint/types@8.54.0)
