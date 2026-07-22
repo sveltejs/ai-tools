@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - 'packages/opencode/config.ts'
+      - 'packages/opencode/config.js'
 
 permissions:
   contents: write
@@ -67,7 +67,7 @@ jobs:
             ## Summary
             Automatically generated update for OpenCode JSON schema.
 
-            This PR was triggered by changes to the OpenCode configuration file `packages/opencode/config.ts`.
+            This PR was triggered by changes to the OpenCode configuration file `packages/opencode/config.js`.
 
             ## Changes
             - Updated `packages/opencode/schema.json` with latest JSON schema

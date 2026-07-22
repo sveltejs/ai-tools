@@ -1,25 +1,33 @@
 /** @jsxImportSource @opentui/solid */
-import type { TuiPlugin, TuiPluginModule } from '@opencode-ai/plugin/tui';
 import { existsSync } from 'node:fs';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { homedir } from 'node:os';
 import { dirname, join } from 'node:path';
 import * as v from 'valibot';
-import { config_schema, type McpConfig } from './config.ts';
+import { config_schema } from './config.js';
+
+/** @typedef {import('@opencode-ai/plugin/tui').TuiPlugin} TuiPlugin */
+/** @typedef {import('@opencode-ai/plugin/tui').TuiPluginApi} TuiPluginApi */
+/** @typedef {import('@opencode-ai/plugin/tui').TuiPluginModule} TuiPluginModule */
+/** @typedef {v.InferInput<typeof config_schema>} McpConfig */
+/** @typedef {'project' | 'global'} Scope */
+/** @typedef {Partial<McpConfig>} Config */
 
 const plugin_id = 'svelte.configure';
-const skill_names = ['svelte-code-writer', 'svelte-core-bestpractices'] as const;
+const skill_names = ['svelte-code-writer', 'svelte-core-bestpractices'];
 const agent_name = 'svelte-file-editor';
 
-type Scope = 'project' | 'global';
-type Config = Partial<McpConfig>;
-
-function project_root(api: Parameters<TuiPlugin>[0]) {
+/** @param {TuiPluginApi} api */
+function project_root(api) {
 	const worktree = api.state.path.worktree;
 	return worktree && worktree !== '/' ? worktree : api.state.path.directory;
 }
 
-function config_path(api: Parameters<TuiPlugin>[0], scope: Scope) {
+/**
+ * @param {TuiPluginApi} api
+ * @param {Scope} scope
+ */
+function config_path(api, scope) {
 	if (scope === 'project') return join(project_root(api), '.opencode', 'svelte.json');
 	return join(
 		process.env.OPENCODE_CONFIG_DIR ?? join(homedir(), '.config', 'opencode'),
@@ -27,26 +35,40 @@ function config_path(api: Parameters<TuiPlugin>[0], scope: Scope) {
 	);
 }
 
-async function read_config(path: string): Promise<Config> {
+/**
+ * @param {string} path
+ * @returns {Promise<Config>}
+ */
+async function read_config(path) {
 	if (!existsSync(path)) return {};
-	const parsed: unknown = JSON.parse(await readFile(path, 'utf8'));
+	/** @type {unknown} */
+	const parsed = JSON.parse(await readFile(path, 'utf8'));
 	const result = v.safeParse(config_schema, parsed);
 	if (!result.success)
 		throw new Error('The existing file does not match the Svelte plugin schema.');
 	// Keep schema annotations and future fields that this version does not edit.
-	return parsed as Config;
+	return /** @type {Config} */ (parsed);
 }
 
-async function save_config(path: string, config: Config) {
+/**
+ * @param {string} path
+ * @param {Config} config
+ */
+async function save_config(path, config) {
 	await mkdir(dirname(path), { recursive: true });
 	await writeFile(path, `${JSON.stringify(config, null, '\t')}\n`, 'utf8');
 }
 
-function display(value: unknown, fallback = 'default') {
+/**
+ * @param {unknown} value
+ * @param {string} [fallback]
+ */
+function display(value, fallback = 'default') {
 	return value === undefined ? fallback : String(value);
 }
 
-const tui: TuiPlugin = async (api) => {
+/** @type {TuiPlugin} */
+const tui = async (api) => {
 	function open_scope() {
 		if (!api.state.path.directory) {
 			api.ui.toast({
@@ -57,7 +79,7 @@ const tui: TuiPlugin = async (api) => {
 		}
 
 		api.ui.dialog.replace(() => (
-			<api.ui.DialogSelect<Scope>
+			<api.ui.DialogSelect
 				title="Configure Svelte plugin"
 				options={[
 					{
@@ -71,14 +93,16 @@ const tui: TuiPlugin = async (api) => {
 						description: 'Write svelte.json in the OpenCode config directory',
 					},
 				]}
-				onSelect={(option) => void open_config(option.value)}
+				onSelect={(option) => void open_config(/** @type {Scope} */ (option.value))}
 			/>
 		));
 	}
 
-	async function open_config(scope: Scope) {
+	/** @param {Scope} scope */
+	async function open_config(scope) {
 		const path = config_path(api, scope);
-		let config: Config;
+		/** @type {Config} */
+		let config;
 		try {
 			config = await read_config(path);
 		} catch (error) {
@@ -90,7 +114,8 @@ const tui: TuiPlugin = async (api) => {
 			return;
 		}
 		const original_config = structuredClone(config);
-		let current_option: string | undefined;
+		/** @type {string | undefined} */
+		let current_option;
 
 		async function persist(show_toast = true) {
 			try {
@@ -102,7 +127,11 @@ const tui: TuiPlugin = async (api) => {
 			}
 		}
 
-		function prompt_agent_number(key: 'temperature' | 'top_p' | 'maxSteps', label: string) {
+		/**
+		 * @param {'temperature' | 'top_p' | 'maxSteps'} key
+		 * @param {string} label
+		 */
+		function prompt_agent_number(key, label) {
 			const agent = config.subagent?.agents?.[agent_name];
 			api.ui.dialog.replace(() => (
 				<api.ui.DialogPrompt
@@ -129,7 +158,7 @@ const tui: TuiPlugin = async (api) => {
 		function open_agent() {
 			const agent = config.subagent?.agents?.[agent_name];
 			api.ui.dialog.replace(() => (
-				<api.ui.DialogSelect<string>
+				<api.ui.DialogSelect
 					title={`Configure ${agent_name}`}
 					options={[
 						{ title: 'Model', value: 'model', description: display(agent?.model) },
@@ -144,11 +173,12 @@ const tui: TuiPlugin = async (api) => {
 					]}
 					onSelect={(option) => {
 						if (option.value === 'back') return open_menu();
-						if (option.value !== 'model')
-							return prompt_agent_number(
-								option.value as 'temperature' | 'top_p' | 'maxSteps',
-								option.title,
-							);
+						if (
+							option.value === 'temperature' ||
+							option.value === 'top_p' ||
+							option.value === 'maxSteps'
+						)
+							return prompt_agent_number(option.value, option.title);
 						api.ui.dialog.replace(() => (
 							<api.ui.DialogPrompt
 								title={`${agent_name}: model`}
@@ -178,14 +208,16 @@ const tui: TuiPlugin = async (api) => {
 				Array.isArray(skills) ? skills : skills === false ? [] : skill_names,
 			);
 			const all_skills_selected = skill_names.every((name) => selected_skills.has(name));
-			function checked(value: boolean | undefined) {
+			/** @param {boolean | undefined} value */
+			function checked(value) {
 				return value !== false ? '[x]' : '[ ]';
 			}
-			function radio(value: 'remote' | 'local') {
+			/** @param {'remote' | 'local'} value */
+			function radio(value) {
 				return (config.mcp?.type ?? 'remote') === value ? '(*)' : '( )';
 			}
 			api.ui.dialog.replace(() => (
-				<api.ui.DialogSelect<string>
+				<api.ui.DialogSelect
 					title={`Svelte plugin (${scope})`}
 					{...(current_option === undefined ? {} : { current: current_option })}
 					skipFilter
@@ -285,7 +317,7 @@ const tui: TuiPlugin = async (api) => {
 	});
 };
 
-export default {
+export default /** @satisfies {TuiPluginModule & { id: string }} */ ({
 	id: plugin_id,
 	tui,
-} satisfies TuiPluginModule & { id: string };
+});

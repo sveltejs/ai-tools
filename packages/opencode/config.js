@@ -1,8 +1,9 @@
-import type { PluginInput } from '@opencode-ai/plugin';
 import { existsSync, readFileSync } from 'fs';
 import { homedir } from 'os';
 import { join } from 'path';
 import * as v from 'valibot';
+
+/** @typedef {import('@opencode-ai/plugin').PluginInput} PluginInput */
 
 // Schema for individual agent configuration
 const agent_config_schema = v.object({
@@ -28,18 +29,18 @@ const agent_config_schema = v.object({
 
 const default_config = {
 	mcp: {
-		type: 'remote' as 'remote' | 'local',
+		type: /** @type {'remote' | 'local'} */ ('remote'),
 		enabled: true,
 	},
 	subagent: {
 		enabled: true,
-		agents: {} as Record<string, v.InferInput<typeof agent_config_schema>>,
+		agents: /** @type {Record<string, v.InferInput<typeof agent_config_schema>>} */ ({}),
 	},
 	instructions: {
 		enabled: true,
 	},
 	skills: {
-		enabled: true as boolean | string[],
+		enabled: /** @type {boolean | string[]} */ (true),
 	},
 };
 
@@ -91,25 +92,24 @@ export const config_schema = v.object({
 	),
 });
 
-export type McpConfig = v.InferInput<typeof config_schema>;
+/** @typedef {v.InferInput<typeof config_schema>} McpConfig */
 
 const GLOBAL_CONFIG_DIR = join(homedir(), '.config', 'opencode');
 const GLOBAL_CONFIG_PATH = join(GLOBAL_CONFIG_DIR, 'svelte.json');
 
-interface ConfigLoadResult {
-	data: Record<string, unknown> | null;
-	parse_error?: string;
-}
+/** @typedef {{ data: Record<string, unknown> | null, parse_error?: string }} ConfigLoadResult */
 
 function get_config_paths() {
 	// Global: ~/.config/opencode/svelte.json
-	let global_path: string | null = null;
+	/** @type {string | null} */
+	let global_path = null;
 	if (existsSync(GLOBAL_CONFIG_PATH)) {
 		global_path = GLOBAL_CONFIG_PATH;
 	}
 
 	// Custom config directory: $OPENCODE_CONFIG_DIR/svelte.json
-	let config_dir_path: string | null = null;
+	/** @type {string | null} */
+	let config_dir_path = null;
 	const opencode_config_dir = process.env.OPENCODE_CONFIG_DIR;
 	if (opencode_config_dir) {
 		const config_json = join(opencode_config_dir, 'svelte.json');
@@ -119,7 +119,8 @@ function get_config_paths() {
 	}
 
 	// Project-local: ./.opencode/svelte.json (cwd)
-	let project_path: string | null = null;
+	/** @type {string | null} */
+	let project_path = null;
 	const project_config = join(process.cwd(), '.opencode', 'svelte.json');
 	if (existsSync(project_config)) {
 		project_path = project_config;
@@ -129,8 +130,13 @@ function get_config_paths() {
 	return [global_path, config_dir_path, project_path];
 }
 
-function load_config_file(config_path: string): ConfigLoadResult {
-	let file_content: string;
+/**
+ * @param {string} config_path
+ * @returns {ConfigLoadResult}
+ */
+function load_config_file(config_path) {
+	/** @type {string} */
+	let file_content;
 	try {
 		file_content = readFileSync(config_path, 'utf-8');
 	} catch {
@@ -144,7 +150,7 @@ function load_config_file(config_path: string): ConfigLoadResult {
 			return { data: null, parse_error: 'Config file is empty or invalid' };
 		}
 		return { data: parsed };
-	} catch (error: unknown) {
+	} catch (error) {
 		return {
 			data: null,
 			parse_error: error instanceof Error ? error.message : 'Failed to parse config',
@@ -152,7 +158,11 @@ function load_config_file(config_path: string): ConfigLoadResult {
 	}
 }
 
-function merge_with_defaults(user_config: Partial<McpConfig>): McpConfig {
+/**
+ * @param {Partial<McpConfig>} user_config
+ * @returns {McpConfig}
+ */
+function merge_with_defaults(user_config) {
 	return {
 		mcp: {
 			...default_config.mcp,
@@ -177,9 +187,11 @@ function merge_with_defaults(user_config: Partial<McpConfig>): McpConfig {
 	};
 }
 
-export function get_mcp_config(ctx: PluginInput) {
+/** @param {PluginInput} ctx */
+export function get_mcp_config(ctx) {
 	const config_paths = get_config_paths();
-	let merged: Partial<McpConfig> = {};
+	/** @type {Partial<McpConfig>} */
+	let merged = {};
 
 	// Iterate from lowest to highest priority, merging as we go
 	for (const path of config_paths) {

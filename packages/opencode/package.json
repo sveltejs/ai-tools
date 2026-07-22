@@ -9,24 +9,24 @@
 	},
 	"scripts": {
 		"check": "tsc --noEmit",
-		"generate-schema": "node --import node-resolve-ts/register scripts/generate-schema.ts"
+		"generate-schema": "node scripts/generate-schema.js"
 	},
 	"files": [
-		"index.ts",
-		"config.ts",
-		"tui.tsx",
-		"agents.ts",
+		"index.js",
+		"config.js",
+		"tui.jsx",
+		"agents.js",
 		"instructions",
 		"skills"
 	],
 	"exports": {
 		"./server": {
-			"types": "./index.ts",
-			"import": "./index.ts"
+			"types": "./index.js",
+			"import": "./index.js"
 		},
 		"./tui": {
-			"types": "./tui.tsx",
-			"import": "./tui.tsx"
+			"types": "./tui.jsx",
+			"import": "./tui.jsx"
 		}
 	},
 	"repository": {

@@ -1,13 +1,18 @@
-import type { Plugin } from '@opencode-ai/plugin';
 import { readdir } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { agents } from './agents.ts';
-import { get_mcp_config } from './config.ts';
+import { agents } from './agents.js';
+import { get_mcp_config } from './config.js';
+
+/** @typedef {import('@opencode-ai/plugin').Plugin} Plugin */
 
 const current_dir = dirname(fileURLToPath(import.meta.url));
 
-export const svelte_plugin: Plugin = async (ctx) => {
+/**
+ * @param {Parameters<Plugin>[0]} ctx
+ * @returns {ReturnType<Plugin>}
+ */
+export async function svelte_plugin(ctx) {
 	return {
 		async config(input) {
 			input.agent ??= {};
@@ -24,8 +29,7 @@ export const svelte_plugin: Plugin = async (ctx) => {
 				const mcp = input.mcp[name];
 				if (
 					(mcp?.type === 'remote' && mcp.url.includes('https://mcp.svelte.dev/mcp')) ||
-					(mcp?.type === 'local' &&
-						mcp.command.some((cmd: string) => cmd.includes('@sveltejs/mcp')))
+					(mcp?.type === 'local' && mcp.command.some((cmd) => cmd.includes('@sveltejs/mcp')))
 				) {
 					// if we found the svelte MCP server, we store its name and break
 					svelte_mcp_name = name;
@@ -75,7 +79,8 @@ export const svelte_plugin: Plugin = async (ctx) => {
 			if (mcp_config.subagent?.enabled !== false) {
 				for (const [agent_name, agent_data] of Object.entries(agents)) {
 					// we add the editor subagent that will be used when editing Svelte files to prevent wasting context on the main agent
-					const default_config: (typeof input.agent)[string] = {
+					/** @type {(typeof input.agent)[string]} */
+					const default_config = {
 						color: '#ff3e00',
 						mode: 'subagent',
 						prompt: agent_data.prompt,
@@ -109,4 +114,4 @@ export const svelte_plugin: Plugin = async (ctx) => {
 			}
 		},
 	};
-};
+}
