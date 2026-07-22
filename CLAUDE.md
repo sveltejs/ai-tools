@@ -57,6 +57,7 @@ Located in `src/lib/server/analyze/`:
 - **Autofixers** (`src/lib/mcp/autofixers.ts`): Visitor pattern implementations for code analysis
 - **Walker Utility** (`src/lib/index.ts`): Enhanced AST walking with visitor mixing capabilities
 - **Current Autofixer**: `assign_in_effect` - detects assignments to `$state` variables inside `$effect` blocks
+- **Suggestion suppression**: each custom-visitor suggestion carries a stable code (`effect_calls_function`, `bind_this_attachment`, …). Users can silence one with a `// svelte-mcp-ignore <code>` (script) or `<!-- svelte-mcp-ignore <code> -->` (markup) comment on the line above the triggering node. Stale or typo'd codes surface as follow-up "unused directive" suggestions. See `packages/mcp-server/src/mcp/autofixers/ignore-directives.ts`.
 
 ### Database Layer
 

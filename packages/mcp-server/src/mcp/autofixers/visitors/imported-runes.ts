@@ -1,5 +1,6 @@
 import { base_runes } from '../../../constants.js';
 import type { Autofixer } from './index.js';
+import { IGNORE_CODES, push_suggestion } from '../ignore-directives.js';
 
 const dollarless_runes = base_runes.map((r) => r.replace('$', ''));
 
@@ -37,11 +38,19 @@ export const imported_runes: Autofixer = {
 						source.startsWith('svelte/') ||
 						source.startsWith('@sveltejs')
 					) {
-						state.output.suggestions.push(
+						push_suggestion(
+							state.output,
+							state.ignore_registry,
+							IGNORE_CODES.IMPORTED_RUNES,
+							node.loc?.start?.line,
 							`You are importing "${id.name}" from "${source}". This is not necessary, all runes are globally available. Please remove this import and use "$${id.name}" directly.`,
 						);
 					} else {
-						state.output.suggestions.push(
+						push_suggestion(
+							state.output,
+							state.ignore_registry,
+							IGNORE_CODES.IMPORTED_RUNES,
+							node.loc?.start?.line,
 							`You are importing "${id.name}" from "${source}". If you are trying to import runes to use them this is not necessary, all runes are globally available. Please remove this import and use "$${id.name}" directly. If you are importing the function from a separate library ignore this suggestion.`,
 						);
 					}

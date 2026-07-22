@@ -9,6 +9,7 @@ import type { Autofixer, AutofixerState } from './index.js';
 import { left_most_id } from '../ast/utils.js';
 import type { AST } from 'svelte-eslint-parser';
 import type { Context } from 'zimmerframe';
+import { IGNORE_CODES, push_suggestion } from '../ignore-directives.js';
 
 function run_if_in_effect(
 	path: (Node | AST.SvelteNode)[],
@@ -39,7 +40,11 @@ function assign_or_update_visitor(
 					init?.type === 'CallExpression' &&
 					state.parsed.is_rune(init, ['$state', '$state.raw', '$derived', '$derived.by'])
 				) {
-					state.output.suggestions.push(
+					push_suggestion(
+						state.output,
+						state.ignore_registry,
+						IGNORE_CODES.EFFECT_ASSIGNS_STATE,
+						node.loc?.start?.line,
 						`The stateful variable "${id.name}" is assigned inside an $effect which is generally consider a malpractice. Consider using $derived if possible.`,
 					);
 				}
@@ -66,7 +71,11 @@ function call_expression_visitor(
 	run_if_in_effect(path, state, () => {
 		const function_name =
 			node.callee.type === 'Identifier' ? `the function \`${node.callee.name}\`` : 'a function';
-		state.output.suggestions.push(
+		push_suggestion(
+			state.output,
+			state.ignore_registry,
+			IGNORE_CODES.EFFECT_CALLS_FUNCTION,
+			node.loc?.start?.line,
 			`You are calling ${function_name} inside an $effect. Please check if the function is reassigning a stateful variable because that's considered malpractice and check if it could use  \`$derived\` instead. Ignore this suggestion if you are sure this function is not assigning any stateful variable or if you can't check if it does.`,
 		);
 	});
