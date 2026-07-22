@@ -1,5 +1,11 @@
 # @sveltejs/opencode
 
+## 0.1.11
+
+### Patch Changes
+
+- fix: ship plugin as js files instead of ts ([#236](https://github.com/sveltejs/ai-tools/pull/236))
+
 ## 0.1.10
 
 ### Patch Changes
