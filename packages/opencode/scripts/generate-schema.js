@@ -4,7 +4,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 // Read agent names from tools/agents/*.md files
-function get_agent_names(agents_dir: string) {
+/** @param {string} agents_dir */
+function get_agent_names(agents_dir) {
 	if (!fs.existsSync(agents_dir)) return [];
 	return fs
 		.readdirSync(agents_dir, { withFileTypes: true })
@@ -12,7 +13,8 @@ function get_agent_names(agents_dir: string) {
 		.map((entry) => entry.name.replace(/\.md$/, ''));
 }
 
-function get_skill_names(skills_dir: string) {
+/** @param {string} skills_dir */
+function get_skill_names(skills_dir) {
 	if (!fs.existsSync(skills_dir)) return [];
 	return fs
 		.readdirSync(skills_dir, { withFileTypes: true })
@@ -29,10 +31,13 @@ const json_schema = toJsonSchema(schema);
 // This is the JSON Schema equivalent of `"a" | "b" | (string & {})` —
 // editors will autocomplete the known names but any string is still valid.
 if (skill_names.length > 0) {
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	const enabled = (json_schema as any).properties?.skills?.properties?.enabled;
+	const enabled = /** @type {any} */ (json_schema).properties?.skills?.properties?.enabled;
 	if (enabled?.anyOf) {
-		const array_branch = enabled.anyOf.find((s: Record<string, unknown>) => s.type === 'array');
+		const array_branch = enabled.anyOf.find(
+			/** @type {(schema: Record<string, unknown>) => boolean} */ (
+				(schema) => schema.type === 'array'
+			),
+		);
 		if (array_branch) {
 			array_branch.items = {
 				anyOf: [{ enum: skill_names }, { type: 'string' }],
@@ -48,8 +53,7 @@ const agents_dir = path.resolve('../../tools/agents');
 const agent_names = get_agent_names(agents_dir);
 
 if (agent_names.length > 0) {
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	const agents = (json_schema as any).properties?.subagent?.properties?.agents;
+	const agents = /** @type {any} */ (json_schema).properties?.subagent?.properties?.agents;
 	if (agents) {
 		agents.propertyNames = {
 			anyOf: [{ enum: agent_names }, { type: 'string' }],

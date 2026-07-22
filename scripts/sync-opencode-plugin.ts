@@ -68,7 +68,7 @@ function parse_agent_md(content: string, file_path: string): AgentData | null {
 }
 
 /**
- * Generate agents.ts module from tools/agents/*.md files
+ * Generate agents.js module from tools/agents/*.md files
  */
 async function sync_agents() {
 	const agents_dir = path.join(TOOLS_DIR, 'agents');
@@ -96,14 +96,14 @@ async function sync_agents() {
 			),
 			null,
 			'\t',
-		)} as const;`,
+		)};`,
 		'',
 	].join('\n');
 
-	const dest = path.join(OPENCODE_PKG_DIR, 'agents.ts');
+	const dest = path.join(OPENCODE_PKG_DIR, 'agents.js');
 	await fs.writeFile(dest, output);
 
-	console.log(`Generated agents.ts with ${agents.length} agent(s)`);
+	console.log(`Generated agents.js with ${agents.length} agent(s)`);
 }
 
 await sync_skills();
