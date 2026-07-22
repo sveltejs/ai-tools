@@ -42,8 +42,8 @@ catalogs:
     '@tmcp/transport-stdio': ^0.4.2
     tmcp: ^1.19.3
   tooling:
+    '@changesets/changelog-github': 1.0.0-next.6
     '@changesets/cli': ^2.29.7
-    '@svitejs/changesets-changelog-github-compact': ^1.2.0
     '@types/estree': ^1.0.8
     '@types/node': ^24.3.1
     '@valibot/to-json-schema': ^1.5.0

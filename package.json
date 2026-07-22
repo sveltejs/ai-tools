@@ -43,12 +43,12 @@
 	],
 	"private": true,
 	"devDependencies": {
+		"@changesets/changelog-github": "catalog:tooling",
 		"@changesets/cli": "catalog:tooling",
 		"@eslint/compat": "catalog:lint",
 		"@eslint/js": "catalog:lint",
 		"@modelcontextprotocol/inspector": "catalog:ai",
 		"@sveltejs/adapter-vercel": "catalog:svelte",
-		"@svitejs/changesets-changelog-github-compact": "catalog:tooling",
 		"eslint": "catalog:lint",
 		"eslint-config-prettier": "catalog:lint",
 		"eslint-plugin-import": "catalog:lint",
