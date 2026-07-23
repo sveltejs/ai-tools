@@ -42,7 +42,7 @@ catalogs:
       version: 1.5.0
     eslint-plugin-svelte:
       specifier: ^3.19.0
-      version: 3.14.0
+      version: 3.19.0
     globals:
       specifier: ^17.0.0
       version: 17.2.0
@@ -149,6 +149,9 @@ catalogs:
     valibot:
       specifier: ^1.2.0
       version: 1.2.0
+    verkit:
+      specifier: ^0.1.2
+      version: 0.1.2
     vite:
       specifier: ^7.0.4
       version: 7.3.1
@@ -412,6 +415,9 @@ importers:
       valibot:
         specifier: catalog:tooling
         version: 1.2.0(typescript@5.9.3)
+      verkit:
+        specifier: catalog:tooling
+        version: 0.1.2
     devDependencies:
       '@opencode-ai/plugin':
         specifier: catalog:opencode
@@ -4517,6 +4523,10 @@ packages:
   vary@1.1.2:
     resolution: {integrity: sha512-BNGbWLfd0eUPabhkXUVm0j8uuvREyTh5ovRa/dyow/BqAbZJyC+5fU+IzQOzmAKzYqYRAISoRhdQr3eIZ/PXqg==}
     engines: {node: '>= 0.8'}
+
+  verkit@0.1.2:
+    resolution: {integrity: sha512-WqkT8n3hqizuCu71W3bUzf5fjBmkbXcudsehe/NbxA8PgqoKnSOY5K0Ba2ckg1qaRaSpSz7as/n9K1R9JXjQKg==}
+    engines: {node: '>=18.12.0'}
 
   vite-plugin-devtools-json@1.0.0:
     resolution: {integrity: sha512-MobvwqX76Vqt/O4AbnNMNWoXWGrKUqZbphCUle/J2KXH82yKQiunOeKnz/nqEPosPsoWWPP9FtNuPBSYpiiwkw==}
@@ -8914,6 +8924,8 @@ snapshots:
       typescript: 5.9.3
 
   vary@1.1.2: {}
+
+  verkit@0.1.2: {}
 
   vite-plugin-devtools-json@1.0.0(vite@7.3.1(@types/node@24.10.9)(yaml@2.9.0)):
     dependencies:
