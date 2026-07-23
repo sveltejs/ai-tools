@@ -38,15 +38,16 @@
 		"access": "public"
 	},
 	"dependencies": {
-		"valibot": "catalog:tooling",
 		"@opentui/core": "catalog:opencode",
 		"@opentui/keymap": "catalog:opencode",
 		"@opentui/solid": "catalog:opencode",
-		"solid-js": "catalog:opencode"
+		"solid-js": "catalog:opencode",
+		"valibot": "catalog:tooling",
+		"verkit": "catalog:tooling"
 	},
 	"devDependencies": {
 		"@opencode-ai/plugin": "catalog:opencode",
-		"@valibot/to-json-schema": "catalog:tooling",
-		"@types/node": "catalog:tooling"
+		"@types/node": "catalog:tooling",
+		"@valibot/to-json-schema": "catalog:tooling"
 	}
 }
