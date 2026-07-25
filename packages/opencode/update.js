@@ -26,15 +26,17 @@ function up(dir, levels) {
  * We return `null` whenever we don't recognize that layout (for example when the plugin is linked
  * locally during development) so that we never delete a folder we don't own.
  */
-function get_install_dir() {
+export function get_install_dir(dir = current_dir) {
 	// from `<cache>/packages/<spec>/node_modules/<name>` up to `<cache>/packages/<spec>`
-	const install_dir = up(current_dir, name_segments.length + 1);
+	const install_dir = up(dir, name_segments.length + 1);
 	// ...and from there up to `<cache>/packages`
 	if (basename(up(install_dir, name_segments.length)) !== 'packages') return null;
-	// an exact version means the user pinned the plugin: wiping the cache would just reinstall the
-	// very same version over and over again
-	const version_spec = basename(install_dir).split('@').at(-1) ?? '';
-	if (/^\d+\.\d+\.\d+/.test(version_spec)) return null;
+	// Only unconstrained installs can pick up npm's latest version. Ranges and alternate tags may
+	// resolve to the same installed version after every wipe.
+	const package_name = name_segments.at(-1);
+	if (!package_name || ![package_name, `${package_name}@latest`].includes(basename(install_dir))) {
+		return null;
+	}
 	return install_dir;
 }
 
