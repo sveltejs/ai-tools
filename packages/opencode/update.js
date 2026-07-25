@@ -78,8 +78,8 @@ export function setup_updates(ctx, autoupdate) {
 					title: 'Svelte: new plugin version available',
 					message: `${package_json.name}@${latest} is available (you are using ${package_json.version}).\n\n${
 						stale_dir
-							? 'It will be installed automatically the next time you start opencode.'
-							: 'Wipe the cache or update you opencode config to update.'
+							? 'It will be installed automatically the next time you start OpenCode.'
+							: 'Wipe the cache or update your OpenCode config to update.'
 					}`,
 					variant: 'warning',
 					duration: 7000,
