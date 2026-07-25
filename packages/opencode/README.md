@@ -72,9 +72,16 @@ Create `svelte.json` to customize how the plugin configures MCP, the Svelte suba
 	},
 	"skills": {
 		"enabled": ["svelte-code-writer", "svelte-core-bestpractices"]
-	}
+	},
+	"autoupdate": false
 }
 ```
+
+### Auto update
+
+The plugin checks npm for newer versions and warns you when one is available. OpenCode caches plugins, so a new version is only picked up once that cache is wiped.
+
+Setting `"autoupdate": true` automates it: when a newer version is detected, the plugin removes itself from the OpenCode cache as OpenCode shuts down, so the latest version is installed on the next start. It is a no-op when the plugin is pinned to an exact version (for example `"@sveltejs/opencode@0.1.11"`), since reinstalling would only fetch the very same version again.
 
 ### Defaults
 
@@ -86,6 +93,7 @@ If omitted, the plugin uses these defaults:
 - `subagent.agents`: `{}`
 - `instructions.enabled`: `true`
 - `skills.enabled`: `true`
+- `autoupdate`: `false`
 
 ### Configuration Options
 
@@ -100,6 +108,7 @@ If omitted, the plugin uses these defaults:
 | `subagent.agents.svelte-file-editor.maxSteps`    | `number`              | unlimited  | Limit the number of steps the subagent can execute.                                            |
 | `instructions.enabled`                           | `boolean`             | `true`     | Enable or disable automatic instruction-file injection.                                        |
 | `skills.enabled`                                 | `boolean \| string[]` | `true`     | Enable all skills (`true`), disable all skills (`false`), or enable only specific skill names. |
+| `autoupdate`                                     | `boolean`             | `false`    | Remove the plugin from the OpenCode cache on exit when a newer version is available.           |
 
 ### Supported Skill Names
 

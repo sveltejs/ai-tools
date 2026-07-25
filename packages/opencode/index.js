@@ -3,9 +3,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { agents } from './agents.js';
 import { get_mcp_config } from './config.js';
-import package_json from './package.json' with { type: 'json' };
-import { exec } from 'node:child_process';
-import { compare } from 'verkit';
+import { setup_updates } from './update.js';
 
 /** @typedef {import('@opencode-ai/plugin').Plugin} Plugin */
 
@@ -16,22 +14,11 @@ const current_dir = dirname(fileURLToPath(import.meta.url));
  * @returns {ReturnType<Plugin>}
  */
 export async function svelte_plugin(ctx) {
-	exec(`npm view ${package_json.name} version`, (_, version) => {
-		const result = compare(version, package_json.version);
-		if (result === 1) {
-			setTimeout(() => {
-				ctx.client.tui.showToast({
-					body: {
-						title: 'Svelte: new plugin version available',
-						message: `${package_json.name}@${version.trim()} is available (you are using ${package_json.version}).\n\nWipe the cache or update you opencode config to update.`,
-						variant: 'warning',
-						duration: 7000,
-					},
-				});
-			}, 7000);
-		}
-	});
+	const mcp_config = get_mcp_config(ctx);
+	const dispose = setup_updates(ctx, mcp_config.autoupdate === true);
+
 	return {
+		dispose,
 		async config(input) {
 			input.agent ??= {};
 			input.mcp ??= {};
@@ -54,7 +41,6 @@ export async function svelte_plugin(ctx) {
 					break;
 				}
 			}
-			const mcp_config = get_mcp_config(ctx);
 
 			if (mcp_config.instructions?.enabled !== false) {
 				const instructions_dir = join(current_dir, 'instructions');

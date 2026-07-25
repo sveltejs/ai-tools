@@ -42,6 +42,7 @@ const default_config = {
 	skills: {
 		enabled: /** @type {boolean | string[]} */ (true),
 	},
+	autoupdate: false,
 };
 
 export const config_schema = v.object({
@@ -88,6 +89,12 @@ export const config_schema = v.object({
 		),
 		v.description(
 			'Configuration for the skills. You can choose if it they should be enabled or not, or specify an array of skill names to enable only specific skills.',
+		),
+	),
+	autoupdate: v.pipe(
+		v.optional(v.boolean()),
+		v.description(
+			'When a new version of the plugin is available, remove it from the opencode cache on exit so that the latest version is installed the next time opencode starts. Disabled by default: without it you only get a warning.',
 		),
 	),
 });
@@ -184,6 +191,7 @@ function merge_with_defaults(user_config) {
 			...default_config.skills,
 			...user_config.skills,
 		},
+		autoupdate: user_config.autoupdate ?? default_config.autoupdate,
 	};
 }
 
@@ -221,6 +229,7 @@ export function get_mcp_config(ctx) {
 					},
 					instructions: { ...merged.instructions, ...parsed.output.instructions },
 					skills: { ...merged.skills, ...parsed.output.skills },
+					autoupdate: parsed.output.autoupdate ?? merged.autoupdate,
 				};
 			} else {
 				setTimeout(() => {

@@ -14,6 +14,7 @@
 	"files": [
 		"index.js",
 		"config.js",
+		"update.js",
 		"tui.jsx",
 		"agents.js",
 		"instructions",
