@@ -42,7 +42,7 @@ const default_config = {
 	skills: {
 		enabled: /** @type {boolean | string[]} */ (true),
 	},
-	autoupdate: false,
+	autoupdate: true,
 };
 
 export const config_schema = v.object({
@@ -94,7 +94,7 @@ export const config_schema = v.object({
 	autoupdate: v.pipe(
 		v.optional(v.boolean()),
 		v.description(
-			'When a new version of an unpinned or latest-tagged plugin is available, remove it from the opencode cache on exit so that the latest version is installed the next time opencode starts. Disabled by default: without it you only get a warning.',
+			'When a new version of an unpinned or latest-tagged plugin is available, remove it from the opencode cache on exit so that the latest version is installed the next time opencode starts. Enabled by default; set it to false to only get a warning.',
 		),
 	),
 });
