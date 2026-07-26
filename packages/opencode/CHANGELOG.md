@@ -1,5 +1,15 @@
 # @sveltejs/opencode
 
+## 0.1.12
+
+### Patch Changes
+
+- chore: show warning for old versions ([#238](https://github.com/sveltejs/ai-tools/pull/238))
+
+- feat: add `autoupdate` option to reinstall the plugin when a new version is available ([#238](https://github.com/sveltejs/ai-tools/pull/238))
+
+- fix: links within references in SKILLS ([#243](https://github.com/sveltejs/ai-tools/pull/243))
+
 ## 0.1.11
 
 ### Patch Changes
