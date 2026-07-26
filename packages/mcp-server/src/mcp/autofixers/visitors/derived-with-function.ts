@@ -1,5 +1,6 @@
 import type { Identifier, PrivateIdentifier } from 'estree';
 import type { Autofixer } from './index.js';
+import { IGNORE_CODES, push_suggestion } from '../ignore-directives.js';
 
 export const derived_with_function: Autofixer = {
 	CallExpression(node, { state, path }) {
@@ -33,7 +34,11 @@ export const derived_with_function: Autofixer = {
 						: undefined;
 			}
 
-			state.output.suggestions.push(
+			push_suggestion(
+				state.output,
+				state.ignore_registry,
+				IGNORE_CODES.DERIVED_WITH_FUNCTION,
+				node.loc?.start?.line,
 				`You are passing a function to $derived ${variable_id ? `when declaring "${variable_id.name}" ` : ''}but $derived expects an expression. You can use $derived.by instead.`,
 			);
 		}

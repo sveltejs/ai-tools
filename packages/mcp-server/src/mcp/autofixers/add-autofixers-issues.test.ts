@@ -5,8 +5,14 @@ import { base_runes } from '../../constants.js';
 const dollarless_runes = base_runes.map((r) => ({ rune: r.replace('$', '') }));
 
 function run_autofixers_on_code(code: string, desired_svelte_version = 5) {
-	const content = { issues: [], suggestions: [] };
+	const content: { issues: string[]; suggestions: string[] } = { issues: [], suggestions: [] };
 	add_autofixers_issues(content, code, desired_svelte_version);
+	// Suggestion messages carry a trailing ` [<code>]` marker
+	// since the `svelte-mcp-ignore` work — strip it here so
+	// pre-existing assertions that match the human-readable
+	// message verbatim keep working. The dedicated ignore-
+	// directive tests assert on the marker explicitly.
+	content.suggestions = content.suggestions.map((s) => s.replace(/ \[[a-z_]+\]$/, ''));
 	return content;
 }
 

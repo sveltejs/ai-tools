@@ -123,7 +123,7 @@ export function svelte_autofixer(server: SvelteMcp) {
 			name: 'svelte-autofixer',
 			title: 'Svelte Autofixer',
 			description:
-				'Given a svelte component or module returns a list of suggestions to fix any issues it has. This tool MUST be used whenever the user is asking to write svelte code before sending the code back to the user',
+				'Given a svelte component or module returns a list of suggestions to fix any issues it has. This tool MUST be used whenever the user is asking to write svelte code before sending the code back to the user. A confirmed false-positive suggestion can be silenced with a `svelte-mcp-ignore <code>` comment on the line above (script or markup).',
 			get schema() {
 				return (
 					cached_schema ?? (cached_schema = get_autofixer_schema(server.ctx.custom?.stdio ?? false))
