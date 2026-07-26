@@ -104,6 +104,10 @@
 			},
 			"required": [],
 			"description": "Configuration for the skills. You can choose if it they should be enabled or not, or specify an array of skill names to enable only specific skills."
+		},
+		"autoupdate": {
+			"type": "boolean",
+			"description": "When a new version of an unpinned or latest-tagged plugin is available, remove it from the opencode cache on exit so that the latest version is installed the next time opencode starts. Enabled by default; set it to false to only get a warning."
 		}
 	},
 	"required": [],

@@ -3,6 +3,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { agents } from './agents.js';
 import { get_mcp_config } from './config.js';
+import { setup_updates } from './update.js';
 
 /** @typedef {import('@opencode-ai/plugin').Plugin} Plugin */
 
@@ -13,7 +14,11 @@ const current_dir = dirname(fileURLToPath(import.meta.url));
  * @returns {ReturnType<Plugin>}
  */
 export async function svelte_plugin(ctx) {
+	const mcp_config = get_mcp_config(ctx);
+	const dispose = setup_updates(ctx, mcp_config.autoupdate === true);
+
 	return {
+		dispose,
 		async config(input) {
 			input.agent ??= {};
 			input.mcp ??= {};
@@ -36,7 +41,6 @@ export async function svelte_plugin(ctx) {
 					break;
 				}
 			}
-			const mcp_config = get_mcp_config(ctx);
 
 			if (mcp_config.instructions?.enabled !== false) {
 				const instructions_dir = join(current_dir, 'instructions');

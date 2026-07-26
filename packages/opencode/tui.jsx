@@ -251,6 +251,12 @@ const tui = async (api) => {
 							category: 'Skills',
 						})),
 						{
+							title: `${config.autoupdate !== false ? '[x]' : '[ ]'} Auto update`,
+							value: 'autoupdate',
+							category: 'Updates',
+							description: 'Reinstall the plugin on the next start when a new version is out',
+						},
+						{
 							title: 'Revert changes',
 							value: 'revert',
 							category: 'Actions',
@@ -284,6 +290,7 @@ const tui = async (api) => {
 						if (option.value === 'skills-all') {
 							config.skills = { enabled: all_skills_selected ? [] : [...skill_names] };
 						}
+						if (option.value === 'autoupdate') config.autoupdate = config.autoupdate === false;
 						if (option.value.startsWith('skill:')) {
 							const name = option.value.slice('skill:'.length);
 							if (selected_skills.has(name)) {
