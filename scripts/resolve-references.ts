@@ -103,7 +103,14 @@ function remove_frontmatter_unneeded_fields(content: string) {
 function derive_name(link: string) {
 	const without_hash = link.split('#')[0]!;
 	const segments = without_hash.split('/').filter(Boolean);
-	return segments[segments.length - 1] ?? 'reference';
+	const name = segments[segments.length - 1] ?? 'reference';
+	const safe_name = name
+		.normalize('NFKD')
+		.replace(/[\u0300-\u036f]/g, '')
+		.replace(/[^a-zA-Z0-9_-]+/g, '-')
+		.replace(/^-+|-+$/g, '');
+
+	return safe_name || 'reference';
 }
 
 /**
