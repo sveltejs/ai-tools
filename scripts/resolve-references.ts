@@ -113,9 +113,12 @@ export function resolve_reference_links(content: string, repo: string) {
 	return content.replace(
 		/\[([^\]]*)\]\((?![a-z][a-z\d+.-]*:|#|\/\/)([^)]+)\)/gi,
 		(full_match, text: string, href: string) => {
-			const url = href.startsWith('/')
-				? `https://svelte.dev${href}/llms.txt`
-				: `https://svelte.dev/docs/${repo}/${href}/llms.txt`;
+			const url = new URL(
+				href.startsWith('/')
+					? `https://svelte.dev${href}`
+					: `https://svelte.dev/docs/${repo}/${href}`,
+			);
+			url.pathname += '/llms.txt';
 
 			return `[${text}](${url})`;
 		},

@@ -393,7 +393,7 @@ Snippets declared at the top level of a `.svelte` file can be exported from a `<
 
 ## Programmatic snippets
 
-Snippets can be created programmatically with the [`createRawSnippet`](https://svelte.dev/docs/svelte/svelte#createRawSnippet/llms.txt) API. This is intended for advanced use cases.
+Snippets can be created programmatically with the [`createRawSnippet`](https://svelte.dev/docs/svelte/svelte/llms.txt#createRawSnippet) API. This is intended for advanced use cases.
 
 ## Snippets and slots
 

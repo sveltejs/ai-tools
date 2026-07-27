@@ -76,15 +76,15 @@ let a = $derived(await one(x));
 let b = $derived(await two(y));
 ```
 
-> [!NOTE] If you write code like this, expect Svelte to give you an [`await_waterfall`](https://svelte.dev/docs/svelte/runtime-warnings#Client-warnings-await_waterfall/llms.txt) warning
+> [!NOTE] If you write code like this, expect Svelte to give you an [`await_waterfall`](https://svelte.dev/docs/svelte/runtime-warnings/llms.txt#Client-warnings-await_waterfall) warning
 
 ## Indicating loading states
 
-To render placeholder UI, you can wrap content in a `<svelte:boundary>` with a [`pending`](https://svelte.dev/docs/svelte/svelte-boundary#Properties-pending/llms.txt) snippet. This will be shown when the boundary is first created, but not for subsequent updates, which are globally coordinated.
+To render placeholder UI, you can wrap content in a `<svelte:boundary>` with a [`pending`](https://svelte.dev/docs/svelte/svelte-boundary/llms.txt#Properties-pending) snippet. This will be shown when the boundary is first created, but not for subsequent updates, which are globally coordinated.
 
-After the contents of a boundary have resolved for the first time and have replaced the `pending` snippet, you can detect subsequent async work with [`$effect.pending()`](https://svelte.dev/docs/svelte/$effect#$effect.pending/llms.txt). This is what you would use to display a "we're asynchronously validating your input" spinner next to a form field, for example.
+After the contents of a boundary have resolved for the first time and have replaced the `pending` snippet, you can detect subsequent async work with [`$effect.pending()`](https://svelte.dev/docs/svelte/$effect/llms.txt#$effect.pending). This is what you would use to display a "we're asynchronously validating your input" spinner next to a form field, for example.
 
-You can also use [`settled()`](https://svelte.dev/docs/svelte/svelte#settled/llms.txt) to get a promise that resolves when the current update is complete:
+You can also use [`settled()`](https://svelte.dev/docs/svelte/svelte/llms.txt#settled) to get a promise that resolves when the current update is complete:
 
 ```js
 import { tick, settled } from 'svelte';
@@ -132,7 +132,7 @@ If a `<svelte:boundary>` with a `pending` snippet is encountered during SSR, tha
 
 ## Forking
 
-The [`fork(...)`](https://svelte.dev/docs/svelte/svelte#fork/llms.txt) API, added in 5.42, makes it possible to run `await` expressions that you _expect_ to happen in the near future. This is mainly intended for frameworks like SvelteKit to implement preloading when (for example) users signal an intent to navigate.
+The [`fork(...)`](https://svelte.dev/docs/svelte/svelte/llms.txt#fork) API, added in 5.42, makes it possible to run `await` expressions that you _expect_ to happen in the near future. This is mainly intended for frameworks like SvelteKit to implement preloading when (for example) users signal an intent to navigate.
 
 ```svelte
 <script>
