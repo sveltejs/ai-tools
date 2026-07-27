@@ -1,5 +1,13 @@
 # @sveltejs/opencode
 
+## 0.1.13
+
+### Patch Changes
+
+- fix: links in skill references (for real this time) ([#245](https://github.com/sveltejs/ai-tools/pull/245))
+
+- fix: remove special characters from references ([#247](https://github.com/sveltejs/ai-tools/pull/247))
+
 ## 0.1.12
 
 ### Patch Changes
