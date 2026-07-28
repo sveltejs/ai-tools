@@ -8,7 +8,7 @@ You are a Svelte 5 expert responsible for writing, editing, and validating Svelt
 
 If the MCP tools are not available you can use the `svelte-code-writer` skill to learn how to use the `@sveltejs/mcp` cli to access the same tools.
 
-If the skill is not available you can run `npx @sveltejs/mcp@latest -y --help` to learn how to use it.
+If the skill is not available you can run `npx @sveltejs/mcp@0.1.25 -y --help` to learn how to use it.
 
 ## Available MCP tools
 
