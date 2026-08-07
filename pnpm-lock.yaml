@@ -60,8 +60,8 @@ catalogs:
       version: 8.54.0
   opencode:
     '@opencode-ai/plugin':
-      specifier: 1.17.9
-      version: 1.17.9
+      specifier: 1.17.18
+      version: 1.17.18
     '@opentui/core':
       specifier: ^0.4.3
       version: 0.4.3
@@ -421,7 +421,7 @@ importers:
     devDependencies:
       '@opencode-ai/plugin':
         specifier: catalog:opencode
-        version: 1.17.9(@opentui/core@0.4.3(typescript@5.9.3)(web-tree-sitter@0.25.10))(@opentui/keymap@0.4.3(@opentui/solid@0.4.3(solid-js@1.9.12)(typescript@5.9.3)(web-tree-sitter@0.25.10))(react@18.3.1)(solid-js@1.9.12)(typescript@5.9.3)(web-tree-sitter@0.25.10))(@opentui/solid@0.4.3(solid-js@1.9.12)(typescript@5.9.3)(web-tree-sitter@0.25.10))
+        version: 1.17.18(@opentui/core@0.4.3(typescript@5.9.3)(web-tree-sitter@0.25.10))(@opentui/keymap@0.4.3(@opentui/solid@0.4.3(solid-js@1.9.12)(typescript@5.9.3)(web-tree-sitter@0.25.10))(react@18.3.1)(solid-js@1.9.12)(typescript@5.9.3)(web-tree-sitter@0.25.10))(@opentui/solid@0.4.3(solid-js@1.9.12)(typescript@5.9.3)(web-tree-sitter@0.25.10))
       '@types/node':
         specifier: catalog:tooling
         version: 24.10.9
@@ -430,6 +430,10 @@ importers:
         version: 1.5.0(valibot@1.2.0(typescript@5.9.3))
 
 packages:
+
+  '@ai-sdk/provider@3.0.8':
+    resolution: {integrity: sha512-oGMAgGoQdBXbZqNG0Ze56CHjDZ1IDYOwGYxYjO5KLSlz5HiNQ9udIXsPZ61VWaHGZ5XW/jyjmr6t2xz2jGVwbQ==}
+    engines: {node: '>=18'}
 
   '@ampproject/remapping@2.3.0':
     resolution: {integrity: sha512-30iZtAPgz+LTIYoeivqYo853f02jBYSd5uGnGpkFV0M3xOt9aN73erkgYAmZU43x4VfqcnLxW9Kpg3R5LC4YYw==}
@@ -1221,12 +1225,12 @@ packages:
     resolution: {integrity: sha512-oGB+UxlgWcgQkgwo8GcEGwemoTFt3FIO9ababBmaGwXIoBKZ+GTy0pP185beGg7Llih/NSHSV2XAs1lnznocSg==}
     engines: {node: '>= 8'}
 
-  '@opencode-ai/plugin@1.17.9':
-    resolution: {integrity: sha512-RvYsX2k90ew0P3c0R/Jrt6UOdA5CYf4GmYuREDKHx31GSJ25WKg9hrTzkcwCfvPPCpaBc53Qq6Fon9aWr+58ag==}
+  '@opencode-ai/plugin@1.17.18':
+    resolution: {integrity: sha512-tqVBzhTHYUzO0laAmcQeBtT56tXYM5VGUk9V60O+cMx4kkSfac4qEfPVguCGUMJnfcU+u+EPvpME6xmHWoQE8w==}
     peerDependencies:
-      '@opentui/core': '>=0.3.4'
-      '@opentui/keymap': '>=0.3.4'
-      '@opentui/solid': '>=0.3.4'
+      '@opentui/core': '>=0.4.3'
+      '@opentui/keymap': '>=0.4.3'
+      '@opentui/solid': '>=0.4.3'
     peerDependenciesMeta:
       '@opentui/core':
         optional: true
@@ -1235,8 +1239,8 @@ packages:
       '@opentui/solid':
         optional: true
 
-  '@opencode-ai/sdk@1.17.9':
-    resolution: {integrity: sha512-MHmXEpGPHkg14v1p+cUlIOUxd6DQdSElfau9nqY7tcDI0x5r4Y8D0dKXcyAh0Gc73ptaGW67Vg84nkcV6O27Pw==}
+  '@opencode-ai/sdk@1.17.18':
+    resolution: {integrity: sha512-c/C9PhY8PrbcxDY+JIYtOZsrmMD0KzoVvxq+RGUrZ6LQp57SuVBbT4lfwA2G8Se5RNC1N5JtYjiuaXeECnF2SQ==}
 
   '@opentui/core-darwin-arm64@0.4.3':
     resolution: {integrity: sha512-p5+7AAxpxGuDGagyQfewKtmTFnN7THvTVY4FyKqUtJomNaHdQXPHztapNNzMx0DGWbwOUbVKzpL+yc3CZY3chQ==}
@@ -2729,8 +2733,8 @@ packages:
   ee-first@1.1.1:
     resolution: {integrity: sha512-WMwm9LhRUo+WUaRN+vRuETqG89IgZphVSNkdFgeb6sS/E4OrDIN7t48CAewSHXc6C8lefD8KKfr5vY61brQlow==}
 
-  effect@4.0.0-beta.74:
-    resolution: {integrity: sha512-Yx+Kh12U+i2FmjwEfKs+ePFmpMd43RPD1oGqc/VraSS9bYzvF0Ff3PojwEFEVEewp8xc92Uxu28gTspU4qyvHA==}
+  effect@4.0.0-beta.83:
+    resolution: {integrity: sha512-0wsak8RtgGAr9UWSbVDgJHZcUqMSvicHcvaZv1MbMM7MCGgW4Rn/137J1MHQbwYPcwYGxT/IqehFd+UbYuj78w==}
 
   electron-to-chromium@1.5.389:
     resolution: {integrity: sha512-cEto7aeOqBfU1D+c5py5pE+ooscKE75JifxLBdFUZsqAxRS6y7kebtxAZvICszSl05gPjYHDTjY+lXpyGvpJbg==}
@@ -3438,6 +3442,9 @@ packages:
 
   json-schema-typed@8.0.2:
     resolution: {integrity: sha512-fQhoXdcvc3V28x7C7BMs4P5+kNlgUURe2jmUT1T//oBRMDrqy1QPelJimwZGo7Hg9VPV3EQV5Bnq4hbFy2vetA==}
+
+  json-schema@0.4.0:
+    resolution: {integrity: sha512-es94M3nTIfsEPisRafak+HDLfHXnKBhV3vU5eqPcS3flIWqcxJWgXHXiey3YrpaNsanY5ei1VoYEbOzijuq9BA==}
 
   json-stable-stringify-without-jsonify@1.0.1:
     resolution: {integrity: sha512-Bdboy+l7tA3OGW6FjyFHWkP5LuByj1Tk33Ljyq0axyzdk9//JSi2u3fP1QSmd1KNwq6VOKYGlAu87CisVir6Pw==}
@@ -4746,6 +4753,10 @@ packages:
 
 snapshots:
 
+  '@ai-sdk/provider@3.0.8':
+    dependencies:
+      json-schema: 0.4.0
+
   '@ampproject/remapping@2.3.0':
     dependencies:
       '@jridgewell/gen-mapping': 0.3.13
@@ -5666,17 +5677,18 @@ snapshots:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.20.1
 
-  '@opencode-ai/plugin@1.17.9(@opentui/core@0.4.3(typescript@5.9.3)(web-tree-sitter@0.25.10))(@opentui/keymap@0.4.3(@opentui/solid@0.4.3(solid-js@1.9.12)(typescript@5.9.3)(web-tree-sitter@0.25.10))(react@18.3.1)(solid-js@1.9.12)(typescript@5.9.3)(web-tree-sitter@0.25.10))(@opentui/solid@0.4.3(solid-js@1.9.12)(typescript@5.9.3)(web-tree-sitter@0.25.10))':
+  '@opencode-ai/plugin@1.17.18(@opentui/core@0.4.3(typescript@5.9.3)(web-tree-sitter@0.25.10))(@opentui/keymap@0.4.3(@opentui/solid@0.4.3(solid-js@1.9.12)(typescript@5.9.3)(web-tree-sitter@0.25.10))(react@18.3.1)(solid-js@1.9.12)(typescript@5.9.3)(web-tree-sitter@0.25.10))(@opentui/solid@0.4.3(solid-js@1.9.12)(typescript@5.9.3)(web-tree-sitter@0.25.10))':
     dependencies:
-      '@opencode-ai/sdk': 1.17.9
-      effect: 4.0.0-beta.74
+      '@ai-sdk/provider': 3.0.8
+      '@opencode-ai/sdk': 1.17.18
+      effect: 4.0.0-beta.83
       zod: 4.1.8
     optionalDependencies:
       '@opentui/core': 0.4.3(typescript@5.9.3)(web-tree-sitter@0.25.10)
       '@opentui/keymap': 0.4.3(@opentui/solid@0.4.3(solid-js@1.9.12)(typescript@5.9.3)(web-tree-sitter@0.25.10))(react@18.3.1)(solid-js@1.9.12)(typescript@5.9.3)(web-tree-sitter@0.25.10)
       '@opentui/solid': 0.4.3(solid-js@1.9.12)(typescript@5.9.3)(web-tree-sitter@0.25.10)
 
-  '@opencode-ai/sdk@1.17.9':
+  '@opencode-ai/sdk@1.17.18':
     dependencies:
       cross-spawn: 7.0.6
 
@@ -6952,7 +6964,7 @@ snapshots:
 
   ee-first@1.1.1: {}
 
-  effect@4.0.0-beta.74:
+  effect@4.0.0-beta.83:
     dependencies:
       '@standard-schema/spec': 1.1.0
       fast-check: 4.8.0
@@ -7815,6 +7827,8 @@ snapshots:
 
   json-schema-typed@8.0.2: {}
 
+  json-schema@0.4.0: {}
+
   json-stable-stringify-without-jsonify@1.0.1: {}
 
   json5@1.0.2:
@@ -8161,7 +8175,7 @@ snapshots:
 
   pnpm-workspace-yaml@1.5.0:
     dependencies:
-      yaml: 2.8.2
+      yaml: 2.9.0
 
   possible-typed-array-names@1.1.0: {}
 
@@ -9074,7 +9088,7 @@ snapshots:
   yaml-eslint-parser@2.0.0:
     dependencies:
       eslint-visitor-keys: 5.0.0
-      yaml: 2.8.2
+      yaml: 2.9.0
 
   yaml@1.10.2: {}
 
