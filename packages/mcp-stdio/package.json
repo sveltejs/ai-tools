@@ -1,6 +1,6 @@
 {
 	"name": "@sveltejs/mcp",
-	"version": "0.1.25",
+	"version": "0.1.26",
 	"type": "module",
 	"license": "MIT",
 	"mcpName": "dev.svelte/mcp",
