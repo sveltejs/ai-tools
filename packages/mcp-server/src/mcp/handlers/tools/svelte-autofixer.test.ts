@@ -8,7 +8,7 @@ import { server } from '../../index.js';
 
 const transport = new InMemoryTransport(server);
 
-let session: ReturnType<typeof transport.session>;
+let client: ReturnType<typeof transport.session> | ReturnType<typeof transport.stateless>;
 
 async function autofixer_tool_call(
 	code: string,
@@ -17,7 +17,7 @@ async function autofixer_tool_call(
 	async = false,
 	ctx?: { stdio?: boolean },
 ) {
-	const result = await session.callTool(
+	const result = await client.callTool(
 		'svelte-autofixer',
 		{
 			code,
@@ -36,19 +36,21 @@ async function autofixer_tool_call(
 	return result.structuredContent as any;
 }
 
-describe('svelte-autofixer tool', () => {
+describe.each(['session', 'stateless'])('svelte-autofixer tool - %s', (type) => {
 	beforeEach(async () => {
-		session = transport.session();
-
-		session = transport.session();
-		await session.initialize(
-			'2025-06-18',
-			{},
-			{
-				name: 'test-client',
-				version: '1.0.0',
-			},
-		);
+		if (type === 'session') {
+			client = transport.session();
+			await client.initialize(
+				'2025-06-18',
+				{},
+				{
+					name: 'test-client',
+					version: '1.0.0',
+				},
+			);
+		} else {
+			client = transport.stateless();
+		}
 	});
 
 	it('should add suggestions for js parse errors', async () => {
