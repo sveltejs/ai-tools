@@ -219,8 +219,8 @@ export function playground_link(server: SvelteMcp) {
 			},
 		},
 		async ({ files, name, tailwind }) => {
-			if (server.ctx.sessionId && server.ctx.custom?.track) {
-				await server.ctx.custom?.track?.(server.ctx.sessionId, 'playground-link');
+			if (server.ctx.custom?.track) {
+				await server.ctx.custom.track(server.ctx.sessionId, 'playground-link');
 			}
 			try {
 				const result = await playground_link_handler({ files, name, tailwind });
@@ -247,8 +247,8 @@ export function playground_link(server: SvelteMcp) {
 				};
 			} catch (e) {
 				const error = e as Error;
-				if (server.ctx.sessionId && server.ctx.custom?.track) {
-					await server.ctx.custom?.track?.(
+				if (server.ctx.custom?.track) {
+					await server.ctx.custom.track(
 						server.ctx.sessionId,
 						'playground-link-error',
 						error.message,

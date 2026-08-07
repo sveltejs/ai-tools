@@ -23,7 +23,8 @@ export const server = new McpServer(
 			'This is the official Svelte MCP server. It MUST be used whenever svelte development is involved. It can provide official documentation, code examples and correct your code. After you correct the component call this tool again to confirm all the issues are fixed.',
 	},
 ).withContext<{
-	track?: (sessionId: string, event: string, extra?: string) => Promise<void>;
+	track?: (sessionId: string | undefined, event: string, extra?: string) => Promise<void>;
+	id?: string;
 	stdio?: boolean;
 }>();
 
@@ -34,6 +35,6 @@ setup_resources(server);
 setup_prompts(server);
 
 server.on('initialize', async ({ clientInfo: client_info }) => {
-	if (!server.ctx.custom?.track || !server.ctx.sessionId) return;
+	if (!server.ctx.custom?.track) return;
 	server.ctx.custom.track(server.ctx.sessionId, 'initialize', client_info.name);
 });

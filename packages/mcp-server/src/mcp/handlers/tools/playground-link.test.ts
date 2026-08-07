@@ -4,23 +4,27 @@ import { server } from '../../index.js';
 
 const transport = new InMemoryTransport(server);
 
-let session: ReturnType<typeof transport.session>;
+let client: ReturnType<typeof transport.session> | ReturnType<typeof transport.stateless>;
 
-describe('playground-link tool', () => {
+describe.each(['session', 'stateless'])('playground-link tool - %s', (kind) => {
 	beforeEach(async () => {
-		session = transport.session();
-		await session.initialize(
-			'2025-06-18',
-			{},
-			{
-				name: 'test-client',
-				version: '1.0.0',
-			},
-		);
+		if (kind === 'session') {
+			client = transport.session();
+			await client.initialize(
+				'2025-06-18',
+				{},
+				{
+					name: 'test-client',
+					version: '1.0.0',
+				},
+			);
+		} else {
+			client = transport.stateless();
+		}
 	});
 
 	it('should create a playground link if App.svelte is present', async () => {
-		const result = await session.callTool<{ url: string }>('playground-link', {
+		const result = await client.callTool<{ url: string }>('playground-link', {
 			name: 'My Playground',
 			tailwind: false,
 			files: {
@@ -35,7 +39,7 @@ describe('playground-link tool', () => {
 	});
 
 	it('should have a content with the stringified version of structured content and an ui resource', async () => {
-		const result = await session.callTool<{ url: string }>('playground-link', {
+		const result = await client.callTool<{ url: string }>('playground-link', {
 			name: 'My Playground',
 			tailwind: false,
 			files: {
@@ -68,7 +72,7 @@ describe('playground-link tool', () => {
 	});
 
 	it('should have tool _meta with resource URI for MCP Apps hosts', async () => {
-		const tools = await session.listTools();
+		const tools = await client.listTools();
 		const playground_tool = tools.tools.find((t) => t.name === 'playground-link');
 		expect(playground_tool).toBeDefined();
 		expect(playground_tool?._meta).toStrictEqual({
@@ -77,7 +81,7 @@ describe('playground-link tool', () => {
 	});
 
 	it('should expose a resource for MCP Apps hosts', async () => {
-		const resources = await session.listResources();
+		const resources = await client.listResources();
 		const playground_resource = resources.resources.find(
 			(r) => r.uri === 'ui://svelte/playground-link',
 		);
@@ -86,7 +90,7 @@ describe('playground-link tool', () => {
 	});
 
 	it('should not create a playground link if App.svelte is missing', async () => {
-		const result = await session.callTool<{ url: string }>('playground-link', {
+		const result = await client.callTool<{ url: string }>('playground-link', {
 			name: 'My Playground',
 			tailwind: false,
 			files: {
