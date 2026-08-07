@@ -10,3 +10,5 @@ export const http_transport = new HttpTransport(server, {
 	// after 5 minutes making the logs dirty.
 	disableSse: true,
 });
+
+export { server };

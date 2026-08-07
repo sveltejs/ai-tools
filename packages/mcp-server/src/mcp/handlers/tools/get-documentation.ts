@@ -159,16 +159,16 @@ export function get_documentation(server: SvelteMcp) {
 			icons,
 		},
 		async ({ section }) => {
-			if (server.ctx.sessionId && server.ctx.custom?.track) {
-				await server.ctx.custom?.track?.(server.ctx.sessionId, 'get-documentation');
+			if (server.ctx.custom?.track) {
+				await server.ctx.custom.track(server.ctx.sessionId, 'get-documentation');
 			}
 			try {
 				const content = await get_documentation_handler({ section });
 				return tool.text(content);
 			} catch (e) {
 				const error = e as Error;
-				if (server.ctx.sessionId && server.ctx.custom?.track) {
-					await server.ctx.custom?.track?.(
+				if (server.ctx.custom?.track) {
+					await server.ctx.custom.track(
 						server.ctx.sessionId,
 						'get-documentation-error',
 						error.message,

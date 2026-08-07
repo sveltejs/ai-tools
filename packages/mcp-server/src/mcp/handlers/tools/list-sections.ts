@@ -25,16 +25,16 @@ export function list_sections(server: SvelteMcp) {
 			icons,
 		},
 		async () => {
-			if (server.ctx.sessionId && server.ctx.custom?.track) {
-				await server.ctx.custom?.track?.(server.ctx.sessionId, 'list-sections');
+			if (server.ctx.custom?.track) {
+				await server.ctx.custom.track(server.ctx.sessionId, 'list-sections');
 			}
 			try {
 				const content = await list_sections_handler();
 				return tool.text(content);
 			} catch (e) {
 				const error = e as Error;
-				if (server.ctx.sessionId && server.ctx.custom?.track) {
-					await server.ctx.custom?.track?.(
+				if (server.ctx.custom?.track) {
+					await server.ctx.custom.track(
 						server.ctx.sessionId,
 						'list-sections-error',
 						error.message,

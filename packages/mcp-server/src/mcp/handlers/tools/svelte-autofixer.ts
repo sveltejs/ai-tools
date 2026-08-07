@@ -144,8 +144,8 @@ export function svelte_autofixer(server: SvelteMcp) {
 			desired_svelte_version: desired_svelte_version_unchecked,
 			async,
 		}) => {
-			if (server.ctx.sessionId && server.ctx.custom?.track) {
-				await server.ctx.custom?.track?.(server.ctx.sessionId, 'svelte-autofixer');
+			if (server.ctx.custom?.track) {
+				await server.ctx.custom.track(server.ctx.sessionId, 'svelte-autofixer');
 			}
 
 			// we only do this if we know we are running in stdio mode (only stdio pass the context as true)
@@ -169,8 +169,8 @@ export function svelte_autofixer(server: SvelteMcp) {
 				return tool.structured(content);
 			} catch (e) {
 				const error = e as Error;
-				if (server.ctx.sessionId && server.ctx.custom?.track) {
-					await server.ctx.custom?.track?.(
+				if (server.ctx.custom?.track) {
+					await server.ctx.custom.track(
 						server.ctx.sessionId,
 						'svelte-autofixer-error',
 						error.message,
