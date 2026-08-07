@@ -1,5 +1,11 @@
 # @sveltejs/mcp
 
+## 0.1.26
+
+### Patch Changes
+
+- fix: new protocol version ([#249](https://github.com/sveltejs/ai-tools/pull/249))
+
 ## 0.1.25
 
 ### Patch Changes
