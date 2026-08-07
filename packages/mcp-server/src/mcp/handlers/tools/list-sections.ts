@@ -34,11 +34,7 @@ export function list_sections(server: SvelteMcp) {
 			} catch (e) {
 				const error = e as Error;
 				if (server.ctx.custom?.track) {
-					await server.ctx.custom.track(
-						server.ctx.sessionId,
-						'list-sections-error',
-						error.message,
-					);
+					await server.ctx.custom.track(server.ctx.sessionId, 'list-sections-error', error.message);
 				}
 				return tool.error(error.message);
 			}
