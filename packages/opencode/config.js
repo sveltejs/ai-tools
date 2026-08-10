@@ -29,7 +29,7 @@ const agent_config_schema = v.object({
 
 const default_config = {
 	mcp: {
-		type: /** @type {'remote' | 'local'} */ ('remote'),
+		type: /** @type {'remote' | 'local'} */ ('local'),
 		enabled: true,
 	},
 	subagent: {
@@ -54,7 +54,7 @@ export const config_schema = v.object({
 			}),
 		),
 		v.description(
-			"Configuration for the MCP. You can chose if it should be enabled or not and the transport to use 'remote' (default) and 'local'.",
+			"Configuration for the MCP. You can choose whether it is enabled and which transport to use: 'local' (default) or 'remote'.",
 		),
 	),
 	subagent: v.pipe(

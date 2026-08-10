@@ -47,7 +47,7 @@ By default, the MCP server, subagent, skills, instructions, and automatic update
 {
 	"$schema": "https://svelte.dev/opencode/schema.json",
 	"mcp": {
-		"type": "remote", // or "local" — defaults to remote
+		"type": "local", // or "remote"; defaults to local
 		"enabled": true
 	},
 	"subagent": {
