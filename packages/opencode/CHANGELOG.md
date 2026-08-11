@@ -1,5 +1,11 @@
 # @sveltejs/opencode
 
+## 0.1.14
+
+### Patch Changes
+
+- chore: use stdio as default server ([#252](https://github.com/sveltejs/ai-tools/pull/252))
+
 ## 0.1.13
 
 ### Patch Changes
