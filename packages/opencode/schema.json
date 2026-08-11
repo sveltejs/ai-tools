@@ -15,7 +15,7 @@
 				}
 			},
 			"required": [],
-			"description": "Configuration for the MCP. You can chose if it should be enabled or not and the transport to use 'remote' (default) and 'local'."
+			"description": "Configuration for the MCP. You can choose whether it is enabled and which transport to use: 'local' (default) or 'remote'."
 		},
 		"subagent": {
 			"type": "object",

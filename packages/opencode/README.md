@@ -53,7 +53,7 @@ Create `svelte.json` to customize how the plugin configures MCP, the Svelte suba
 {
 	"$schema": "https://svelte.dev/opencode/schema.json",
 	"mcp": {
-		"type": "remote",
+		"type": "local",
 		"enabled": true
 	},
 	"subagent": {
@@ -87,7 +87,7 @@ Automatic updates are enabled by default. When a newer version is detected, the 
 
 If omitted, the plugin uses these defaults:
 
-- `mcp.type`: `"remote"`
+- `mcp.type`: `"local"`
 - `mcp.enabled`: `true`
 - `subagent.enabled`: `true`
 - `subagent.agents`: `{}`
@@ -99,7 +99,7 @@ If omitted, the plugin uses these defaults:
 
 | Option                                           | Type                  | Default    | Description                                                                                    |
 | ------------------------------------------------ | --------------------- | ---------- | ---------------------------------------------------------------------------------------------- |
-| `mcp.type`                                       | `"remote" \| "local"` | `"remote"` | Use `https://mcp.svelte.dev/mcp` (`remote`) or run `@sveltejs/mcp` via `npx` (`local`).        |
+| `mcp.type`                                       | `"remote" \| "local"` | `"local"`  | Run `@sveltejs/mcp` via `npx` (`local`) or use `https://mcp.svelte.dev/mcp` (`remote`).        |
 | `mcp.enabled`                                    | `boolean`             | `true`     | Enable or disable the Svelte MCP server entry.                                                 |
 | `subagent.enabled`                               | `boolean`             | `true`     | Enable or disable registration of the `svelte-file-editor` subagent.                           |
 | `subagent.agents.svelte-file-editor.model`       | `string`              | main agent | Override the model used by the Svelte file editor subagent.                                    |

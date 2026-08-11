@@ -214,7 +214,7 @@ const tui = async (api) => {
 			}
 			/** @param {'remote' | 'local'} value */
 			function radio(value) {
-				return (config.mcp?.type ?? 'remote') === value ? '(*)' : '( )';
+				return (config.mcp?.type ?? 'local') === value ? '(*)' : '( )';
 			}
 			api.ui.dialog.replace(() => (
 				<api.ui.DialogSelect
