@@ -40,7 +40,7 @@ catalogs:
     '@tmcp/transport-http': 0.9.0-next.0
     '@tmcp/transport-in-memory': 0.1.0-next.0
     '@tmcp/transport-stdio': 0.5.0-next.0
-    tmcp: 1.20.0-next.1
+    tmcp: 1.20.0-next.2
   tooling:
     '@changesets/changelog-github': 1.0.0-next.6
     '@changesets/cli': ^2.29.7
