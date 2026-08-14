@@ -39,7 +39,9 @@ server.on('initialize', async ({ clientInfo: client_info }) => {
 	server.ctx.custom.track(server.ctx.sessionId, 'initialize', client_info.name);
 });
 
-server.on('discover', ({ _meta: { 'io.modelcontextprotocol/clientInfo': client_info } }) => {
+server.on('discover', (request) => {
+	if (!request?._meta) return;
+	const { 'io.modelcontextprotocol/clientInfo': client_info } = request._meta;
 	if (!server.ctx.custom?.track || !client_info) return;
 	server.ctx.custom.track(undefined, 'discover', client_info.name);
 });
