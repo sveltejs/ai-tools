@@ -1,9 +1,7 @@
-import { existsSync, readFileSync } from 'fs';
+import { existsSync, readFileSync, unwatchFile, watchFile } from 'fs';
 import { homedir } from 'os';
 import { join } from 'path';
 import * as v from 'valibot';
-
-/** @typedef {import('@opencode-ai/plugin').PluginInput} PluginInput */
 
 // Schema for individual agent configuration
 const agent_config_schema = v.object({
@@ -101,40 +99,41 @@ export const config_schema = v.object({
 
 /** @typedef {v.InferInput<typeof config_schema>} McpConfig */
 
-const GLOBAL_CONFIG_DIR = join(homedir(), '.config', 'opencode');
-const GLOBAL_CONFIG_PATH = join(GLOBAL_CONFIG_DIR, 'svelte.json');
+const GLOBAL_CONFIG_PATH = join(homedir(), '.config', 'opencode', 'svelte.json');
 
 /** @typedef {{ data: Record<string, unknown> | null, parse_error?: string }} ConfigLoadResult */
+/** @typedef {{ title: string, message: string }} ConfigWarning */
 
-function get_config_paths() {
-	// Global: ~/.config/opencode/svelte.json
-	/** @type {string | null} */
-	let global_path = null;
-	if (existsSync(GLOBAL_CONFIG_PATH)) {
-		global_path = GLOBAL_CONFIG_PATH;
-	}
-
-	// Custom config directory: $OPENCODE_CONFIG_DIR/svelte.json
-	/** @type {string | null} */
-	let config_dir_path = null;
+/** @param {string} directory */
+function get_config_candidates(directory) {
 	const opencode_config_dir = process.env.OPENCODE_CONFIG_DIR;
-	if (opencode_config_dir) {
-		const config_json = join(opencode_config_dir, 'svelte.json');
-		if (existsSync(config_json)) {
-			config_dir_path = config_json;
-		}
-	}
+	// Lowest priority is first, so project config overrides global config.
+	return [
+		GLOBAL_CONFIG_PATH,
+		opencode_config_dir ? join(opencode_config_dir, 'svelte.json') : null,
+		join(directory, '.opencode', 'svelte.json'),
+	];
+}
 
-	// Project-local: ./.opencode/svelte.json (cwd)
-	/** @type {string | null} */
-	let project_path = null;
-	const project_config = join(process.cwd(), '.opencode', 'svelte.json');
-	if (existsSync(project_config)) {
-		project_path = project_config;
-	}
+/** @param {string} directory */
+function get_config_paths(directory) {
+	return get_config_candidates(directory).map((path) => (path && existsSync(path) ? path : null));
+}
 
-	// Lowest priority first, highest priority last (project overrides global)
-	return [global_path, config_dir_path, project_path];
+/**
+ * We watch for the config paths in the case of Opencode 2 because the plugin is only
+ * instantiated once per folder and then kept alive but the one long running opencode server
+ * this allows us to also hot reload in case the user changes the configuration with
+ * the opencode tui plugin.
+ * @param {string} directory
+ * @param {() => void} on_change
+ */
+export function watch_mcp_config(directory, on_change) {
+	const paths = [...new Set(get_config_candidates(directory).filter((path) => path !== null))];
+	for (const path of paths) watchFile(path, { interval: 500, persistent: false }, on_change);
+	return () => {
+		for (const path of paths) unwatchFile(path, on_change);
+	};
 }
 
 /**
@@ -195,9 +194,13 @@ function merge_with_defaults(user_config) {
 	};
 }
 
-/** @param {PluginInput} ctx */
-export function get_mcp_config(ctx) {
-	const config_paths = get_config_paths();
+/**
+ * @param {{ directory?: string, on_warning?: (warning: ConfigWarning) => void }} [options]
+ */
+export function get_mcp_config(options = {}) {
+	const directory = options.directory ?? process.cwd();
+	const config_paths = get_config_paths(directory);
+	const on_warning = options.on_warning ?? (() => {});
 	/** @type {Partial<McpConfig>} */
 	let merged = {};
 
@@ -206,16 +209,10 @@ export function get_mcp_config(ctx) {
 		if (path && existsSync(path)) {
 			const result = load_config_file(path);
 			if (result.parse_error) {
-				setTimeout(() => {
-					ctx.client.tui.showToast({
-						body: {
-							title: 'Svelte: Invalid opencode plugin config',
-							message: `${result.parse_error} (${path})\nSkipping this config file`,
-							variant: 'warning',
-							duration: 7000,
-						},
-					});
-				}, 7000);
+				on_warning({
+					title: 'Svelte: Invalid opencode plugin config',
+					message: `${result.parse_error} (${path})\nSkipping this config file`,
+				});
 				continue;
 			}
 			const parsed = v.safeParse(config_schema, result.data);
@@ -232,16 +229,10 @@ export function get_mcp_config(ctx) {
 					autoupdate: parsed.output.autoupdate ?? merged.autoupdate,
 				};
 			} else {
-				setTimeout(() => {
-					ctx.client.tui.showToast({
-						body: {
-							title: 'Svelte: Invalid opencode plugin config',
-							message: `Invalid config schema (${path})\nSkipping this config file`,
-							variant: 'warning',
-							duration: 7000,
-						},
-					});
-				}, 7000);
+				on_warning({
+					title: 'Svelte: Invalid opencode plugin config',
+					message: `Invalid config schema (${path})\nSkipping this config file`,
+				});
 			}
 		}
 	}

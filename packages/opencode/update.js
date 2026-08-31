@@ -5,8 +5,6 @@ import { fileURLToPath } from 'node:url';
 import { compare } from 'verkit';
 import package_json from './package.json' with { type: 'json' };
 
-/** @typedef {import('@opencode-ai/plugin').PluginInput} PluginInput */
-
 const current_dir = dirname(fileURLToPath(import.meta.url));
 const name_segments = package_json.name.split('/');
 
@@ -45,13 +43,14 @@ export function get_install_dir(dir = current_dir) {
  * enabled we also delete the cached plugin once opencode shuts down, so the next start picks up the
  * new version.
  *
- * @param {PluginInput} ctx
  * @param {boolean} autoupdate
+ * @param {(update: { latest: string, message: string }) => void} on_update
  * @returns {() => Promise<void>} the `dispose` hook
  */
-export function setup_updates(ctx, autoupdate) {
+export function setup_updates(autoupdate, on_update) {
 	/** @type {string | null} */
 	let stale_dir = null;
+	let disposed = false;
 	let wiped = false;
 
 	function wipe() {
@@ -66,6 +65,7 @@ export function setup_updates(ctx, autoupdate) {
 	}
 
 	exec(`npm view ${package_json.name} version`, (_, version) => {
+		if (disposed) return;
 		const latest = version?.trim();
 		if (!latest || compare(latest, package_json.version) !== 1) return;
 
@@ -74,23 +74,18 @@ export function setup_updates(ctx, autoupdate) {
 		// register it once we know we have something to delete to avoid piling up listeners.
 		if (stale_dir) process.once('exit', wipe);
 
-		setTimeout(() => {
-			ctx.client.tui.showToast({
-				body: {
-					title: 'Svelte: new plugin version available',
-					message: `${package_json.name}@${latest} is available (you are using ${package_json.version}).\n\n${
-						stale_dir
-							? 'It will be installed automatically the next time you start OpenCode.'
-							: 'Wipe the cache or update your OpenCode config to update.'
-					}`,
-					variant: 'warning',
-					duration: 7000,
-				},
-			});
-		}, 7000);
+		on_update({
+			latest,
+			message: `${package_json.name}@${latest} is available (you are using ${package_json.version}).\n\n${
+				stale_dir
+					? 'It will be installed automatically the next time you start OpenCode.'
+					: 'Wipe the cache or update your OpenCode config to update.'
+			}`,
+		});
 	});
 
 	return async () => {
+		disposed = true;
 		process.off('exit', wipe);
 		wipe();
 	};

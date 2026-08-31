@@ -15,7 +15,9 @@ Add `@sveltejs/opencode` to your OpenCode config (either global or local):
 
 That's it! You now have the Svelte MCP server and the file editor subagent configured automatically.
 
-To configure the plugin from OpenCode's TUI, also add the package to `tui.json`:
+The same package and `@sveltejs/opencode/server` entrypoint support both OpenCode V1 and V2. No server configuration change is needed when upgrading OpenCode.
+
+To configure the plugin from OpenCode V1's TUI, also add the package to `tui.json`:
 
 ```json
 {
@@ -23,6 +25,8 @@ To configure the plugin from OpenCode's TUI, also add the package to `tui.json`:
 	"plugin": ["@sveltejs/opencode"]
 }
 ```
+
+OpenCode V2 automatically loads the package's TUI entrypoint when the server plugin is active.
 
 Run `/svelte-plugin` or choose **Configure Svelte plugin** from the command palette. The dialog lets you choose project or global scope before editing the available options, and guides you through finite choices such as built-in skills.
 
@@ -81,7 +85,11 @@ Create `svelte.json` to customize how the plugin configures MCP, the Svelte suba
 
 The plugin checks npm for newer versions and warns you when one is available. OpenCode caches plugins, so a new version is only picked up once that cache is wiped.
 
-Automatic updates are enabled by default. When a newer version is detected, the plugin removes itself from the OpenCode cache as OpenCode shuts down, so the latest version is installed on the next start. This only applies when the plugin is unpinned or explicitly uses the `latest` tag. Exact versions, ranges, and other dist-tags are left untouched because reinstalling them may resolve to the same version again. Set `"autoupdate": false` to only receive the warning.
+Automatic updates are enabled by default. When a newer version is detected, the plugin removes itself from the OpenCode cache when its server instance shuts down, so the latest version is installed on the next start. This only applies when the plugin is unpinned or explicitly uses the `latest` tag. Exact versions, ranges, and other dist-tags are left untouched because reinstalling them may resolve to the same version again. Set `"autoupdate": false` to only receive the warning.
+
+OpenCode V2 keeps a background server running after its TUI closes. Closing the TUI is therefore not a plugin shutdown; cleanup occurs when V2 evicts the idle location or when the background server stops.
+
+OpenCode V1 displays update and invalid-config warnings as TUI toasts. The V2 server plugin API does not currently expose notifications, so V2 reports the same messages as Node process warnings. V2 also registers the bundled instructions and skills directly through its plugin domains rather than adding their paths to the legacy configuration.
 
 ### Defaults
 
@@ -97,18 +105,18 @@ If omitted, the plugin uses these defaults:
 
 ### Configuration Options
 
-| Option                                           | Type                  | Default    | Description                                                                                    |
-| ------------------------------------------------ | --------------------- | ---------- | ---------------------------------------------------------------------------------------------- |
-| `mcp.type`                                       | `"remote" \| "local"` | `"local"`  | Run `@sveltejs/mcp` via `npx` (`local`) or use `https://mcp.svelte.dev/mcp` (`remote`).        |
-| `mcp.enabled`                                    | `boolean`             | `true`     | Enable or disable the Svelte MCP server entry.                                                 |
-| `subagent.enabled`                               | `boolean`             | `true`     | Enable or disable registration of the `svelte-file-editor` subagent.                           |
-| `subagent.agents.svelte-file-editor.model`       | `string`              | main agent | Override the model used by the Svelte file editor subagent.                                    |
-| `subagent.agents.svelte-file-editor.temperature` | `number`              | unset      | Set temperature for the subagent.                                                              |
-| `subagent.agents.svelte-file-editor.top_p`       | `number`              | unset      | Set top-p sampling for the subagent.                                                           |
-| `subagent.agents.svelte-file-editor.maxSteps`    | `number`              | unlimited  | Limit the number of steps the subagent can execute.                                            |
-| `instructions.enabled`                           | `boolean`             | `true`     | Enable or disable automatic instruction-file injection.                                        |
-| `skills.enabled`                                 | `boolean \| string[]` | `true`     | Enable all skills (`true`), disable all skills (`false`), or enable only specific skill names. |
-| `autoupdate`                                     | `boolean`             | `true`     | Remove an unpinned/latest plugin from the cache on exit when a newer version is available.     |
+| Option                                           | Type                  | Default    | Description                                                                                     |
+| ------------------------------------------------ | --------------------- | ---------- | ----------------------------------------------------------------------------------------------- |
+| `mcp.type`                                       | `"remote" \| "local"` | `"local"`  | Run `@sveltejs/mcp` via `npx` (`local`) or use `https://mcp.svelte.dev/mcp` (`remote`).         |
+| `mcp.enabled`                                    | `boolean`             | `true`     | Enable or disable the Svelte MCP server entry.                                                  |
+| `subagent.enabled`                               | `boolean`             | `true`     | Enable or disable registration of the `svelte-file-editor` subagent.                            |
+| `subagent.agents.svelte-file-editor.model`       | `string`              | main agent | Override the model used by the Svelte file editor subagent.                                     |
+| `subagent.agents.svelte-file-editor.temperature` | `number`              | unset      | Set temperature for the subagent.                                                               |
+| `subagent.agents.svelte-file-editor.top_p`       | `number`              | unset      | Set top-p sampling for the subagent.                                                            |
+| `subagent.agents.svelte-file-editor.maxSteps`    | `number`              | unlimited  | Limit the number of steps the subagent can execute.                                             |
+| `instructions.enabled`                           | `boolean`             | `true`     | Enable or disable automatic instruction-file injection.                                         |
+| `skills.enabled`                                 | `boolean \| string[]` | `true`     | Enable all skills (`true`), disable all skills (`false`), or enable only specific skill names.  |
+| `autoupdate`                                     | `boolean`             | `true`     | Remove an unpinned/latest plugin from the cache on plugin shutdown when an update is available. |
 
 ### Supported Skill Names
 
@@ -126,6 +134,8 @@ The plugin reads from these files (lowest priority first, highest priority last)
 - `.opencode/svelte.json` in the current project
 
 If the same key is defined in multiple files, the later location overrides earlier ones.
+
+OpenCode V2 watches these files and reloads the MCP, subagent, instructions, and skills when they change. A server restart is not required.
 
 ## License
 
