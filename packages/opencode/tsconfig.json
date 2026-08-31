@@ -5,6 +5,17 @@
 		"jsxImportSource": "@opentui/solid",
 		"types": ["@types/node"]
 	},
-	"include": ["index.js", "config.js", "update.js", "agents.js", "tui.jsx", "scripts/*"],
+	"include": [
+		"index.js",
+		"v1.js",
+		"v2.js",
+		"config.js",
+		"update.js",
+		"agents.js",
+		"tui.jsx",
+		"v1-tui.jsx",
+		"v2-tui.js",
+		"scripts/*"
+	],
 	"exclude": ["node_modules"]
 }

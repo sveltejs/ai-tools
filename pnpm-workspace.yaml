@@ -24,7 +24,8 @@ catalogs:
     svelte-eslint-parser: ^1.7.1
     typescript-eslint: ^8.44.0
   opencode:
-    '@opencode-ai/plugin': 1.17.18
+    '@opencode-ai/plugin': 0.0.0-beta-18684
+    '@opencode-ai/plugin-v1': npm:@opencode-ai/plugin@1.17.18
     '@opentui/core': ^0.4.3
     '@opentui/keymap': ^0.4.3
     '@opentui/solid': ^0.4.3
