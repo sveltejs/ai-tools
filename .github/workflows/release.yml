@@ -52,7 +52,7 @@ jobs:
       - name: Create Release Pull Request or Publish to npm
         id: changesets
         # pinned for security, always review third party action code before updating
-        uses: changesets/action@c48e67d110a68bc90ccf1098e9646092baacaa87 # v1.6.0
+        uses: changesets/action@8488615a623b1b9c987934bb89eae8af6a946ac1 # v2.1.1
         with:
           # This expects you to have a script called changeset:version version that calls changeset version and updated what it needs to be updated
           version: pnpm changeset:version
