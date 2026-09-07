@@ -15,9 +15,9 @@ Add `@sveltejs/opencode` to your OpenCode config (either global or local):
 
 That's it! You now have the Svelte MCP server and the file editor subagent configured automatically.
 
-The same package and `@sveltejs/opencode/server` entrypoint support both OpenCode V1 and V2. No server configuration change is needed when upgrading OpenCode.
+The same package and `@sveltejs/opencode/server` entrypoint support both OpenCode v1 and v2. No server configuration change is needed when upgrading OpenCode.
 
-To configure the plugin from OpenCode V1's TUI, also add the package to `tui.json`:
+To configure the plugin from OpenCode v1's TUI, add the package to `tui.json` as well:
 
 ```json
 {
@@ -87,9 +87,9 @@ The plugin checks npm for newer versions and warns you when one is available. Op
 
 Automatic updates are enabled by default. When a newer version is detected, the plugin removes itself from the OpenCode cache when its server instance shuts down, so the latest version is installed on the next start. This only applies when the plugin is unpinned or explicitly uses the `latest` tag. Exact versions, ranges, and other dist-tags are left untouched because reinstalling them may resolve to the same version again. Set `"autoupdate": false` to only receive the warning.
 
-OpenCode V2 keeps a background server running after its TUI closes. Closing the TUI is therefore not a plugin shutdown; cleanup occurs when V2 evicts the idle location or when the background server stops.
+OpenCode v2 keeps a background server running after its TUI closes. Closing the TUI is therefore not a plugin shutdown; cleanup occurs when v2 evicts the idle location or when the background server stops.
 
-OpenCode V1 displays update and invalid-config warnings as TUI toasts. The V2 server plugin API does not currently expose notifications, so V2 reports the same messages as Node process warnings. V2 also registers the bundled instructions and skills directly through its plugin domains rather than adding their paths to the legacy configuration.
+OpenCode v1 displays update and invalid-config warnings as TUI toasts. The v2 server plugin API does not currently expose notifications, so v2 reports the same messages as Node process warnings. v2 also registers the bundled instructions and skills directly through its plugin domains rather than adding their paths to the legacy configuration.
 
 ### Defaults
 
@@ -135,7 +135,7 @@ The plugin reads from these files (lowest priority first, highest priority last)
 
 If the same key is defined in multiple files, the later location overrides earlier ones.
 
-OpenCode V2 watches these files and reloads the MCP, subagent, instructions, and skills when they change. A server restart is not required.
+OpenCode v2 watches these files and reloads the MCP, subagent, instructions, and skills when they change. A server restart is not required.
 
 ## License
 

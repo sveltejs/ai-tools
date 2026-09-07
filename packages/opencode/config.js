@@ -210,7 +210,7 @@ export function get_mcp_config(options = {}) {
 			const result = load_config_file(path);
 			if (result.parse_error) {
 				on_warning({
-					title: 'Svelte: Invalid opencode plugin config',
+					title: 'Svelte: Invalid OpenCode plugin config',
 					message: `${result.parse_error} (${path})\nSkipping this config file`,
 				});
 				continue;
@@ -230,7 +230,7 @@ export function get_mcp_config(options = {}) {
 				};
 			} else {
 				on_warning({
-					title: 'Svelte: Invalid opencode plugin config',
+					title: 'Svelte: Invalid OpenCode plugin config',
 					message: `Invalid config schema (${path})\nSkipping this config file`,
 				});
 			}

@@ -2,4 +2,4 @@
 '@sveltejs/opencode': patch
 ---
 
-feat: support Opencode V2
+feat: support OpenCode V2
