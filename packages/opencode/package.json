@@ -13,9 +13,13 @@
 	},
 	"files": [
 		"index.js",
+		"v1.js",
+		"v2.js",
 		"config.js",
 		"update.js",
 		"tui.jsx",
+		"v1-tui.jsx",
+		"v2-tui.js",
 		"agents.js",
 		"instructions",
 		"skills"
@@ -48,6 +52,7 @@
 	},
 	"devDependencies": {
 		"@opencode-ai/plugin": "catalog:opencode",
+		"@opencode-ai/plugin-v1": "catalog:opencode",
 		"@types/node": "catalog:tooling",
 		"@valibot/to-json-schema": "catalog:tooling"
 	}
