@@ -1,5 +1,11 @@
 # @sveltejs/opencode
 
+## 0.1.15
+
+### Patch Changes
+
+- feat: support OpenCode V2 ([#258](https://github.com/sveltejs/ai-tools/pull/258))
+
 ## 0.1.14
 
 ### Patch Changes
