@@ -51,8 +51,8 @@
 		"verkit": "catalog:tooling"
 	},
 	"devDependencies": {
-		"@opencode-ai/plugin": "catalog:opencode",
 		"@opencode-ai/plugin-v1": "catalog:opencode",
+		"@opencode/plugin": "catalog:opencode",
 		"@types/node": "catalog:tooling",
 		"@valibot/to-json-schema": "catalog:tooling"
 	}

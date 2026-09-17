@@ -8,7 +8,7 @@ import { config_schema } from './config.js';
 /** @typedef {v.InferInput<typeof config_schema>} McpConfig */
 /** @typedef {'project' | 'global'} Scope */
 /** @typedef {Partial<McpConfig>} Config */
-/** @typedef {import('@opencode-ai/plugin/tui').Plugin.Context} V2TuiContext */
+/** @typedef {import('@opencode/plugin/tui').Plugin.Context} V2TuiContext */
 
 const skill_names = ['svelte-code-writer', 'svelte-core-bestpractices'];
 const agent_name = 'svelte-file-editor';
