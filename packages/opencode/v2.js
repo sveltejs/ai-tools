@@ -5,10 +5,15 @@ import { agents } from './agents.js';
 import { get_mcp_config, watch_mcp_config } from './config.js';
 import { setup_updates } from './update.js';
 
-/** @typedef {import('@opencode-ai/plugin').Plugin.Context} V2Context */
-/** @typedef {import('@opencode-ai/plugin').Mcp.ServerConfig} McpConfig */
-/** @typedef {import('@opencode-ai/plugin').Skill.Info} SkillInfo */
-/** @typedef {NonNullable<import('@opencode-ai/plugin').Agent.Info['model']>} ModelRef */
+/** @typedef {import('@opencode/plugin').Plugin.Context} V2Context */
+/** @typedef {import('@opencode/plugin').Mcp.ServerConfig} McpConfig */
+/** @typedef {import('@opencode/plugin').Skill.Info} SkillInfo */
+/**
+ * Opencode renamed `Skill.Info.location` to `path` in 2.0.4. Both schemas drop unknown keys, so
+ * sending the two lets one build of the plugin work on either side of that rename.
+ * @typedef {SkillInfo & { location: SkillInfo['path'] }} SkillPayload
+ */
+/** @typedef {NonNullable<import('@opencode/plugin').Agent.Info['model']>} ModelRef */
 
 const current_dir = dirname(fileURLToPath(import.meta.url));
 
@@ -54,7 +59,7 @@ function parse_model(model) {
 
 /**
  * Opencode V1 could load the skills directly by including a folder in the path. In Opencode V2 we need to provide an object with
- * `id`, `name`, `description`, `location`, and `content`. This helper parses the SKILL.md file and returns the object.
+ * `id`, `name`, `description`, `path`, and `content`. This helper parses the SKILL.md file and returns the object.
  * The SKILL.md file is expected to have a frontmatter section with `name` and `description` fields, followed by the content of the skill.
  * If the frontmatter is missing or invalid, the skill will be skipped.
  * @param {string} content
@@ -88,24 +93,25 @@ async function load_skills(enabled) {
 		: (await readdir(skills_dir, { withFileTypes: true }))
 				.filter((entry) => entry.isDirectory())
 				.map((entry) => entry.name);
-	/** @type {SkillInfo[]} */
+	/** @type {SkillPayload[]} */
 	const result = [];
 	for (const id of names) {
-		const location = join(skills_dir, id, 'SKILL.md');
+		const path = /** @type {SkillInfo['path']} */ (join(skills_dir, id, 'SKILL.md'));
 		let content;
 		try {
-			content = await readFile(location, 'utf8');
+			content = await readFile(path, 'utf8');
 		} catch {
 			continue;
 		}
 		const parsed = parse_skill(content);
 		if (!parsed) continue;
 		result.push(
-			/** @type {SkillInfo} */ ({
+			/** @type {SkillPayload} */ ({
 				id,
 				name: parsed.name ?? id,
 				...(parsed.description === undefined ? {} : { description: parsed.description }),
-				location,
+				path,
+				location: path,
 				content: parsed.content,
 			}),
 		);
