@@ -1,11 +1,12 @@
 import { compile as compile_component, compileModule } from 'svelte/compiler';
 import { extname } from 'path';
 import ts from 'ts-blank-space';
+import type { SemVer } from 'verkit';
 
 export function add_compile_issues(
 	content: { issues: string[]; suggestions: string[] },
 	code: string,
-	desired_svelte_version: number,
+	desired_svelte_version: SemVer,
 	filename = 'Component.svelte',
 	async = false,
 ) {
@@ -27,7 +28,7 @@ export function add_compile_issues(
 	const compilation_result = compile(code, {
 		filename: filename || 'Component.svelte',
 		generate: false,
-		runes: desired_svelte_version >= 5,
+		runes: desired_svelte_version.major >= 5,
 		experimental: { async },
 	});
 
