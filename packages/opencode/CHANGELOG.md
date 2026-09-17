@@ -1,5 +1,11 @@
 # @sveltejs/opencode
 
+## 0.1.16
+
+### Patch Changes
+
+- fix: skill transform for newer opencode versions ([#267](https://github.com/sveltejs/ai-tools/pull/267))
+
 ## 0.1.15
 
 ### Patch Changes
