@@ -41,6 +41,7 @@ export function parse(code: string, file_path: string) {
 
 	return {
 		ast,
+		code,
 		tokens,
 		scope_manager: parsed.scopeManager as ScopeManager,
 		visitor_keys: parsed.visitorKeys,

@@ -3,6 +3,7 @@ import svelte_parser from 'svelte-eslint-parser';
 import svelte from 'eslint-plugin-svelte';
 import type { Config } from '@sveltejs/kit';
 import ts from 'typescript-eslint';
+import type { SemVer } from 'verkit';
 
 let svelte_5_linter: ESLint | undefined;
 
@@ -52,8 +53,8 @@ function base_config(svelte_config: Config): ESLint.Options['baseConfig'] {
 	];
 }
 
-function get_linter(version: number, async = false) {
-	if (version < 5) {
+function get_linter(version: SemVer, async = false) {
+	if (version.major < 5) {
 		return (svelte_4_linter ??= new ESLint({
 			overrideConfigFile: true,
 			baseConfig: base_config({
@@ -77,7 +78,7 @@ function get_linter(version: number, async = false) {
 export async function add_eslint_issues(
 	content: { issues: string[]; suggestions: string[] },
 	code: string,
-	desired_svelte_version: number,
+	desired_svelte_version: SemVer,
 	filename = 'Component.svelte',
 	async = false,
 ) {
