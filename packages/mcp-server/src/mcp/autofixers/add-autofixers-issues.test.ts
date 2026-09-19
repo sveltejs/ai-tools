@@ -787,4 +787,396 @@ describe('add_autofixers_issues', () => {
 			).not.toThrow();
 		});
 	});
+
+	// https://github.com/sveltejs/ai-tools/issues/263
+	describe('self_spread_state_update', () => {
+		function message(name: string, kind: 'object' | 'array', mutation: string) {
+			return `Reassigning the stateful value "${name}" with a spread of itself is less performant than mutating it. Prefer \`${mutation}\` or, if you always replace the whole ${kind}, declare it with \`$state.raw\`.`;
+		}
+
+		function expect_not_suggested(
+			content: { suggestions: string[] },
+			...expected: [name: string, mutation: string][]
+		) {
+			for (const [name, mutation] of expected) {
+				expect(content.suggestions).not.toContain(message(name, 'object', mutation));
+				expect(content.suggestions).not.toContain(message(name, 'array', mutation));
+			}
+		}
+
+		it('should suggest a property mutation for `x = { ...x, key: value }`', () => {
+			const content = run_autofixers_on_code(`
+			<script>
+				let data = $state({ phase: 'idle', error: null });
+
+				function start() {
+					data = { ...data, phase: 'recording' };
+				}
+			</script>`);
+
+			expect(content.suggestions).toContain(message('data', 'object', 'data.phase = ...'));
+		});
+
+		it('should suggest `.push()` for `items = [...items, item]`', () => {
+			const content = run_autofixers_on_code(`
+			<script>
+				let items = $state([]);
+
+				function add(item) {
+					items = [...items, item];
+				}
+			</script>`);
+
+			expect(content.suggestions).toContain(message('items', 'array', 'items.push(...)'));
+		});
+
+		it('should work in the template', () => {
+			const content = run_autofixers_on_code(`
+			<script>
+				let data = $state({ count: 0 });
+			</script>
+
+			<button onclick={() => { data = { ...data, count: data.count + 1 }; }}>+</button>`);
+
+			expect(content.suggestions).toContain(message('data', 'object', 'data.count = ...'));
+		});
+
+		it('should work in `.svelte.ts` modules', () => {
+			const content = { issues: [], suggestions: [] };
+			add_autofixers_issues(
+				content,
+				`
+				type Data = { phase: string; error: string | null };
+				let data = $state<Data>({ phase: 'idle', error: null });
+
+				export function start() {
+					data = { ...data, phase: 'recording' };
+				}`,
+				5,
+				'state.svelte.ts',
+			);
+
+			expect(content.suggestions).toContain(message('data', 'object', 'data.phase = ...'));
+		});
+
+		it('should recognise `$state({ ... } as Type)` as an object state', () => {
+			const content = { issues: [], suggestions: [] };
+			add_autofixers_issues(
+				content,
+				`
+				type Data = { phase: string };
+				let data = $state({ phase: 'idle' } as Data);
+
+				export function start() {
+					data = { ...data, phase: 'recording' };
+				}`,
+				5,
+				'state.svelte.ts',
+			);
+
+			expect(content.suggestions).toContain(message('data', 'object', 'data.phase = ...'));
+		});
+
+		it('should support shorthand properties', () => {
+			const content = run_autofixers_on_code(`
+			<script>
+				let data = $state({ phase: 'idle' });
+
+				function set(phase) {
+					data = { ...data, phase };
+				}
+			</script>`);
+
+			expect(content.suggestions).toContain(message('data', 'object', 'data.phase = ...'));
+		});
+
+		it('should support string literal keys', () => {
+			const content = run_autofixers_on_code(`
+			<script>
+				let data = $state({ 'my-key': 0 });
+
+				function set() {
+					data = { ...data, 'my-key': 1 };
+				}
+			</script>`);
+
+			expect(content.suggestions).toContain(message('data', 'object', "data['my-key'] = ..."));
+		});
+
+		it.each([{ init: '$state.raw' }, { init: '$derived' }, { init: '$derived.by' }])(
+			'should not suggest anything for $init',
+			({ init }) => {
+				const content = run_autofixers_on_code(`
+				<script>
+					let data = ${init}({ phase: 'idle' });
+					let items = ${init}([]);
+
+					function start() {
+						data = { ...data, phase: 'recording' };
+						items = [...items, 1];
+					}
+				</script>`);
+
+				expect_not_suggested(content, ['data', 'data.phase = ...'], ['items', 'items.push(...)']);
+			},
+		);
+
+		it('should not suggest anything for non stateful variables', () => {
+			const content = run_autofixers_on_code(`
+			<script>
+				let data = { phase: 'idle' };
+				let items = [];
+
+				function start() {
+					data = { ...data, phase: 'recording' };
+					items = [...items, 1];
+				}
+			</script>`);
+
+			expect_not_suggested(content, ['data', 'data.phase = ...'], ['items', 'items.push(...)']);
+		});
+
+		it('should suggest a mutation even when the shape of the state is not known', () => {
+			const content = run_autofixers_on_code(`
+			<script>
+				let data = $state(initial);
+
+				function start() {
+					data = { ...data, phase: 'recording' };
+				}
+			</script>`);
+
+			expect(content.suggestions).toContain(message('data', 'object', 'data.phase = ...'));
+		});
+
+		it('should not suggest anything for a state declared without an initial value', () => {
+			const content = run_autofixers_on_code(`
+			<script>
+				let data = $state();
+
+				function start() {
+					data = { ...data, phase: 'recording' };
+				}
+			</script>`);
+
+			expect_not_suggested(content, ['data', 'data.phase = ...']);
+		});
+
+		it('should suggest a mutation for member targets', () => {
+			const content = run_autofixers_on_code(`
+			<script>
+				let data = $state({ inner: { k: 0 }, list: [] });
+
+				function start() {
+					data.inner = { ...data.inner, k: 1 };
+					data.list = [...data.list, 1];
+				}
+			</script>`);
+
+			expect(content.suggestions).toContain(message('data.inner', 'object', 'data.inner.k = ...'));
+			expect(content.suggestions).toContain(message('data.list', 'array', 'data.list.push(...)'));
+		});
+
+		it('should suggest a mutation for class fields', () => {
+			const content = run_autofixers_on_code(`
+			<script>
+				class Store {
+					x = $state({ k: 0 });
+					#items = $state([]);
+					update() {
+						this.x = { ...this.x, k: 1 };
+						this.#items = [...this.#items, 1];
+					}
+				}
+			</script>`);
+
+			expect(content.suggestions).toContain(message('this.x', 'object', 'this.x.k = ...'));
+			expect(content.suggestions).toContain(
+				message('this.#items', 'array', 'this.#items.push(...)'),
+			);
+		});
+
+		it('should not suggest anything for class fields that are not stateful', () => {
+			const content = run_autofixers_on_code(`
+			<script>
+				class Store {
+					x = { k: 0 };
+					raw = $state.raw({ k: 0 });
+					update() {
+						this.x = { ...this.x, k: 1 };
+						this.raw = { ...this.raw, k: 1 };
+					}
+				}
+			</script>`);
+
+			expect_not_suggested(content, ['this.x', 'this.x.k = ...'], ['this.raw', 'this.raw.k = ...']);
+		});
+
+		it('should suggest a mutation for destructured bindings', () => {
+			const content = run_autofixers_on_code(`
+			<script>
+				let { a } = $state({ a: { k: 0 } });
+
+				function start() {
+					a = { ...a, k: 1 };
+				}
+			</script>`);
+
+			expect(content.suggestions).toContain(message('a', 'object', 'a.k = ...'));
+		});
+
+		it('should not suggest anything for aliased bindings', () => {
+			const content = run_autofixers_on_code(`
+			<script>
+				let data = $state({ k: 0, inner: { k: 0 } });
+				let alias = data;
+				let inner = data.inner;
+
+				function start() {
+					alias = { ...alias, k: 1 };
+					inner = { ...inner, k: 1 };
+				}
+			</script>`);
+
+			expect_not_suggested(content, ['alias', 'alias.k = ...'], ['inner', 'inner.k = ...']);
+		});
+
+		it('should not suggest anything when there is more than one spread', () => {
+			const content = run_autofixers_on_code(`
+			<script>
+				let data = $state({ k: 0 });
+				let items = $state([]);
+
+				function start() {
+					data = { ...data, ...other, k: 1 };
+					items = [...items, ...other];
+				}
+			</script>`);
+
+			expect_not_suggested(content, ['data', 'data.k = ...'], ['items', 'items.push(...)']);
+		});
+
+		it('should not suggest anything when the spread is not first', () => {
+			const content = run_autofixers_on_code(`
+			<script>
+				let data = $state({ k: 0 });
+				let items = $state([]);
+
+				function start() {
+					data = { k: 1, ...data };
+					items = [item, ...items];
+				}
+			</script>`);
+
+			expect_not_suggested(content, ['data', 'data.k = ...'], ['items', 'items.push(...)']);
+		});
+
+		it('should not suggest anything when the spread is of a different variable', () => {
+			const content = run_autofixers_on_code(`
+			<script>
+				let data = $state({ k: 0 });
+				let other = $state({ k: 0 });
+
+				function start() {
+					data = { ...other, k: 1 };
+				}
+			</script>`);
+
+			expect_not_suggested(content, ['data', 'data.k = ...']);
+		});
+
+		it('should not suggest anything when the spread identifier is shadowed', () => {
+			const content = run_autofixers_on_code(`
+			<script>
+				let data = $state({ k: 0 });
+
+				function start() {
+					data = (() => {
+						let data = { k: 0 };
+						return { ...data, k: 1 };
+					})();
+				}
+			</script>`);
+
+			expect_not_suggested(content, ['data', 'data.k = ...']);
+		});
+
+		it('should suggest multiple mutations for more than one property or element', () => {
+			const content = run_autofixers_on_code(`
+			<script>
+				let data = $state({ k: 0, j: 0 });
+				let items = $state([]);
+
+				function start() {
+					data = { ...data, k: 1, j: 1 };
+					items = [...items, 1, 2];
+				}
+			</script>`);
+
+			expect(content.suggestions).toContain(
+				message('data', 'object', 'data.k = ...; data.j = ...'),
+			);
+			expect(content.suggestions).toContain(message('items', 'array', 'items.push(...)'));
+		});
+
+		it('should not suggest anything for a spread with nothing else', () => {
+			const content = run_autofixers_on_code(`
+			<script>
+				let data = $state({ k: 0 });
+				let items = $state([]);
+
+				function start() {
+					data = { ...data };
+					items = [...items];
+				}
+			</script>`);
+
+			expect_not_suggested(content, ['data', 'data.k = ...'], ['items', 'items.push(...)']);
+		});
+
+		it('should not suggest anything for computed or accessor properties', () => {
+			const content = run_autofixers_on_code(`
+			<script>
+				let data = $state({ k: 0 });
+
+				function start() {
+					data = { ...data, [key]: 1 };
+					data = { ...data, get k() { return 1; } };
+					data = { ...data, k() { return 1; } };
+				}
+			</script>`);
+
+			expect_not_suggested(content, ['data', 'data.k = ...'], ['data', 'data[key] = ...']);
+		});
+
+		it('should not suggest anything when the assignment is not standalone', () => {
+			const content = run_autofixers_on_code(`
+			<script>
+				let data = $state({ k: 0 });
+				let copy;
+
+				function start() {
+					copy = data = { ...data, k: 1 };
+					console.log((data = { ...data, k: 2 }));
+				}
+			</script>`);
+
+			expect_not_suggested(content, ['data', 'data.k = ...'], ['copy', 'copy.k = ...']);
+		});
+
+		it('should not suggest anything when the object kind does not match the state kind', () => {
+			const content = run_autofixers_on_code(`
+			<script>
+				let data = $state({ k: 0 });
+				let items = $state([]);
+
+				function start() {
+					data = [...data, 1];
+					items = { ...items, k: 1 };
+				}
+			</script>`);
+
+			expect_not_suggested(content, ['data', 'data.push(...)'], ['items', 'items.k = ...']);
+		});
+	});
 });
