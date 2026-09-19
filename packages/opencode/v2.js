@@ -205,7 +205,7 @@ export async function v2_setup(ctx) {
 		}
 	});
 
-	const stop_updates = setup_updates(mcp_config.autoupdate === true, (update) => {
+	const stop_updates = setup_updates(mcp_config.autoupdate === true, true, (update) => {
 		emit_warning({ title: 'Svelte: new plugin version available', message: update.message });
 	});
 	let stopped = false;

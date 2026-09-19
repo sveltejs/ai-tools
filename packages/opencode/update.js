@@ -18,17 +18,30 @@ function up(dir, levels) {
 }
 
 /**
- * opencode installs every plugin in `<cache>/packages/<spec>/node_modules/<name>`, so removing
+ * opencode v1 installs every plugin in `<cache>/packages/<spec>/node_modules/<name>`, so removing
  * `<spec>` is enough to make it reinstall the plugin from scratch on the next start.
  *
- * We return `null` whenever we don't recognize that layout (for example when the plugin is linked
+ * opencode v2 installs them in `<cache>/npm/<spec>/<generation>/node_modules/<name>` instead, where
+ * `<generation>` is a timestamp. It keeps the last two generations around and always loads the
+ * newest one, so we have to remove the whole `<spec>` folder: deleting only the running generation
+ * would make it fall back to an even older version.
+ *
+ * In both cases `<spec>` is nested in the scope folder (`@sveltejs/opencode@latest`).
+ *
+ * We return `null` whenever we don't recognize the layout (for example when the plugin is linked
  * locally during development) so that we never delete a folder we don't own.
+ *
+ * @param {boolean} is_v2 whether the plugin is running in opencode v2
+ * @param {string} [dir]
  */
-export function get_install_dir(dir = current_dir) {
-	// from `<cache>/packages/<spec>/node_modules/<name>` up to `<cache>/packages/<spec>`
-	const install_dir = up(dir, name_segments.length + 1);
-	// ...and from there up to `<cache>/packages`
-	if (basename(up(install_dir, name_segments.length)) !== 'packages') return null;
+export function get_install_dir(is_v2, dir = current_dir) {
+	if (basename(up(dir, name_segments.length)) !== 'node_modules') return null;
+	// from `.../node_modules/<name>` up to the folder containing `node_modules`
+	const root = up(dir, name_segments.length + 1);
+	// in v2 that's the generation folder and `<spec>` is its parent, in v1 it's `<spec>` itself
+	const install_dir = is_v2 ? dirname(root) : root;
+	// ...and from there up to `<cache>/packages` (v1) or `<cache>/npm` (v2)
+	if (basename(up(install_dir, name_segments.length)) !== (is_v2 ? 'npm' : 'packages')) return null;
 	// Only unconstrained installs can pick up npm's latest version. Ranges and alternate tags may
 	// resolve to the same installed version after every wipe.
 	const package_name = name_segments.at(-1);
@@ -44,10 +57,11 @@ export function get_install_dir(dir = current_dir) {
  * new version.
  *
  * @param {boolean} autoupdate
+ * @param {boolean} is_v2 whether the plugin is running in opencode v2
  * @param {(update: { latest: string, message: string }) => void} on_update
  * @returns {() => Promise<void>} the `dispose` hook
  */
-export function setup_updates(autoupdate, on_update) {
+export function setup_updates(autoupdate, is_v2, on_update) {
 	/** @type {string | null} */
 	let stale_dir = null;
 	let disposed = false;
@@ -69,7 +83,7 @@ export function setup_updates(autoupdate, on_update) {
 		const latest = version?.trim();
 		if (!latest || compare(latest, package_json.version) !== 1) return;
 
-		stale_dir = autoupdate ? get_install_dir() : null;
+		stale_dir = autoupdate ? get_install_dir(is_v2) : null;
 		// `dispose` covers a graceful shutdown, `exit` is the safety net for everything else. We only
 		// register it once we know we have something to delete to avoid piling up listeners.
 		if (stale_dir) process.once('exit', wipe);
