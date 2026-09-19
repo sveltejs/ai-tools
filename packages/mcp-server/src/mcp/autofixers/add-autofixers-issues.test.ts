@@ -787,4 +787,59 @@ describe('add_autofixers_issues', () => {
 			).not.toThrow();
 		});
 	});
+
+	describe('use_app_state_instead_of_app_stores', () => {
+		describe.each([{ import: 'page' }, { import: 'navigating' }, { import: 'updated' }])(
+			'importing $import from $app/stores',
+			({ import: imported }) => {
+				it(`should add suggestions when importing '${imported}' from '$app/stores'`, () => {
+					const content = run_autofixers_on_code(`
+				<script>
+					import { ${imported} } from '$app/stores';
+				</script>`);
+
+					expect(content.suggestions.length).toBeGreaterThanOrEqual(1);
+					expect(content.suggestions).toContain(
+						`You are importing "${imported}" from "$app/stores". This module is deprecated, consider importing "${imported}" from "$app/state" instead (requires SvelteKit 2.12 or later) and reading it as a normal object without the "$" prefix.`,
+					);
+				});
+
+				it(`should not add suggestions when importing '${imported}' from '$app/stores' in Svelte 4`, () => {
+					const content = run_autofixers_on_code(
+						`
+				<script>
+					import { ${imported} } from '$app/stores';
+				</script>`,
+						4,
+					);
+
+					expect(content.suggestions).not.toContain(
+						`You are importing "${imported}" from "$app/stores". This module is deprecated, consider importing "${imported}" from "$app/state" instead (requires SvelteKit 2.12 or later) and reading it as a normal object without the "$" prefix.`,
+					);
+				});
+			},
+		);
+
+		it(`should not add suggestions when importing other identifiers from '$app/stores'`, () => {
+			const content = run_autofixers_on_code(`
+			<script>
+				import { getStores } from '$app/stores';
+			</script>`);
+
+			expect(content.suggestions).not.toContain(
+				`You are importing "getStores" from "$app/stores". This module is deprecated, consider importing "getStores" from "$app/state" instead (requires SvelteKit 2.12 or later) and reading it as a normal object without the "$" prefix.`,
+			);
+		});
+
+		it(`should not add suggestions when importing from '$app/state'`, () => {
+			const content = run_autofixers_on_code(`
+			<script>
+				import { page } from '$app/state';
+			</script>`);
+
+			expect(content.suggestions).not.toContain(
+				`You are importing "page" from "$app/stores". This module is deprecated, consider importing "page" from "$app/state" instead (requires SvelteKit 2.12 or later) and reading it as a normal object without the "$" prefix.`,
+			);
+		});
+	});
 });
