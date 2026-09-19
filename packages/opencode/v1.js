@@ -27,7 +27,7 @@ export async function v1_plugin(ctx) {
 			}, 7000);
 		},
 	});
-	const dispose = setup_updates(mcp_config.autoupdate === true, (update) => {
+	const dispose = setup_updates(mcp_config.autoupdate === true, false, (update) => {
 		setTimeout(() => {
 			ctx.client.tui.showToast({
 				body: {
