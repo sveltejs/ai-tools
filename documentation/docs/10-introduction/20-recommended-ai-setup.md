@@ -6,6 +6,8 @@ There are a lot of ways to configure your agents given the range of tool we offe
 
 For this reason the aim of this page is not to prescribe what to use in an absolute manner but to give you the tools to make your own decisions.
 
+Also, things are moving fast and we will try to keep this documentation page up to date with the latest suggestion so if you find that something relevant is missing feel free to [open an issue](https://github.com/sveltejs/ai-tools/issues/new?template=BLANK_ISSUE).
+
 ## The plugins
 
 If one of our [Plugins](claude-plugin) is available for your harness you should set up your tools using them. It's the easiest way to get updates and to set up everything in one go. The plugins still allows you to configure the various tool separately either with a `svelte.json` file (for the [OpenCode](opencode-plugin) plugin) or directly in the harness.
