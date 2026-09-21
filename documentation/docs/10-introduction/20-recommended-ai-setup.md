@@ -8,23 +8,23 @@ For this reason the aim of this page is not to prescribe what to use in an absol
 
 ## The plugins
 
-If one of our [Plugins](claude-plugin) is available for your harness you should probably setup your tools with them. It's the easiest way to get updates from us and to setup everything in one go. The plugins still allows you to configure the various tool separately either with a `svelte.json` file (for the [OpenCode](opencode-plugin) plugin) or directly in the harness.
+If one of our [Plugins](claude-plugin) is available for your harness you should set up your tools using them. It's the easiest way to get updates and to set up everything in one go. The plugins still allows you to configure the various tool separately either with a `svelte.json` file (for the [OpenCode](opencode-plugin) plugin) or directly in the harness.
 
 ## `AGENTS.md`
 
-In [this page](instructions) we recommend to add an `AGENTS.md` that instruct the LLM to invoke the MCP server. We also create one for you when you create a new project with `sv` and by default the plugins will include the instructions for you.
+We recommend to add an `AGENTS.md` that instruct the LLM to invoke the MCP server. ([See this page](instructions)) We also automatically add one for you when you create a new project with `sv` and by default the plugins will include the instructions for you.
 
 While overall this is a small price to pay in terms of tokens, modern models tend to do much better when it comes to tool selection from MCP servers. So it might not be necessary to have such instructions in your `AGENTS.md` provided you are using newer models. Our suggestions? Try to delete the instructions (or disable them for the plugin) and keep an eye on to see if the model is invoking the MCP or not. If it is not, reintroduce them, if it is you just shaved a few tokens from your context.
 
 ## Skills
 
-The [svelte-core-bestpractices](skills#svelte-core-bestpractices) skill is a must have: from our evals that skill by itself boosted the success rate as much as the MCP server (if not more).
+The [svelte-core-bestpractices](skills#svelte-core-bestpractices) skill is a must have: from our evals that skill by itself boosted the success rate at least as much as the MCP server.
 
-[svelte-code-writer](skills#svelte-code-writer), however, is a bit different: it instructs the LLM on how to use the `@sveltejs/mcp` package [as a cli](cli) and should be used as an alternative to the MCP. In our experience the MCP yield slightly better results (because models are trained to invoke an MCP tool and less trained to use a random CLI) but if you want to cut as much token as possible the skill+CLI approach should still allow most models to write very good Svelte.
+[svelte-code-writer](skills#svelte-code-writer), is a bit different: it instructs the LLM on how to use the `@sveltejs/mcp` package [as a cli](cli) and should be used as an alternative to the MCP. In our experience the MCP yield better results (because models are trained to invoke an MCP tool and less trained to use a CLI).
 
 > [!NOTE] By using the CLI you also forgo the other benefits of the MCP server like [resources](resources) and [prompts](prompts).
 
-The suggestion is once again to test it with your setup and check if the model invokes the tools correctly.
+When testing this, the main success metric should be whether your model successfully invokes the MCP or CLI when asking Svelte-related questions.
 
 ## MCP
 
@@ -43,7 +43,7 @@ If you are running a local model `stdio` is a no-brainer. If you are not you get
 
 The [svelte-task](prompts#svelte-task) prompt that comes with the MCP server serves two main purposes:
 
-1. Give an extra hint about how to use the MCP server
+1. Provides additional instructions about how to use the MCP server
 2. Provide the list of available documentation without requiring an extra tool call
 
 However, quite often, both points adds little value to the conversation:
@@ -51,11 +51,11 @@ However, quite often, both points adds little value to the conversation:
 1. As stated with the [AGENTS.md](#AGENTS.md) paragraph modern models are already quite good at invoking MCP tools
 2. From our experience models tends to still invoke `list-sections` just to be sure.
 
-Our suggestions is to use the [svelte-task](prompts#svelte-task) prompt only if your agent/model still fails to invoke the MCP tools.
+Our suggestion is to use the [svelte-task](prompts#svelte-task) prompt *only* if your agent/model still fails to invoke the MCP tools.
 
 ### Resources
 
-Resources are often overlooked in MCP servers but we think they are a very powerful primitive. If your harness supports them (quite a few, unfortunately, does not) we suggest to include the [doc-section](resources#doc-section) template resource for every documentation page you know your agent will need: if you are working with transitions add the `svelte://svelte/transition.md` resource and all the agent needs to know about transitions will be right there in their context.
+Resources are often overlooked in MCP servers but we think they are a very powerful primitive. If your harness supports them (quite a few, unfortunately, do not) we suggest to include the [doc-section](resources#doc-section) template resource for every documentation page you know your agent will need. For example, if you are working with transitions add the `svelte://svelte/transition.md` resource and all the agent needs to know about transitions will be right there in their context.
 
 It will need a bit of guessing (so to not include unneeded documentation pages every single time) but after a while you will get a feeling about what the model already knows about Svelte and you can preemptively include them in context.
 
