@@ -51,7 +51,7 @@ However, quite often, both points adds little value to the conversation:
 1. As stated with the [AGENTS.md](#AGENTS.md) paragraph modern models are already quite good at invoking MCP tools
 2. From our experience models tends to still invoke `list-sections` just to be sure.
 
-Our suggestion is to use the [svelte-task](prompts#svelte-task) prompt *only* if your agent/model still fails to invoke the MCP tools.
+Our suggestion is to use the [svelte-task](prompts#svelte-task) prompt _only_ if your agent/model still fails to invoke the MCP tools.
 
 ### Resources
 
