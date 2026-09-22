@@ -1,12 +1,19 @@
+import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { describe, expect, test, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import package_json from './package.json' with { type: 'json' };
 
 const { exec_mock } = vi.hoisted(() => ({ exec_mock: vi.fn() }));
 
 vi.mock('node:child_process', () => ({ exec: exec_mock }));
 
-import { get_install_dir, setup_updates } from './update.js';
+import {
+	get_install_dir,
+	has_other_instances,
+	register_instance,
+	setup_updates,
+} from './update.js';
 
 const cache_packages = join('/cache', 'packages');
 const [package_scope = '@sveltejs', package_name = 'opencode'] = package_json.name.split('/');
@@ -102,6 +109,84 @@ describe('get_install_dir', () => {
 		const dir = join('/workspace', 'node_modules', package_scope, package_name);
 		expect(get_install_dir(true, dir)).toBeNull();
 		expect(get_install_dir(false, dir)).toBeNull();
+	});
+});
+
+describe('instance markers', () => {
+	/** @type {string} */
+	let install_dir;
+
+	beforeEach(() => {
+		install_dir = mkdtempSync(join(tmpdir(), 'svelte-opencode-'));
+	});
+
+	afterEach(() => {
+		vi.restoreAllMocks();
+		rmSync(install_dir, { recursive: true, force: true });
+	});
+
+	test('is alone when nobody registered', () => {
+		expect(has_other_instances(install_dir)).toBe(false);
+	});
+
+	test('counts its registration until it unregisters', () => {
+		const unregister = register_instance(install_dir);
+		expect(has_other_instances(install_dir)).toBe(true);
+
+		unregister();
+		expect(has_other_instances(install_dir)).toBe(false);
+	});
+
+	test('keeps same-process registrations separate even in the same millisecond', () => {
+		vi.spyOn(Date, 'now').mockReturnValue(1789644998306);
+		const unregister_first = register_instance(install_dir);
+		const unregister_second = register_instance(install_dir);
+		const markers_dir = join(install_dir, '.instances');
+		const markers = readdirSync(markers_dir);
+		expect(markers).toHaveLength(2);
+		for (const marker of markers) {
+			expect(marker.startsWith(`${process.pid}-`)).toBe(true);
+			expect(readFileSync(join(markers_dir, marker), 'utf8')).toBe('');
+		}
+
+		unregister_first();
+		unregister_first();
+		expect(readdirSync(markers_dir)).toHaveLength(1);
+		expect(has_other_instances(install_dir)).toBe(true);
+
+		unregister_second();
+		expect(readdirSync(markers_dir)).toEqual([]);
+		expect(has_other_instances(install_dir)).toBe(false);
+	});
+
+	test('detects another running instance until it unregisters', () => {
+		// the parent process is as good as any other running process
+		const unregister = register_instance(install_dir, process.ppid);
+		const unregister_self = register_instance(install_dir);
+		unregister_self();
+		expect(has_other_instances(install_dir)).toBe(true);
+
+		unregister();
+		expect(has_other_instances(install_dir)).toBe(false);
+	});
+
+	test('cleans up the marker of a crashed instance', () => {
+		register_instance(install_dir);
+		vi.spyOn(process, 'kill').mockImplementation(() => {
+			throw Object.assign(new Error('No such process'), { code: 'ESRCH' });
+		});
+		expect(has_other_instances(install_dir)).toBe(false);
+		expect(readdirSync(join(install_dir, '.instances'))).toEqual([]);
+		expect(existsSync(install_dir)).toBe(true);
+	});
+
+	test('preserves a registration when its process exists but cannot be signaled', () => {
+		register_instance(install_dir);
+		vi.spyOn(process, 'kill').mockImplementation(() => {
+			throw Object.assign(new Error('Operation not permitted'), { code: 'EPERM' });
+		});
+		expect(has_other_instances(install_dir)).toBe(true);
+		expect(readdirSync(join(install_dir, '.instances'))).toHaveLength(1);
 	});
 });
 
