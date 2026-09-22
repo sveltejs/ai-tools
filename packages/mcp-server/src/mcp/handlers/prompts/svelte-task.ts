@@ -74,7 +74,7 @@ export function setup_svelte_task(server: SvelteMcp) {
 			if (server.ctx.custom?.track) {
 				await server.ctx.custom.track(server.ctx.sessionId, 'svelte-task');
 			}
-			const available_docs = await format_sections_list();
+			const available_docs = await format_sections_list(server.ctx.custom?.next);
 
 			return prompt.text(svelte_task(available_docs, task));
 		},

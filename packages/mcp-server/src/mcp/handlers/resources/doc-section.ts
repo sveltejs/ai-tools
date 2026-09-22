@@ -3,14 +3,13 @@ import { get_sections, fetch_with_timeout } from '../../utils.js';
 import { icons } from '../../icons/index.js';
 import { resource } from 'tmcp/utils';
 
-export async function list_sections(server: SvelteMcp) {
-	const sections = await get_sections();
-
+export function list_sections(server: SvelteMcp) {
 	server.template(
 		{
 			name: 'Svelte-Doc-Section',
 			description: 'A single documentation section',
-			list() {
+			async list() {
+				const sections = await get_sections(server.ctx.custom?.next);
 				return sections.map((section) => {
 					const section_name = section.slug;
 					const resource_name = section_name;
@@ -24,7 +23,8 @@ export async function list_sections(server: SvelteMcp) {
 				});
 			},
 			complete: {
-				slug: (query) => {
+				slug: async (query) => {
+					const sections = await get_sections(server.ctx.custom?.next);
 					const values = sections
 						.reduce<string[]>((acc, section) => {
 							const section_name = section.slug;
@@ -54,6 +54,7 @@ export async function list_sections(server: SvelteMcp) {
 					Array.isArray(slug) ? slug.join(',') : slug,
 				);
 			}
+			const sections = await get_sections(server.ctx.custom?.next);
 			const section = sections.find((section) => {
 				return slug === section.slug;
 			});
