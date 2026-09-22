@@ -1,12 +1,14 @@
 import { exec } from 'node:child_process';
-import { rmSync } from 'node:fs';
-import { basename, dirname } from 'node:path';
+import { randomUUID } from 'node:crypto';
+import { mkdirSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
+import { basename, dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { compare } from 'verkit';
 import package_json from './package.json' with { type: 'json' };
 
 const current_dir = dirname(fileURLToPath(import.meta.url));
 const name_segments = package_json.name.split('/');
+const instances_dir = '.instances';
 
 /**
  * @param {string} dir
@@ -52,9 +54,82 @@ export function get_install_dir(is_v2, dir = current_dir) {
 }
 
 /**
+ * Every plugin setup drops an empty `<pid>-<uuid>` marker in `<install_dir>/.instances`. The UUID
+ * keeps registrations in the same process separate, while the pid lets us remove markers left
+ * behind by crashed processes.
+ *
+ * @param {string} install_dir
+ * @param {number} [pid]
+ * @returns {() => void} removes the marker
+ */
+export function register_instance(install_dir, pid = process.pid) {
+	const marker = join(install_dir, instances_dir, `${pid}-${randomUUID()}`);
+	try {
+		mkdirSync(dirname(marker), { recursive: true });
+		writeFileSync(marker, '');
+	} catch {
+		// without a marker the other instances could wipe the plugin while we are running, which is
+		// what happened before the markers existed anyway
+	}
+	return () => {
+		try {
+			rmSync(marker, { force: true });
+		} catch {
+			// the pid check will take care of it
+		}
+	};
+}
+
+/**
+ * @param {number} pid
+ */
+function is_running(pid) {
+	try {
+		// this doesn't kill the process, because it send signal 0
+		// we use this to determine if the process that claimed a marker
+		// is still running or not
+		process.kill(pid, 0);
+		return true;
+	} catch (error) {
+		// `EPERM` means the process exists but belongs to someone else
+		return /** @type {NodeJS.ErrnoException} */ (error).code === 'EPERM';
+	}
+}
+
+/**
+ * Checks the remaining registrations after the caller removes its own marker. Registrations in
+ * the current process still count because another location may be using the same installation.
+ *
+ * @param {string} install_dir
+ */
+export function has_other_instances(install_dir) {
+	const dir = join(install_dir, instances_dir);
+	/** @type {string[]} */
+	let markers;
+	try {
+		markers = readdirSync(dir);
+	} catch (error) {
+		// if we can't tell we'd rather skip the update than break another instance
+		return /** @type {NodeJS.ErrnoException} */ (error).code !== 'ENOENT';
+	}
+	return markers.some((marker) => {
+		const pid = /^(\d+)-/.exec(marker)?.[1];
+		if (pid && is_running(Number(pid))) return true;
+		// the instance crashed without cleaning up after itself
+		try {
+			rmSync(join(dir, marker), { force: true });
+		} catch {
+			// it's stale either way
+		}
+		return false;
+	});
+}
+
+/**
  * Checks npm for a newer version of the plugin and warns the user about it. If `autoupdate` is
- * enabled we also delete the cached plugin once opencode shuts down, so the next start picks up the
- * new version.
+ * enabled we also delete the cached plugin on cleanup, so the next start picks up the new version.
+ * If other registrations are still active we leave it alone. The last registration can delete it
+ * if its version check also found an update.
  *
  * @param {boolean} autoupdate
  * @param {boolean} is_v2 whether the plugin is running in opencode v2
@@ -67,9 +142,14 @@ export function setup_updates(autoupdate, is_v2, on_update) {
 	let disposed = false;
 	let wiped = false;
 
+	const install_dir = get_install_dir(is_v2);
+	const unregister = install_dir ? register_instance(install_dir) : null;
+
 	function wipe() {
-		if (wiped || !stale_dir) return;
+		if (wiped) return;
 		wiped = true;
+		unregister?.();
+		if (!stale_dir || has_other_instances(stale_dir)) return;
 		try {
 			rmSync(stale_dir, { recursive: true, force: true });
 		} catch {
@@ -83,20 +163,21 @@ export function setup_updates(autoupdate, is_v2, on_update) {
 		const latest = version?.trim();
 		if (!latest || compare(latest, package_json.version) !== 1) return;
 
-		stale_dir = autoupdate ? get_install_dir(is_v2) : null;
-		// `dispose` covers a graceful shutdown, `exit` is the safety net for everything else. We only
-		// register it once we know we have something to delete to avoid piling up listeners.
-		if (stale_dir) process.once('exit', wipe);
+		stale_dir = autoupdate ? install_dir : null;
 
 		on_update({
 			latest,
 			message: `${package_json.name}@${latest} is available (you are using ${package_json.version}).\n\n${
 				stale_dir
-					? 'It will be installed automatically the next time you start OpenCode.'
+					? 'It will be installed automatically the next time you start OpenCode after closing every running instance.'
 					: 'Wipe the cache or update your OpenCode config to update.'
 			}`,
 		});
 	});
+
+	// `dispose` covers plugin unload, including graceful shutdown. `exit` also removes the marker
+	// when the process exits without disposing the plugin.
+	if (install_dir) process.once('exit', wipe);
 
 	return async () => {
 		disposed = true;
