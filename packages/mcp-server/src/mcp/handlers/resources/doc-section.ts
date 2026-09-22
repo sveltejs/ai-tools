@@ -4,12 +4,23 @@ import { icons } from '../../icons/index.js';
 import { resource } from 'tmcp/utils';
 
 export function list_sections(server: SvelteMcp) {
+	// Start both requests during setup and retain their results for the server's lifetime.
+	// Keep failures separate so an unavailable Next index does not break stable resources.
+	const section_indexes = Promise.allSettled([get_sections(), get_sections(true)]);
+
+	async function get_resource_sections() {
+		const index = server.ctx.custom?.next ? 1 : 0;
+		const result = (await section_indexes)[index];
+		if (result.status === 'rejected') throw result.reason;
+		return result.value;
+	}
+
 	server.template(
 		{
 			name: 'Svelte-Doc-Section',
 			description: 'A single documentation section',
 			async list() {
-				const sections = await get_sections(server.ctx.custom?.next);
+				const sections = await get_resource_sections();
 				return sections.map((section) => {
 					const section_name = section.slug;
 					const resource_name = section_name;
@@ -24,7 +35,7 @@ export function list_sections(server: SvelteMcp) {
 			},
 			complete: {
 				slug: async (query) => {
-					const sections = await get_sections(server.ctx.custom?.next);
+					const sections = await get_resource_sections();
 					const values = sections
 						.reduce<string[]>((acc, section) => {
 							const section_name = section.slug;
@@ -54,7 +65,7 @@ export function list_sections(server: SvelteMcp) {
 					Array.isArray(slug) ? slug.join(',') : slug,
 				);
 			}
-			const sections = await get_sections(server.ctx.custom?.next);
+			const sections = await get_resource_sections();
 			const section = sections.find((section) => {
 				return slug === section.slug;
 			});

@@ -1,12 +1,11 @@
 import { InMemoryTransport } from '@tmcp/transport-in-memory';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { server } from '../../index.js';
 
-const transport = new InMemoryTransport(server);
-const client = transport.stateless();
+let client: ReturnType<InMemoryTransport<{ next?: boolean }>['stateless']>;
 const fetch_mock = vi.fn<typeof fetch>();
 
-beforeEach(() => {
+beforeEach(async () => {
+	vi.resetModules();
 	vi.stubGlobal('fetch', fetch_mock);
 	fetch_mock.mockImplementation(async (input) => {
 		const url = new URL(String(input));
@@ -24,6 +23,18 @@ beforeEach(() => {
 		}
 		throw new Error(`Unexpected documentation URL: ${url}`);
 	});
+	const { server } = await import('../../index.js');
+	client = new InMemoryTransport(server).stateless();
+	expect(fetch_mock).toHaveBeenCalledTimes(2);
+	expect(fetch_mock).toHaveBeenCalledWith(
+		'https://svelte.dev/docs/experimental/sections.json',
+		expect.anything(),
+	);
+	expect(fetch_mock).toHaveBeenCalledWith(
+		'https://next.svelte.dev/docs/experimental/sections.json',
+		expect.anything(),
+	);
+	fetch_mock.mockClear();
 });
 
 afterEach(() => {
@@ -82,7 +93,7 @@ describe.each([undefined, false, true])('documentation with next=%s', (next) => 
 		expect(fetch_mock.mock.calls.every(([url]) => String(url).startsWith(origin))).toBe(true);
 	});
 
-	it('uses the selected site for resource lists, reads, and completions', async () => {
+	it('reuses the preloaded index for resource lists, reads, and completions', async () => {
 		const uri = `svelte://svelte/${channel}-overview.md`;
 		const resources = await client.listResources({}, ctx);
 		expect(resources.resources).toContainEqual(expect.objectContaining({ uri }));
@@ -97,6 +108,19 @@ describe.each([undefined, false, true])('documentation with next=%s', (next) => 
 			ctx,
 		);
 		expect(completion.completion.values).toEqual([`svelte/${channel}-overview`]);
+		await client.listResources({}, ctx);
+		await client.complete(
+			{ type: 'ref/resource', uri: 'svelte://{/slug*}.md' },
+			{ name: 'slug', value: 'overview' },
+			undefined,
+			ctx,
+		);
+		// Only the page content is fetched; listing and completion use the startup snapshot.
+		expect(fetch_mock).toHaveBeenCalledTimes(1);
+		expect(fetch_mock).toHaveBeenCalledWith(
+			`${origin}/docs/svelte/${channel}-overview/llms.txt`,
+			expect.anything(),
+		);
 	});
 
 	it('uses the selected section list in the Svelte task prompt', async () => {
@@ -117,3 +141,26 @@ it('isolates Next and stable documentation for concurrent requests', async () =>
 	expect(stable_text).toContain('stable documentation content');
 	expect(stable_text).not.toContain('package.json');
 });
+
+it.each([false, true])(
+	'keeps next=%s resources available if the other index fails',
+	async (next) => {
+		vi.resetModules();
+		const fetch_documentation = fetch_mock.getMockImplementation()!;
+		const failed_origin = next ? 'https://svelte.dev' : 'https://next.svelte.dev';
+		fetch_mock.mockImplementation(async (input, init) => {
+			if (String(input).startsWith(failed_origin)) throw new Error('Index unavailable');
+			return fetch_documentation(input, init);
+		});
+		const { server } = await import('../../index.js');
+		const resource_client = new InMemoryTransport(server).stateless();
+		const channel = next ? 'next' : 'stable';
+		const resources = await resource_client.listResources({}, { next });
+		expect(resources.resources).toContainEqual(
+			expect.objectContaining({ uri: `svelte://svelte/${channel}-overview.md` }),
+		);
+		await expect(resource_client.listResources({}, { next: !next })).rejects.toThrow(
+			'Index unavailable',
+		);
+	},
+);
