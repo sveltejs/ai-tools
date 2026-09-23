@@ -6,6 +6,7 @@ import { add_compile_issues } from '../../autofixers/add-compile-issues.js';
 import { add_eslint_issues } from '../../autofixers/add-eslint-issues.js';
 import { icons } from '../../icons/index.js';
 import { type SvelteMcp } from '../../index.js';
+import { parse_svelte_version } from '../../version.js';
 
 let cached_schema: ReturnType<typeof get_autofixer_schema> | null = null;
 
@@ -25,7 +26,7 @@ function get_autofixer_schema(stdio: boolean) {
 		desired_svelte_version: v.pipe(
 			v.union([v.string(), v.number()]),
 			v.description(
-				'The desired major svelte version as an integer (must be 4 or 5)...if possible read this from the package.json of the user project, otherwise use some hint from the wording (if the user asks for runes it wants version 5). Default to 5 in case of doubt.',
+				'The desired svelte version as a full semver string (e.g. "5.16.0", the major MUST be 4 or 5)...you MUST read this from the package.json of the user project (or from the installed node_modules/svelte/package.json) since some suggestions are only enabled for newer versions. If you can\'t find it use some hint from the wording (if the user asks for runes it wants version 5) and pass only the major. Default to 5 in case of doubt.',
 			),
 		),
 		async: v.pipe(
@@ -56,19 +57,14 @@ export async function svelte_autofixer_handler({
 	filename: filename_or_path,
 }: v.InferInput<ReturnType<typeof get_autofixer_schema>>) {
 	// we validate manually because some clients don't support union in the input schema (looking at you cursor)
-	const parsed_version = v.safeParse(
-		v.union([v.literal(4), v.literal(5), v.literal('4'), v.literal('5')]),
-		desired_svelte_version_unchecked,
-	);
-	if (parsed_version.success === false) {
+	const desired_svelte_version = parse_svelte_version(desired_svelte_version_unchecked);
+	if (!desired_svelte_version) {
 		throw new Error(
-			`The desired_svelte_version MUST be either 4 or 5 but received "${desired_svelte_version_unchecked}"`,
+			`The desired_svelte_version MUST be a svelte version with major 4 or 5 (e.g. "5.16.0") but received "${desired_svelte_version_unchecked}"`,
 		);
 	}
 
-	const desired_svelte_version = parsed_version.output;
-
-	if (async && +desired_svelte_version < 5) {
+	if (async && desired_svelte_version.major < 5) {
 		throw new Error('The async option can only be used with Svelte version 5 or higher.');
 	}
 
@@ -83,11 +79,11 @@ export async function svelte_autofixer_handler({
 
 		const filename = filename_or_path ? basename(filename_or_path) : 'Component.svelte';
 
-		add_compile_issues(content, code, +desired_svelte_version, filename, async);
+		add_compile_issues(content, code, desired_svelte_version, filename, async);
 
-		add_autofixers_issues(content, code, +desired_svelte_version, filename, async);
+		add_autofixers_issues(content, code, desired_svelte_version, filename, async);
 
-		await add_eslint_issues(content, code, +desired_svelte_version, filename, async);
+		await add_eslint_issues(content, code, desired_svelte_version, filename, async);
 	} catch (e: unknown) {
 		const error = e as Error & { start?: { line: number; column: number }; frame?: string };
 		content.issues.push(
