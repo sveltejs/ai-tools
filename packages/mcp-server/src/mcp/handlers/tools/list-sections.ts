@@ -1,13 +1,18 @@
 import type { SvelteMcp } from '../../index.js';
 import { format_sections_list } from '../../utils.js';
-import { SECTIONS_LIST_INTRO, SECTIONS_LIST_OUTRO } from './prompts.js';
+import {
+	NEXT_DOCUMENTATION_INSTRUCTIONS,
+	SECTIONS_LIST_INTRO,
+	SECTIONS_LIST_OUTRO,
+} from './prompts.js';
 import { icons } from '../../icons/index.js';
 import { tool } from 'tmcp/utils';
 
-export async function list_sections_handler() {
-	const formatted_sections = await format_sections_list();
+export async function list_sections_handler(next = false) {
+	const formatted_sections = await format_sections_list(next);
+	const instructions = next ? `${NEXT_DOCUMENTATION_INSTRUCTIONS}\n\n` : '';
 
-	return `${SECTIONS_LIST_INTRO}\n\n${formatted_sections}\n\n${SECTIONS_LIST_OUTRO}`;
+	return `${instructions}${SECTIONS_LIST_INTRO}\n\n${formatted_sections}\n\n${SECTIONS_LIST_OUTRO}`;
 }
 
 export function list_sections(server: SvelteMcp) {
@@ -29,7 +34,7 @@ export function list_sections(server: SvelteMcp) {
 				await server.ctx.custom.track(server.ctx.sessionId, 'list-sections');
 			}
 			try {
-				const content = await list_sections_handler();
+				const content = await list_sections_handler(server.ctx.custom?.next);
 				return tool.text(content);
 			} catch (e) {
 				const error = e as Error;

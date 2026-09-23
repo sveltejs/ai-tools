@@ -1,7 +1,11 @@
 import type { SvelteMcp } from '../../index.js';
 import * as v from 'valibot';
 import { get_sections, fetch_with_timeout, format_sections_list } from '../../utils.js';
-import { SECTIONS_LIST_INTRO, SECTIONS_LIST_OUTRO } from './prompts.js';
+import {
+	NEXT_DOCUMENTATION_INSTRUCTIONS,
+	SECTIONS_LIST_INTRO,
+	SECTIONS_LIST_OUTRO,
+} from './prompts.js';
 import { icons } from '../../icons/index.js';
 import { tool } from 'tmcp/utils';
 
@@ -14,9 +18,11 @@ const get_documentation_schema = v.object({
 	),
 });
 
-export async function get_documentation_handler({
-	section,
-}: v.InferInput<typeof get_documentation_schema>) {
+export async function get_documentation_handler(
+	{ section }: v.InferInput<typeof get_documentation_schema>,
+	next = false,
+) {
+	const instructions = next ? `${NEXT_DOCUMENTATION_INSTRUCTIONS}\n\n` : '';
 	let sections: string[];
 
 	if (Array.isArray(section)) {
@@ -42,7 +48,7 @@ export async function get_documentation_handler({
 		sections = [];
 	}
 
-	const available_sections = await get_sections();
+	const available_sections = await get_sections(next);
 
 	const settled_results = await Promise.allSettled(
 		sections.map(async (requested_section) => {
@@ -100,7 +106,7 @@ export async function get_documentation_handler({
 	);
 
 	if (successes.length > 0 && failed_sections.length === 0) {
-		return successes.map((r) => r.content).join('\n\n---\n\n');
+		return instructions + successes.map((r) => r.content).join('\n\n---\n\n');
 	}
 
 	const parts: string[] = [];
@@ -125,7 +131,7 @@ export async function get_documentation_handler({
 
 	// Full list only when no successes and no fuzzy matches
 	if (successes.length === 0 && !has_fuzzy) {
-		const formatted_sections = await format_sections_list();
+		const formatted_sections = await format_sections_list(next);
 		parts.push(`${SECTIONS_LIST_INTRO}\n\n${formatted_sections}\n\n${SECTIONS_LIST_OUTRO}`);
 	}
 
@@ -140,7 +146,7 @@ export async function get_documentation_handler({
 		parts.push(`Section not found: "${requested}".`);
 	}
 
-	return parts.join('\n\n---\n\n');
+	return instructions + parts.join('\n\n---\n\n');
 }
 
 export function get_documentation(server: SvelteMcp) {
@@ -163,7 +169,7 @@ export function get_documentation(server: SvelteMcp) {
 				await server.ctx.custom.track(server.ctx.sessionId, 'get-documentation');
 			}
 			try {
-				const content = await get_documentation_handler({ section });
+				const content = await get_documentation_handler({ section }, server.ctx.custom?.next);
 				return tool.text(content);
 			} catch (e) {
 				const error = e as Error;
