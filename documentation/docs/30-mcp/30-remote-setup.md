@@ -31,7 +31,6 @@ You can choose your preferred `scope` (it must be `user`, `project` or `local`) 
 Add the following to your `config.toml` (which defaults to `~/.codex/config.toml`, but refer to [the configuration documentation](https://github.com/openai/codex/blob/main/docs/config.md) for more advanced setups):
 
 ```toml
-rmcp_client = true
 [mcp_servers.svelte]
 url = "https://mcp.svelte.dev/mcp"
 ```
