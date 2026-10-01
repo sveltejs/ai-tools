@@ -22,14 +22,14 @@ Then, install the Svelte plugin:
 /plugin install svelte
 ```
 
-## Using Next documentation
+## Choosing a documentation subdomain
 
-If your project uses a Next release of Svelte or SvelteKit, you can configure the MCP server to fetch documentation from `next.svelte.dev` while keeping the plugin's skills and agent.
+You can configure the MCP server to fetch documentation from a subdomain of `svelte.dev` while keeping the plugin's skills and agent. These examples use `next`; replace it with the subdomain you need.
 
-For the local server, register the same command with `SVELTE_MCP_NEXT=true`:
+For the local server, register the same command with `SVELTE_MCP_SUBDOMAIN=next`:
 
 ```bash
-claude mcp add --scope local --env SVELTE_MCP_NEXT=true \
+claude mcp add --scope local --env SVELTE_MCP_SUBDOMAIN=next \
   --transport stdio svelte -- npx -y @sveltejs/mcp
 ```
 
@@ -38,9 +38,9 @@ This configures the server for the current project. Use `--scope user` to apply 
 To use the remote server instead, disable the plugin's bundled Svelte MCP server in `/mcp`, then add:
 
 ```bash
-claude mcp add --scope local --transport http svelte 'https://mcp.svelte.dev/mcp?next=true'
+claude mcp add --scope local --transport http svelte 'https://mcp.svelte.dev/mcp?subdomain=next'
 ```
 
 The remote URL is a different endpoint from the bundled local command, so disable the bundled server to avoid running both. The plugin itself can stay enabled.
 
-See [local setup](local-setup) and [remote setup](remote-setup) for details about Next mode and the package-version check performed by the documentation tools.
+See [local setup](local-setup) and [remote setup](remote-setup) for details about subdomain selection, version checks, and the fallback to `svelte.dev` with an agent warning when the selected docs are unavailable.

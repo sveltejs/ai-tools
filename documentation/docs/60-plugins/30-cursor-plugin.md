@@ -24,9 +24,9 @@ Once installed, Cursor will discover the plugin components automatically:
 
 > [!NOTE] The Cursor CLI does not support plugins yet. Plugin support in [Cloud Agents](https://cursor.com/docs/cloud-agent) is limited to MCP servers.
 
-## Using Next documentation
+## Choosing a documentation subdomain
 
-If your project uses a Next release of Svelte or SvelteKit, you can configure the MCP server to fetch documentation from `next.svelte.dev` while keeping the plugin's rules, skills, and agent.
+You can configure the MCP server to fetch documentation from a subdomain of `svelte.dev` while keeping the plugin's rules, skills, and agent. These examples use `next`; replace it with the subdomain you need.
 
 In **Customize**, disable the plugin's bundled Svelte MCP server. Then add a custom server to `.cursor/mcp.json` for the current project, or `~/.cursor/mcp.json` for all projects:
 
@@ -38,7 +38,7 @@ In **Customize**, disable the plugin's bundled Svelte MCP server. Then add a cus
 			"command": "npx",
 			"args": ["-y", "@sveltejs/mcp"],
 			"env": {
-				"SVELTE_MCP_NEXT": "true"
+				"SVELTE_MCP_SUBDOMAIN": "next"
 			}
 		}
 	}
@@ -49,10 +49,10 @@ To use the remote server instead, replace the `svelte-next` entry with:
 
 ```json
 {
-	"url": "https://mcp.svelte.dev/mcp?next=true"
+	"url": "https://mcp.svelte.dev/mcp?subdomain=next"
 }
 ```
 
 Keep the plugin enabled and toggle only its bundled MCP server off. See [Cursor's MCP documentation](https://cursor.com/docs/context/mcp) for configuration and server-management details.
 
-See [local setup](local-setup) and [remote setup](remote-setup) for details about Next mode and the package-version check performed by the documentation tools.
+See [local setup](local-setup) and [remote setup](remote-setup) for details about subdomain selection, version checks, and the fallback to `svelte.dev` with an agent warning when the selected docs are unavailable.

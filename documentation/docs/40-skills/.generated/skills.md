@@ -17,14 +17,16 @@ You have access to `@sveltejs/mcp` CLI for Svelte-specific assistance. Use these
 
 Before fetching documentation, check `package.json` dependencies and devDependencies for the relevant Svelte or SvelteKit version. If the version uses a catalog or workspace reference, resolve it from the referenced configuration or lockfile.
 
-For a Next release (the `next` tag or a corresponding prerelease version), set `SVELTE_MCP_NEXT=true` on both documentation commands to fetch from `next.svelte.dev`:
+To use documentation from a subdomain of `svelte.dev`, set `SVELTE_MCP_SUBDOMAIN` on both documentation commands. For example, for a Next release (the `next` tag or a corresponding prerelease version), use `next` to fetch from `next.svelte.dev`:
 
 ```bash
-SVELTE_MCP_NEXT=true npx @sveltejs/mcp list-sections
-SVELTE_MCP_NEXT=true npx @sveltejs/mcp get-documentation 'svelte/$state,kit/routing'
+SVELTE_MCP_SUBDOMAIN=next npx @sveltejs/mcp list-sections
+SVELTE_MCP_SUBDOMAIN=next npx @sveltejs/mcp get-documentation 'svelte/$state,kit/routing'
 ```
 
-For stable releases, leave the variable unset or set it to `false` to use `svelte.dev`. If Next mode is enabled for a project that isn't using a Next release, tell the user to unset `SVELTE_MCP_NEXT` or set it to `false` in their configuration: Next documentation may be ahead of or behind their installed version. Use `SVELTE_MCP_NEXT=false` on CLI documentation commands to override an inherited Next setting for that project.
+Replace `next` with the subdomain appropriate for the project (a single DNS label, not a full URL). For stable releases, leave the variable unset or empty to use `svelte.dev`. If the selected docs don't match the installed version, tell the user to update or unset `SVELTE_MCP_SUBDOMAIN`: these docs may describe unavailable or outdated APIs. Use `SVELTE_MCP_SUBDOMAIN=` on CLI documentation commands to override an inherited setting for that project.
+
+If the selected subdomain's documentation index is unavailable or invalid, the server falls back to `svelte.dev`. When the output reports this fallback, warn the user that the requested docs couldn't be loaded and that the returned default docs may not match their installed version.
 
 This variable selects documentation for `list-sections` and `get-documentation`; it does not change the version used by `svelte-autofixer`.
 

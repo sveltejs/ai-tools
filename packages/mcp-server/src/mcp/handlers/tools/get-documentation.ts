@@ -1,11 +1,7 @@
 import type { SvelteMcp } from '../../index.js';
 import * as v from 'valibot';
-import { get_sections, fetch_with_timeout, format_sections_list } from '../../utils.js';
-import {
-	NEXT_DOCUMENTATION_INSTRUCTIONS,
-	SECTIONS_LIST_INTRO,
-	SECTIONS_LIST_OUTRO,
-} from './prompts.js';
+import { get_sections, fetch_with_timeout, format_sections } from '../../utils.js';
+import { SECTIONS_LIST_INTRO, SECTIONS_LIST_OUTRO } from './prompts.js';
 import { icons } from '../../icons/index.js';
 import { tool } from 'tmcp/utils';
 
@@ -20,9 +16,8 @@ const get_documentation_schema = v.object({
 
 export async function get_documentation_handler(
 	{ section }: v.InferInput<typeof get_documentation_schema>,
-	next = false,
+	subdomain?: string,
 ) {
-	const instructions = next ? `${NEXT_DOCUMENTATION_INSTRUCTIONS}\n\n` : '';
 	let sections: string[];
 
 	if (Array.isArray(section)) {
@@ -48,7 +43,7 @@ export async function get_documentation_handler(
 		sections = [];
 	}
 
-	const available_sections = await get_sections(next);
+	const { sections: available_sections, instructions } = await get_sections(subdomain);
 
 	const settled_results = await Promise.allSettled(
 		sections.map(async (requested_section) => {
@@ -131,7 +126,7 @@ export async function get_documentation_handler(
 
 	// Full list only when no successes and no fuzzy matches
 	if (successes.length === 0 && !has_fuzzy) {
-		const formatted_sections = await format_sections_list(next);
+		const formatted_sections = format_sections(available_sections);
 		parts.push(`${SECTIONS_LIST_INTRO}\n\n${formatted_sections}\n\n${SECTIONS_LIST_OUTRO}`);
 	}
 
@@ -169,7 +164,7 @@ export function get_documentation(server: SvelteMcp) {
 				await server.ctx.custom.track(server.ctx.sessionId, 'get-documentation');
 			}
 			try {
-				const content = await get_documentation_handler({ section }, server.ctx.custom?.next);
+				const content = await get_documentation_handler({ section }, server.ctx.custom?.subdomain);
 				return tool.text(content);
 			} catch (e) {
 				const error = e as Error;

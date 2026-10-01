@@ -27,9 +27,9 @@ Choose the Svelte marketplace, select the `svelte` plugin, and install it.
 
 Codex can read the repository's legacy-compatible `.claude-plugin/marketplace.json` marketplace file, so the same marketplace source works for both Claude Code and Codex CLI.
 
-## Using Next documentation
+## Choosing a documentation subdomain
 
-If your project uses a Next release of Svelte or SvelteKit, you can configure the MCP server to fetch documentation from `next.svelte.dev` while keeping the plugin's other components enabled.
+You can configure the MCP server to fetch documentation from a subdomain of `svelte.dev` while keeping the plugin's other components enabled. These examples use `next`; replace it with the subdomain you need.
 
 Codex's plugin MCP settings support enabling or disabling the bundled server and configuring its tool policy. To customize its environment or URL, disable only the bundled MCP server and configure a separate server in `~/.codex/config.toml` or your trusted project's `.codex/config.toml`:
 
@@ -40,7 +40,7 @@ enabled = false
 [mcp_servers.svelte]
 command = "npx"
 args = ["-y", "@sveltejs/mcp"]
-env = { SVELTE_MCP_NEXT = "true" }
+env = { SVELTE_MCP_SUBDOMAIN = "next" }
 ```
 
 The `svelte@svelte` identifier combines the plugin name and marketplace name from this repository. If you installed the plugin under a different marketplace name, use the identifier shown in your Codex plugin configuration.
@@ -49,9 +49,9 @@ To use the remote server instead, replace the `[mcp_servers.svelte]` table with:
 
 ```toml
 [mcp_servers.svelte]
-url = "https://mcp.svelte.dev/mcp?next=true"
+url = "https://mcp.svelte.dev/mcp?subdomain=next"
 ```
 
 Keep the bundled server's `enabled = false` setting when switching transports. See [Codex's plugin-provided MCP documentation](https://developers.openai.com/codex/mcp#plugin-provided-mcp-servers) for details about plugin overrides.
 
-See [local setup](local-setup) and [remote setup](remote-setup) for details about Next mode and the package-version check performed by the documentation tools.
+See [local setup](local-setup) and [remote setup](remote-setup) for details about subdomain selection, version checks, and the fallback to `svelte.dev` with an agent warning when the selected docs are unavailable.

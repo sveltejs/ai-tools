@@ -35,9 +35,9 @@ You can also run the same commands from an interactive Copilot CLI session:
 /plugin install svelte@ai-tools
 ```
 
-## Using Next documentation
+## Choosing a documentation subdomain
 
-If your project uses a Next release of Svelte or SvelteKit, you can configure the MCP server to fetch documentation from `next.svelte.dev` while keeping the plugin's skills and agent.
+You can configure the MCP server to fetch documentation from a subdomain of `svelte.dev` while keeping the plugin's skills and agent. These examples use `next`; replace it with the subdomain you need.
 
 Create a file such as `svelte-next.mcp.json` with a complete server definition using the same `svelte` key as the plugin:
 
@@ -49,7 +49,7 @@ Create a file such as `svelte-next.mcp.json` with a complete server definition u
 			"command": "npx",
 			"args": ["-y", "@sveltejs/mcp"],
 			"env": {
-				"SVELTE_MCP_NEXT": "true"
+				"SVELTE_MCP_SUBDOMAIN": "next"
 			},
 			"tools": ["*"]
 		}
@@ -70,9 +70,9 @@ To use the remote server instead, replace the `svelte` entry in the override fil
 ```json
 {
 	"type": "http",
-	"url": "https://mcp.svelte.dev/mcp?next=true",
+	"url": "https://mcp.svelte.dev/mcp?subdomain=next",
 	"tools": ["*"]
 }
 ```
 
-See [local setup](local-setup) and [remote setup](remote-setup) for details about Next mode and the package-version check performed by the documentation tools.
+See [local setup](local-setup) and [remote setup](remote-setup) for details about subdomain selection, version checks, and the fallback to `svelte.dev` with an agent warning when the selected docs are unavailable.

@@ -1,16 +1,12 @@
 import type { SvelteMcp } from '../../index.js';
-import { format_sections_list } from '../../utils.js';
-import {
-	NEXT_DOCUMENTATION_INSTRUCTIONS,
-	SECTIONS_LIST_INTRO,
-	SECTIONS_LIST_OUTRO,
-} from './prompts.js';
+import { get_sections, format_sections } from '../../utils.js';
+import { SECTIONS_LIST_INTRO, SECTIONS_LIST_OUTRO } from './prompts.js';
 import { icons } from '../../icons/index.js';
 import { tool } from 'tmcp/utils';
 
-export async function list_sections_handler(next = false) {
-	const formatted_sections = await format_sections_list(next);
-	const instructions = next ? `${NEXT_DOCUMENTATION_INSTRUCTIONS}\n\n` : '';
+export async function list_sections_handler(subdomain?: string) {
+	const { sections, instructions } = await get_sections(subdomain);
+	const formatted_sections = format_sections(sections);
 
 	return `${instructions}${SECTIONS_LIST_INTRO}\n\n${formatted_sections}\n\n${SECTIONS_LIST_OUTRO}`;
 }
@@ -34,7 +30,7 @@ export function list_sections(server: SvelteMcp) {
 				await server.ctx.custom.track(server.ctx.sessionId, 'list-sections');
 			}
 			try {
-				const content = await list_sections_handler(server.ctx.custom?.next);
+				const content = await list_sections_handler(server.ctx.custom?.subdomain);
 				return tool.text(content);
 			} catch (e) {
 				const error = e as Error;
