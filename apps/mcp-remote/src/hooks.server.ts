@@ -16,6 +16,7 @@ export async function handle({ event, resolve }) {
 		}
 	}
 	const mcp_response = await http_transport.respond(event.request, {
+		subdomain: event.url.searchParams.get('subdomain') ?? '',
 		// only add analytics in production
 		track: dev
 			? undefined

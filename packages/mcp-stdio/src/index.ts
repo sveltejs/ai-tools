@@ -11,11 +11,13 @@ import { StdioTransport } from '@tmcp/transport-stdio';
 import sade from 'sade';
 
 const cli = sade('svelte-mcp');
+const subdomain = process.env.SVELTE_MCP_SUBDOMAIN ?? '';
 
 cli.command('__mcp', '', { default: true }).action(() => {
 	const transport = new StdioTransport(server);
 	transport.listen({
 		stdio: true,
+		subdomain,
 	});
 });
 
@@ -23,14 +25,14 @@ cli
 	.command('list-sections')
 	.describe('List all the available documentation sections')
 	.action(async () => {
-		console.log(await list_sections_handler());
+		console.log(await list_sections_handler(subdomain));
 	});
 
 cli
 	.command('get-documentation <sections>')
 	.describe('Get documentation for specified sections, separated by commas')
 	.action(async (sections) => {
-		console.log(await get_documentation_handler({ section: sections.split(',') }));
+		console.log(await get_documentation_handler({ section: sections.split(',') }, subdomain));
 	});
 
 cli
