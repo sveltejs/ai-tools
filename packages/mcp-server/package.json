@@ -30,6 +30,7 @@
 		"ts-blank-space": "catalog:tooling",
 		"typescript-eslint": "catalog:lint",
 		"valibot": "catalog:tooling",
+		"verkit": "catalog:tooling",
 		"vitest": "catalog:tooling",
 		"zimmerframe": "catalog:tooling"
 	},

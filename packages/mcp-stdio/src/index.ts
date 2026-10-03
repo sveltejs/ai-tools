@@ -39,7 +39,11 @@ cli
 		'Detect and suggest fixes for Svelte code issues, because the terminal will substitute variables `$` should be correctly escaped',
 	)
 	.option('--async', 'Wether the project is using async svelte or not', false)
-	.option('--svelte-version', 'Which version of svelte to use...it can be 4 or 5', 5)
+	.option(
+		'--svelte-version',
+		'Which version of svelte to use...ideally the full version from package.json (e.g. 5.16.0), the major must be 4 or 5',
+		'5',
+	)
 	.action(async (code_or_path, { async, 'svelte-version': version }) => {
 		let code = code_or_path;
 
@@ -53,7 +57,7 @@ cli
 			console.log('File not found, treating input as code...');
 		}
 
-		const desired_svelte_version = +version;
+		const desired_svelte_version = String(version);
 
 		const result = await svelte_autofixer_handler({
 			code,
