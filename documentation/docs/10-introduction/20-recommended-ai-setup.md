@@ -2,15 +2,15 @@
 title: Recommended AI setup
 ---
 
-There are a lot of ways to configure your agents given the range of tool we offer. Each setup will differ based on the harness, the model, the task you are working on and they are subject to change as any of those evolve over time.
+There's no one correct way to configure your agent — each setup will differ based on the harness, the model and the task you're working on. All these things will evolve over time.
 
-For this reason the aim of this page is not to prescribe what to use in an absolute manner but to give you the tools to make your own decisions.
+Accordingly, this page aims to give you the tools to make your own decisions, rather than prescribing a particular setup.
 
-Also, things are moving fast and we will try to keep this documentation page up to date with the latest suggestion so if you find that something relevant is missing feel free to [open an issue](https://github.com/sveltejs/ai-tools/issues/new?template=BLANK_ISSUE).
+AI best practices are a moving target. We will endeavour to keep this documentation up to date, but if something relevant is missing please [open an issue](https://github.com/sveltejs/ai-tools/issues/new?template=BLANK_ISSUE).
 
 ## The plugins
 
-If one of our [Plugins](claude-plugin) is available for your harness you should set up your tools using them. It's the easiest way to get updates and to set up everything in one go. The plugins still allows you to configure the various tool separately either with a `svelte.json` file (for the [OpenCode](opencode-plugin) plugin) or directly in the harness.
+If we provide a [plugin](claude-plugin) for your harness we recommend using it — it's the easiest way to get updates and to set everything up in one go. You can configure individual tools either with a `svelte.json` file (for the [OpenCode plugin](opencode-plugin)) or directly in the harness.
 
 ## `AGENTS.md`
 
@@ -20,9 +20,9 @@ While overall this is a small price to pay in terms of tokens, modern models ten
 
 ## Skills
 
-The [svelte-core-bestpractices](skills#svelte-core-bestpractices) skill is a must have: from our evals that skill by itself boosted the success rate at least as much as the MCP server.
+The [svelte-core-bestpractices](skills#svelte-core-bestpractices) skill is strongly recommended — our evals show that it boosts success rate by at least as much as the MCP server.
 
-[svelte-code-writer](skills#svelte-code-writer), is a bit different: it instructs the LLM on how to use the `@sveltejs/mcp` package [as a cli](cli) and should be used as an alternative to the MCP. In our experience the MCP yield better results (because models are trained to invoke an MCP tool and less trained to use a CLI).
+[svelte-code-writer](skills#svelte-code-writer) is a bit different: it teaches the LLM how to use the `@sveltejs/mcp` package [as a cli](cli) and should be used as an alternative to the MCP. In our experience the MCP yields better results, because that's what models are trained to use.
 
 > [!NOTE] By using the CLI you also forgo the other benefits of the MCP server like [resources](resources) and [prompts](prompts).
 
@@ -63,6 +63,6 @@ It will need a bit of guessing (so to not include unneeded documentation pages e
 
 ## Subagents
 
-Subagents are very effective when writing Svelte components: they can work in parallel, they get their own context window (which means they don't pollute and don't get polluted by the main context window) and are a staple for every atomic operation (which writing a component, very often, is).
+Subagents are very effective when writing Svelte components — they can work in parallel, and avoid filling up the main context window. They're very useful for atomic operations such as writing components.
 
-The only trade off with subagents is about token cost: since each subagent has a fresh context window skills needs to be re-loaded, `get-documentation` needs to be called again etc. So unless you are on the verge of reaching your limits we suggest to keep subagents enabled.
+The trade-off is token cost. Since each subagent has a fresh context window, skills needs to be reloaded, tool calls like `get-documentation` need to run again, and so on. Keep this in mind if you're approach your token limits.
