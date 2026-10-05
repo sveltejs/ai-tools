@@ -9,8 +9,11 @@ import { readFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { StdioTransport } from '@tmcp/transport-stdio';
 import sade from 'sade';
+import pkg from '../package.json' with { type: 'json' };
 
 const cli = sade('svelte-mcp');
+
+cli.version(pkg.version);
 
 cli.command('__mcp', '', { default: true }).action(() => {
 	const transport = new StdioTransport(server);
