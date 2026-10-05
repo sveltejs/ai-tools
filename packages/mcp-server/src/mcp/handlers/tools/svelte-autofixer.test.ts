@@ -13,7 +13,7 @@ let client: ReturnType<typeof transport.session> | ReturnType<typeof transport.s
 async function autofixer_tool_call(
 	code: string,
 	is_error = false,
-	desired_svelte_version = 5,
+	desired_svelte_version: number | string = 5,
 	async = false,
 	ctx?: { stdio?: boolean },
 ) {
@@ -153,8 +153,48 @@ describe.each(['session', 'stateless'])('svelte-autofixer tool - %s', (type) => 
 		expect(content.content).toBeDefined();
 		expect(content.content[0]).toBeDefined();
 		expect(content.content[0].text).toContain(
-			'The desired_svelte_version MUST be either 4 or 5 but received "3"',
+			'The desired_svelte_version MUST be a svelte version with major 4 or 5 (e.g. "5.16.0") but received "3"',
 		);
+	});
+
+	it('should error in case the passed in version is not a version', async () => {
+		const content = await autofixer_tool_call(`whatever`, true, 'latest');
+
+		expect(content.content).toBeDefined();
+		expect(content.content[0]).toBeDefined();
+		expect(content.content[0].text).toContain(
+			'The desired_svelte_version MUST be a svelte version with major 4 or 5 (e.g. "5.16.0") but received "latest"',
+		);
+	});
+
+	it('should accept a full svelte version and enable version specific suggestions', async () => {
+		const code = `<script>
+			let cool = $state(true);
+		</script>
+
+		<div class:cool></div>`;
+
+		const content = await autofixer_tool_call(code, false, '5.16.0');
+		expect(content.suggestions).toContain(
+			'Consider using the `class` attribute instead of the `class:` directive for "cool" on the `div` element, e.g. `class={{ cool }}`.',
+		);
+
+		const old_content = await autofixer_tool_call(code, false, '5.15.0');
+		expect(old_content.suggestions).not.toContain(
+			'Consider using the `class` attribute instead of the `class:` directive for "cool" on the `div` element, e.g. `class={{ cool }}`.',
+		);
+	});
+
+	it('should accept a version range like the one found in package.json', async () => {
+		const content = await autofixer_tool_call(
+			`<script>
+				let count = $state(0);
+			</script>`,
+			false,
+			'^5.16.0',
+		);
+
+		expect(content.issues).toEqual([]);
 	});
 
 	it('should read file content from path when stdio context is true', async () => {
