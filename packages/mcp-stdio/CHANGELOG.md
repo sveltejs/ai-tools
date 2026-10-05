@@ -1,5 +1,11 @@
 # @sveltejs/mcp
 
+## 0.1.27
+
+### Patch Changes
+
+- fix: set correct version for mcp cli ([#284](https://github.com/sveltejs/ai-tools/pull/284))
+
 ## 0.1.26
 
 ### Patch Changes
