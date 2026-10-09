@@ -1,0 +1,65 @@
+{
+	"type": "object",
+	"properties": {
+		"$schema": {
+			"type": "string",
+			"description": "The JSON schema of this file."
+		},
+		"mcp": {
+			"type": "object",
+			"properties": {
+				"type": {
+					"enum": ["remote", "local"]
+				},
+				"enabled": {
+					"type": "boolean"
+				},
+				"exposure": {
+					"enum": ["direct", "codemode", "deferred", "hidden"]
+				}
+			},
+			"required": [],
+			"description": "Configuration for the MCP. You can choose whether it is enabled, which transport to use: 'local' (default) or 'remote', and how the tools are exposed to the model ('direct' by default)."
+		},
+		"instructions": {
+			"type": "object",
+			"properties": {
+				"enabled": {
+					"type": "boolean"
+				}
+			},
+			"required": [],
+			"description": "Configuration for the automatic instructions injection in the system prompt. You can choose if it should be enabled or not."
+		},
+		"skills": {
+			"type": "object",
+			"properties": {
+				"enabled": {
+					"anyOf": [
+						{
+							"type": "boolean"
+						},
+						{
+							"type": "array",
+							"items": {
+								"anyOf": [
+									{
+										"enum": ["svelte-code-writer", "svelte-core-bestpractices"]
+									},
+									{
+										"type": "string"
+									}
+								]
+							}
+						}
+					],
+					"description": "It can be either a boolean or an array containing the skills that you want to enable"
+				}
+			},
+			"required": [],
+			"description": "Configuration for the skills. You can choose if they should be enabled or not, or specify an array of skill names to enable only specific skills."
+		}
+	},
+	"required": [],
+	"$schema": "http://json-schema.org/draft-07/schema#"
+}
