@@ -2,7 +2,7 @@ import { readFile, readdir } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { get_config } from './config.js';
-import { DEFAULT_MCP_NAME, mcp_tool_name, setup_mcp } from './mcp.js';
+import { mcp_tool_name, setup_mcp } from './mcp.js';
 
 /** @typedef {import('@earendil-works/pi-coding-agent').ExtensionAPI} ExtensionAPI */
 /** @typedef {import('@earendil-works/pi-coding-agent').ExtensionContext} ExtensionContext */
@@ -23,8 +23,11 @@ async function get_skill_paths(enabled) {
 	return names.map((name) => join(skills_dir, name));
 }
 
-/** @param {string} mcp_name */
-async function load_instructions(mcp_name) {
+/**
+ * @param {string} mcp_name
+ * @param {boolean} isolated whether the MCP server runs outside of the project directory
+ */
+async function load_instructions(mcp_name, isolated) {
 	const files = (await readdir(instructions_dir)).filter((file) => file.endsWith('.md')).sort();
 	const contents = await Promise.all(
 		files.map((file) => readFile(join(instructions_dir, file), 'utf-8')),
@@ -35,6 +38,11 @@ async function load_instructions(mcp_name) {
 			.map((tool) => `\`${mcp_tool_name(mcp_name, tool)}\``)
 			.join(', ')}.`,
 		'Depending on the configured exposure they are either declared directly, reachable through `tool_search`, or callable from `codemode` scripts.',
+		...(isolated
+			? [
+					`The Svelte MCP server runs outside of the project directory, so when passing a file path to \`${mcp_tool_name(mcp_name, 'svelte-autofixer')}\` it MUST be an absolute path (or pass the code directly): relative paths would be treated as code.`,
+				]
+			: []),
 	].join(' ');
 	return [naming, ...contents].join('\n\n');
 }
@@ -66,7 +74,6 @@ export default function svelte(pi) {
 	}
 	/** @type {ResolvedConfig | undefined} */
 	let config;
-	let mcp_name = DEFAULT_MCP_NAME;
 	/** @type {string | undefined} */
 	let instructions;
 
@@ -85,8 +92,10 @@ export default function svelte(pi) {
 
 	pi.on('session_start', async (_event, ctx) => {
 		const resolved = current_config(ctx);
-		mcp_name = setup_mcp(pi, resolved, ctx.cwd, ctx.isProjectTrusted());
-		instructions = resolved.instructions.enabled ? await load_instructions(mcp_name) : undefined;
+		const mcp = setup_mcp(pi, resolved, ctx.cwd, ctx.isProjectTrusted());
+		instructions = resolved.instructions.enabled
+			? await load_instructions(mcp.name, mcp.isolated)
+			: undefined;
 	});
 
 	pi.on('before_agent_start', (event) => {

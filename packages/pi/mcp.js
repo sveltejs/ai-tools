@@ -1,4 +1,5 @@
 import { existsSync, readFileSync } from 'node:fs';
+import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { CONFIG_DIR_NAME, getAgentDir } from '@earendil-works/pi-coding-agent';
 
@@ -54,8 +55,22 @@ export function mcp_tool_name(server, tool) {
 }
 
 /**
+ * Working directory of the local MCP server in untrusted projects. pi spawns stdio servers in the
+ * session directory by default, but `npx` reads the project `.npmrc` (e.g. `script-shell`,
+ * `registry`) and prefers a `@sveltejs/mcp` found in the project `node_modules`: a malicious
+ * repository could use either to run arbitrary code as soon as pi starts. In untrusted projects we
+ * run the server from the pi agent directory instead, which is user-controlled and outside of the
+ * project.
+ */
+function get_isolated_cwd() {
+	const agent_dir = getAgentDir();
+	return existsSync(agent_dir) ? agent_dir : homedir();
+}
+
+/**
  * Registers the Svelte MCP server unless the user already configured it in `mcp.json`.
- * Returns the name of the server in use (registered or user configured).
+ * Returns the name of the server in use (registered or user configured) and whether the server
+ * runs outside of the project directory (in which case relative paths can't be resolved by it).
  *
  * @param {ExtensionAPI} pi
  * @param {ResolvedConfig} config
@@ -66,7 +81,7 @@ export function setup_mcp(pi, config, cwd, trusted) {
 	// if the user already configured the Svelte MCP server we don't register ours, but we return
 	// its name so that the instructions can reference the right tool names
 	const configured = find_configured_svelte_mcp(cwd, trusted);
-	if (configured) return configured;
+	if (configured) return { name: configured, isolated: false };
 	const description =
 		'Official Svelte MCP server: Svelte 5 and SvelteKit documentation, code analysis with the autofixer and playground links.';
 	if (config.mcp.type === 'remote') {
@@ -76,14 +91,19 @@ export function setup_mcp(pi, config, cwd, trusted) {
 			exposure: config.mcp.exposure,
 			description,
 		});
-	} else {
-		pi.registerMcpServer(DEFAULT_MCP_NAME, {
-			command: 'npx',
-			args: ['-y', '@sveltejs/mcp'],
-			enabled: config.mcp.enabled,
-			exposure: config.mcp.exposure,
-			description,
-		});
+		return { name: DEFAULT_MCP_NAME, isolated: false };
 	}
-	return DEFAULT_MCP_NAME;
+	// In trusted projects we keep the default working directory (the project) so that the autofixer
+	// can resolve relative file paths: pi already runs project extensions there, so honoring the
+	// project npm configuration doesn't add any risk.
+	const isolated = !trusted;
+	pi.registerMcpServer(DEFAULT_MCP_NAME, {
+		command: 'npx',
+		args: ['-y', '@sveltejs/mcp'],
+		...(isolated ? { cwd: get_isolated_cwd() } : {}),
+		enabled: config.mcp.enabled,
+		exposure: config.mcp.exposure,
+		description,
+	});
+	return { name: DEFAULT_MCP_NAME, isolated };
 }
