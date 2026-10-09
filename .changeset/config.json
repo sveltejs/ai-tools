@@ -7,5 +7,5 @@
 	"access": "public",
 	"baseBranch": "main",
 	"updateInternalDependencies": "patch",
-	"ignore": ["!@sveltejs/mcp", "!@sveltejs/opencode"]
+	"ignore": ["!@sveltejs/mcp", "!@sveltejs/opencode", "!@sveltejs/pi"]
 }
