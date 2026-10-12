@@ -55,12 +55,15 @@ export function mcp_tool_name(server, tool) {
 }
 
 /**
- * Working directory of the local MCP server in untrusted projects. pi spawns stdio servers in the
- * session directory by default, but `npx` reads the project `.npmrc` (e.g. `script-shell`,
- * `registry`) and prefers a `@sveltejs/mcp` found in the project `node_modules`: a malicious
- * repository could use either to run arbitrary code as soon as pi starts. In untrusted projects we
- * run the server from the pi agent directory instead, which is user-controlled and outside of the
- * project.
+ * Working directory of the local MCP server. pi spawns stdio servers in the session directory by
+ * default, but there `npx` reads the project `.npmrc` (e.g. `script-shell`, `registry`), prefers a
+ * `@sveltejs/mcp` found in the project `node_modules`, and puts the project `node_modules/.bin`
+ * first in the `PATH` of the server (so even `node` can be shadowed). A malicious repository could
+ * use any of those to run arbitrary code as soon as pi starts. We can't rely on project trust to
+ * decide: pi implicitly trusts folders without pi-specific resources, and a repository can simply
+ * omit them. So we always run the server from the pi agent directory, which is user-controlled and
+ * outside of the project. `--prefix` alone is not enough because npm still builds the `PATH` from
+ * the working directory.
  */
 function get_isolated_cwd() {
 	const agent_dir = getAgentDir();
@@ -93,17 +96,13 @@ export function setup_mcp(pi, config, cwd, trusted) {
 		});
 		return { name: DEFAULT_MCP_NAME, isolated: false };
 	}
-	// In trusted projects we keep the default working directory (the project) so that the autofixer
-	// can resolve relative file paths: pi already runs project extensions there, so honoring the
-	// project npm configuration doesn't add any risk.
-	const isolated = !trusted;
 	pi.registerMcpServer(DEFAULT_MCP_NAME, {
 		command: 'npx',
 		args: ['-y', '@sveltejs/mcp'],
-		...(isolated ? { cwd: get_isolated_cwd() } : {}),
+		cwd: get_isolated_cwd(),
 		enabled: config.mcp.enabled,
 		exposure: config.mcp.exposure,
 		description,
 	});
-	return { name: DEFAULT_MCP_NAME, isolated };
+	return { name: DEFAULT_MCP_NAME, isolated: true };
 }
