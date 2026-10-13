@@ -12,6 +12,6 @@ You can download the latest skills from the [releases page](https://github.com/s
 
 The `svelte-mcp-feedback` skill tells the agent to check for opportunities to improve the MCP autofixer when you correct a Svelte or SvelteKit mistake an agent made. It creates an issue in [`sveltejs/ai-tools`](https://github.com/sveltejs/ai-tools) using the GitHub CLI, or opens a prefilled issue form for you to submit when the CLI is unavailable.
 
-Since we want this to be completely opt-in it's not bundled with any plugin and you must install it separately. To do it, download the standalone `svelte-mcp-feedback` skill from the releases page, copy `tools/skills/svelte-mcp-feedback` into your client's skills directory or use your favorite skills manager.
+Since we want this to be completely opt-in, it's not bundled with any plugin and you must install it separately.
 
 @include .generated/skills.md
