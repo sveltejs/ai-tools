@@ -1,5 +1,13 @@
 # @sveltejs/mcp
 
+## 0.1.27
+
+### Patch Changes
+
+- feat: class directive to clsx attribute fixer ([#269](https://github.com/sveltejs/ai-tools/pull/269))
+
+- fix: set correct version for mcp cli ([#284](https://github.com/sveltejs/ai-tools/pull/284))
+
 ## 0.1.26
 
 ### Patch Changes
