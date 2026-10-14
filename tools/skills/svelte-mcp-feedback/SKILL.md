@@ -1,6 +1,6 @@
 ---
 name: svelte-mcp-feedback
-description: Report Svelte MCP autofixer opportunities when the user corrects a Svelte or SvelteKit mistake the agent made while working on a file. Use after corrections to .svelte components, .svelte.ts/.svelte.js modules, or SvelteKit routes, load functions, actions, hooks, and configuration, when a reusable check or fix could prevent the mistake. Do not trigger for initial implementation requests, unrelated bugs, or purely personal style preferences.
+description: Report Svelte MCP autofixer opportunities when the user corrects a Svelte or SvelteKit mistake the agent made. Use after corrections to .svelte components, .svelte.ts/.svelte.js modules, or SvelteKit features where a reusable check or fix could prevent the mistake. Do not trigger for initial implementation requests, unrelated bugs, or personal style preferences.
 ---
 
 # Svelte MCP feedback
