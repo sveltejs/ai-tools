@@ -1,22 +1,10 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import { sync_skills } from './sync-skills.ts';
 
 const CURSOR_PLUGIN_DIR = './plugins/cursor/svelte';
 const TOOLS_PLUGIN_DIR = './tools';
 const AGENTS_MD_PATH = './tools/instructions/AGENTS.md';
-
-/**
- * Sync skills from Claude plugin to Cursor plugin (direct copy)
- */
-async function sync_skills() {
-	const source = path.join(TOOLS_PLUGIN_DIR, 'skills');
-	const dest = path.join(CURSOR_PLUGIN_DIR, 'skills');
-
-	await fs.rm(dest, { recursive: true, force: true });
-	await fs.cp(source, dest, { recursive: true });
-
-	console.log('Synced skills to Cursor plugin');
-}
 
 /**
  * Sync agent definition from Claude plugin to Cursor plugin,
@@ -78,7 +66,7 @@ ${agents_content.trim()}
 	console.log('Synced rules to Cursor plugin');
 }
 
-await sync_skills();
+await sync_skills(path.join(TOOLS_PLUGIN_DIR, 'skills'), path.join(CURSOR_PLUGIN_DIR, 'skills'));
 await sync_agents();
 await sync_rules();
 
