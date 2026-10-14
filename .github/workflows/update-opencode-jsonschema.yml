@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - 'packages/opencode/config.ts'
+      - 'packages/opencode/config.js'
 
 permissions:
   contents: write
@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
           fetch-depth: 0
 
@@ -67,7 +67,7 @@ jobs:
             ## Summary
             Automatically generated update for OpenCode JSON schema.
 
-            This PR was triggered by changes to the OpenCode configuration file `packages/opencode/config.ts`.
+            This PR was triggered by changes to the OpenCode configuration file `packages/opencode/config.js`.
 
             ## Changes
             - Updated `packages/opencode/schema.json` with latest JSON schema

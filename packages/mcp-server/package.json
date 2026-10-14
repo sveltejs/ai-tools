@@ -30,13 +30,13 @@
 		"ts-blank-space": "catalog:tooling",
 		"typescript-eslint": "catalog:lint",
 		"valibot": "catalog:tooling",
+		"verkit": "catalog:tooling",
 		"vitest": "catalog:tooling",
 		"zimmerframe": "catalog:tooling"
 	},
 	"devDependencies": {
 		"@anthropic-ai/sdk": "catalog:ai",
 		"@sveltejs/kit": "catalog:svelte",
-		"@types/eslint-scope": "catalog:lint",
 		"@types/estree": "catalog:tooling",
 		"@typescript-eslint/types": "catalog:lint",
 		"dotenv": "catalog:tooling"

@@ -1,12 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import { add_autofixers_issues } from './add-autofixers-issues.js';
 import { base_runes } from '../../constants.js';
+import { parse_svelte_version } from '../version.js';
 
 const dollarless_runes = base_runes.map((r) => ({ rune: r.replace('$', '') }));
 
-function run_autofixers_on_code(code: string, desired_svelte_version = 5) {
+function run_autofixers_on_code(code: string, desired_svelte_version: number | string = 5) {
 	const content = { issues: [], suggestions: [] };
-	add_autofixers_issues(content, code, desired_svelte_version);
+	add_autofixers_issues(content, code, parse_svelte_version(desired_svelte_version)!);
 	return content;
 }
 
@@ -785,6 +786,183 @@ describe('add_autofixers_issues', () => {
 					const x = foo.bar;
 					</script>`),
 			).not.toThrow();
+		});
+	});
+
+	describe('class_directive_to_clsx', () => {
+		function run(code: string, desired_svelte_version: number | string = '5.16.0') {
+			return run_autofixers_on_code(code, desired_svelte_version);
+		}
+
+		function suggestion(names: string, element: string, value: string) {
+			return `Consider using the \`class\` attribute instead of the \`class:\` directive for ${names} on the \`${element}\` element, e.g. \`class={${value}}\`.`;
+		}
+
+		function class_suggestions(content: { suggestions: string[] }) {
+			return content.suggestions.filter((s) => s.includes('instead of the `class:` directive'));
+		}
+
+		it('should add a suggestion when using a class: directive with an expression', () => {
+			const content = run(`<script>
+					let cool = $state(true);
+				</script>
+
+				<div class:lame={!cool}></div>`);
+
+			expect(content.suggestions).toContain(suggestion('"lame"', 'div', '{ lame: !cool }'));
+		});
+
+		it('should add a suggestion when using the shorthand class: directive', () => {
+			const content = run(`<script>
+					let cool = $state(true);
+				</script>
+
+				<div class:cool></div>`);
+
+			expect(content.suggestions).toContain(suggestion('"cool"', 'div', '{ cool }'));
+		});
+
+		it('should use the shorthand object property when the expression is an identifier with the same name', () => {
+			const content = run(`<script>
+					let cool = $state(true);
+				</script>
+
+				<div class:cool={cool}></div>`);
+
+			expect(content.suggestions).toContain(suggestion('"cool"', 'div', '{ cool }'));
+		});
+
+		it('should add a single suggestion combining every class: directive on the same element', () => {
+			const content = run(`<script>
+					let cool = $state(true);
+				</script>
+
+				<div class:cool class:lame={!cool}></div>`);
+
+			expect(class_suggestions(content)).toHaveLength(1);
+			expect(content.suggestions).toContain(
+				suggestion('"cool", "lame"', 'div', '{ cool, lame: !cool }'),
+			);
+		});
+
+		it('should add a suggestion for each element using a class: directive', () => {
+			const content = run(`<script>
+					let cool = $state(true);
+				</script>
+
+				<div class:cool></div>
+				<span class:lame={!cool}></span>`);
+
+			expect(content.suggestions).toContain(suggestion('"cool"', 'div', '{ cool }'));
+			expect(content.suggestions).toContain(suggestion('"lame"', 'span', '{ lame: !cool }'));
+		});
+
+		it('should quote class names that are not valid identifiers', () => {
+			const content = run(`<script>
+					let active = $state(true);
+				</script>
+
+				<div class:text-red-500={active}></div>`);
+
+			expect(content.suggestions).toContain(
+				suggestion('"text-red-500"', 'div', "{ 'text-red-500': active }"),
+			);
+		});
+
+		it('should suggest an array when there is already a static class attribute', () => {
+			const content = run(`<script>
+					let cool = $state(true);
+				</script>
+
+				<div class="card big" class:cool></div>`);
+
+			expect(content.suggestions).toContain(suggestion('"cool"', 'div', "['card big', { cool }]"));
+		});
+
+		it('should suggest an array when there is already a dynamic class attribute', () => {
+			const content = run(`<script>
+					let cool = $state(true);
+					let extra = $state('big');
+				</script>
+
+				<div class={extra} class:cool></div>`);
+
+			expect(content.suggestions).toContain(suggestion('"cool"', 'div', '[extra, { cool }]'));
+		});
+
+		it('should suggest an array with a template literal when there is already a mixed class attribute', () => {
+			const content = run(`<script>
+					let cool = $state(true);
+					let extra = $state('big');
+				</script>
+
+				<div class="card {extra}" class:cool></div>`);
+
+			expect(content.suggestions).toContain(
+				suggestion('"cool"', 'div', '[`card ${extra}`, { cool }]'),
+			);
+		});
+
+		it('should add a suggestion for versions newer than 5.16', () => {
+			const content = run(
+				`<script>
+					let cool = $state(true);
+				</script>
+
+				<div class:cool></div>`,
+				'5.20.3',
+			);
+
+			expect(content.suggestions).toContain(suggestion('"cool"', 'div', '{ cool }'));
+		});
+
+		it('should not add a suggestion when the desired svelte version is older than 5.16', () => {
+			const content = run(
+				`<script>
+					let cool = $state(true);
+				</script>
+
+				<div class:cool></div>`,
+				'5.15.9',
+			);
+
+			expect(class_suggestions(content)).toHaveLength(0);
+		});
+
+		it('should not add a suggestion when only the major version is provided', () => {
+			const content = run(
+				`<script>
+					let cool = $state(true);
+				</script>
+
+				<div class:cool></div>`,
+				5,
+			);
+
+			expect(class_suggestions(content)).toHaveLength(0);
+		});
+
+		it('should not add a suggestion when the desired svelte version is 4', () => {
+			const content = run(
+				`<script>
+					let cool = true;
+				</script>
+
+				<div class:cool></div>`,
+				'4.2.19',
+			);
+
+			expect(class_suggestions(content)).toHaveLength(0);
+		});
+
+		it('should not add a suggestion when only the class attribute is used', () => {
+			const content = run(`<script>
+					let cool = $state(true);
+				</script>
+
+				<div class={{ cool }}></div>`);
+
+			expect(class_suggestions(content)).toHaveLength(0);
 		});
 	});
 });

@@ -1,6 +1,6 @@
 {
 	"name": "@sveltejs/opencode",
-	"version": "0.1.8",
+	"version": "0.1.16",
 	"type": "module",
 	"license": "MIT",
 	"homepage": "https://github.com/sveltejs/ai-tools#readme",
@@ -9,35 +9,51 @@
 	},
 	"scripts": {
 		"check": "tsc --noEmit",
-		"generate-schema": "node --import node-resolve-ts/register scripts/generate-schema.ts"
+		"generate-schema": "node scripts/generate-schema.js"
 	},
 	"files": [
-		"index.ts",
-		"config.ts",
-		"agents.ts",
+		"index.js",
+		"v1.js",
+		"v2.js",
+		"config.js",
+		"update.js",
+		"tui.jsx",
+		"v1-tui.jsx",
+		"v2-tui.js",
+		"agents.js",
 		"instructions",
 		"skills"
 	],
 	"exports": {
 		"./server": {
-			"types": "./index.ts",
-			"import": "./index.ts"
+			"types": "./index.js",
+			"import": "./index.js"
+		},
+		"./tui": {
+			"types": "./tui.jsx",
+			"import": "./tui.jsx"
 		}
 	},
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/sveltejs/ai-tools.git",
-		"path": "packages/opencode"
+		"directory": "packages/opencode"
 	},
 	"publishConfig": {
 		"access": "public"
 	},
 	"dependencies": {
-		"valibot": "catalog:tooling"
+		"@opentui/core": "catalog:opencode",
+		"@opentui/keymap": "catalog:opencode",
+		"@opentui/solid": "catalog:opencode",
+		"solid-js": "catalog:opencode",
+		"valibot": "catalog:tooling",
+		"verkit": "catalog:tooling"
 	},
 	"devDependencies": {
-		"@opencode-ai/plugin": "catalog:ai",
-		"@valibot/to-json-schema": "catalog:tooling",
-		"@types/node": "catalog:tooling"
+		"@opencode-ai/plugin-v1": "catalog:opencode",
+		"@opencode/plugin": "catalog:opencode",
+		"@types/node": "catalog:tooling",
+		"@valibot/to-json-schema": "catalog:tooling"
 	}
 }

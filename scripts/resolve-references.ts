@@ -103,7 +103,33 @@ function remove_frontmatter_unneeded_fields(content: string) {
 function derive_name(link: string) {
 	const without_hash = link.split('#')[0]!;
 	const segments = without_hash.split('/').filter(Boolean);
-	return segments[segments.length - 1] ?? 'reference';
+	const name = segments[segments.length - 1] ?? 'reference';
+	const safe_name = name
+		.normalize('NFKD')
+		.replace(/[\u0300-\u036f]/g, '')
+		.replace(/[^a-zA-Z0-9_-]+/g, '-')
+		.replace(/^-+|-+$/g, '');
+
+	return safe_name || 'reference';
+}
+
+/**
+ * Makes links copied into reference files point back to their pages on svelte.dev.
+ */
+export function resolve_reference_links(content: string, repo: string) {
+	return content.replace(
+		/\[([^\]]*)\]\((?![a-z][a-z\d+.-]*:|#|\/\/)([^)]+)\)/gi,
+		(full_match, text: string, href: string) => {
+			const url = new URL(
+				href.startsWith('/')
+					? `https://svelte.dev${href}`
+					: `https://svelte.dev/docs/${repo}/${href}`,
+			);
+			url.pathname += '/llms.txt';
+
+			return `[${text}](${url})`;
+		},
+	);
 }
 
 const content = remove_llm_ignore_blocks(
@@ -203,8 +229,13 @@ for (const link of links) {
 
 		const ref_filename = `${name}.md`;
 		const ref_path = path.join(references_dir, ref_filename);
+		const reference_repo = link.is_absolute_docs ? link.clean_path.split('/')[2]! : repo;
+		const reference_content = resolve_reference_links(
+			remove_llm_ignore_blocks(remove_cut_preambles(fetched_content)),
+			reference_repo,
+		);
 
-		await fs.writeFile(ref_path, remove_llm_ignore_blocks(remove_cut_preambles(fetched_content)));
+		await fs.writeFile(ref_path, reference_content);
 		console.log(`  Saved: references/${ref_filename}`);
 
 		// Replace the link in the markdown

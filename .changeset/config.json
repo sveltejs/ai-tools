@@ -1,6 +1,6 @@
 {
 	"$schema": "https://unpkg.com/@changesets/config@3.1.1/schema.json",
-	"changelog": ["@svitejs/changesets-changelog-github-compact", { "repo": "sveltejs/ai-tools" }],
+	"changelog": ["@changesets/changelog-github", { "repo": "sveltejs/ai-tools", "template": "\n- {summary} {ref}" }],
 	"commit": false,
 	"fixed": [],
 	"linked": [],

@@ -87,6 +87,6 @@ ${fence}
 	}
 }
 
-const generated_dir = './documentation/docs/60-skills/.generated';
+const generated_dir = './documentation/docs/40-skills/.generated';
 await fs.mkdir(generated_dir, { recursive: true });
 await fs.writeFile(path.join(generated_dir, 'skills.md'), content.trim() + '\n');

@@ -1,9 +1,21 @@
 {
 	"extends": "../../tsconfig.json",
 	"compilerOptions": {
-		"allowImportingTsExtensions": true,
+		"jsx": "preserve",
+		"jsxImportSource": "@opentui/solid",
 		"types": ["@types/node"]
 	},
-	"include": ["index.ts", "config.ts", "agents.ts", "scripts/*"],
+	"include": [
+		"index.js",
+		"v1.js",
+		"v2.js",
+		"config.js",
+		"update.js",
+		"agents.js",
+		"tui.jsx",
+		"v1-tui.jsx",
+		"v2-tui.js",
+		"scripts/*"
+	],
 	"exclude": ["node_modules"]
 }

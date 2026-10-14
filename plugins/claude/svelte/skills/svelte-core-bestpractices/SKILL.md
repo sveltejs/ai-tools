@@ -35,9 +35,9 @@ If the derived expression is an object or array, it will be returned as-is — i
 
 Effects are an escape hatch and should mostly be avoided. In particular, avoid updating state inside effects.
 
-- If you need to sync state to an external library such as D3, it is often neater to use [`{@attach ...}`](references/@attach.md)
+- If you need to sync state to an external library such as D3, it is often neater to use [`{@attach ...}`](references/attach.md)
 - If you need to run some code in response to user interaction, put the code directly in an event handler or use a [function binding](references/bind.md) as appropriate
-- If you need to log values for debugging purposes, use [`$inspect`](references/$inspect.md)
+- If you need to log values for debugging purposes, use [`$inspect`](references/inspect.md)
 - If you need to observe something external to Svelte, use [`createSubscriber`](references/svelte-reactivity.md)
 
 Never wrap the contents of an effect in `if (browser) {...}` or similar — effects do not run on the server.
@@ -60,6 +60,10 @@ let color = type === 'danger' ? 'red' : 'green';
 ## `$inspect.trace`
 
 `$inspect.trace` is a debugging tool for reactivity. If something is not updating properly or running more than it should you can add `$inspect.trace(label)` as the first line of an `$effect` or `$derived.by` (or any function they call) to trace their dependencies and discover which one triggered an update.
+
+## `#key` block
+
+While the `#key` block is useful when you want transitions/animations to run when a certain expression changes, it can be very expensive — it unmounts every element/component inside each time, so should be used sparingly. Instead of using `#key` to cause expressions in a child component's `<script>` block to re-run, for example, consider wrapping those expressions in `$derived`.
 
 ## Events
 
@@ -86,7 +90,7 @@ Avoid using `onMount` or `$effect` for this.
 
 ## Snippets
 
-[Snippets](references/snippet.md) are a way to define reusable chunks of markup that can be instantiated with the [`{@render ...}`](references/@render.md) tag, or passed to components as props. They must be declared within the template.
+[Snippets](references/snippet.md) are a way to define reusable chunks of markup that can be instantiated with the [`{@render ...}`](references/render.md) tag, or passed to components as props. They must be declared within the template.
 
 ```svelte
 {#snippet greeting(name)}
@@ -158,7 +162,7 @@ Use `createContext` rather than `setContext` and `getContext`, as it provides ty
 
 ## Async Svelte
 
-If using version 5.36 or higher, you can use [await expressions](references/await-expressions.md) and [hydratable](references/hydratable.md) to use promises directly inside components. Note that these require the `experimental.async` option to be enabled in `svelte.config.js` as they are not yet considered fully stable.
+If using version 5.36 or higher, you can use [await expressions](references/await-expressions.md) and [hydratable](references/hydratable.md) to use promises directly inside components. Note that these require the `experimental.async` option to be enabled in the plugin options in `vite.config.js` or in the `svelte.config.js` as they are not yet considered fully stable.
 
 ## Avoid legacy features
 

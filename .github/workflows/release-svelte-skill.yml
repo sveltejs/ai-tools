@@ -21,7 +21,7 @@ jobs:
       skills: ${{ steps.find-skills.outputs.skills }}
     steps:
       - name: checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 
       - name: Find all skills
         id: find-skills
@@ -41,7 +41,7 @@ jobs:
         skill: ${{ fromJson(needs.detect-skills.outputs.skills) }}
     steps:
       - name: checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 
       - name: Get version from date
         id: version
@@ -53,7 +53,7 @@ jobs:
           zip -r ${{ matrix.skill }}.zip ${{ matrix.skill }}/
 
       - name: Create Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2
         with:
           tag_name: ${{ matrix.skill }}-v${{ steps.version.outputs.version }}
           name: ${{ matrix.skill }} v${{ steps.version.outputs.version }}

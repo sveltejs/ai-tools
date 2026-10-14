@@ -1,5 +1,5 @@
 import { dev } from '$app/environment';
-import { http_transport } from '$lib/mcp/index.js';
+import { http_transport, server } from '$lib/mcp/index.js';
 import { redirect } from '@sveltejs/kit';
 import { track } from '@vercel/analytics/server';
 
@@ -20,7 +20,13 @@ export async function handle({ event, resolve }) {
 		track: dev
 			? undefined
 			: async (session_id, event, extra) => {
-					await track(event, { session_id, ...(extra ? { extra } : {}) });
+					await track(event, {
+						...(session_id ? { session_id } : {}),
+						...(extra ? { extra } : {}),
+						...(server.ctx?.protocolVersion
+							? { protocol_version: server.ctx.protocolVersion }
+							: {}),
+					});
 				},
 	});
 	return mcp_response ?? resolve(event);

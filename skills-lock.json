@@ -1,0 +1,11 @@
+{
+	"version": 1,
+	"skills": {
+		"writing-great-skills": {
+			"source": "mattpocock/skills",
+			"sourceType": "github",
+			"skillPath": "skills/productivity/writing-great-skills/SKILL.md",
+			"computedHash": "dd555ce552f82784c3d2b8d13a8e26a6677a07ddc00032e142dec33bfd5438c6"
+		}
+	}
+}

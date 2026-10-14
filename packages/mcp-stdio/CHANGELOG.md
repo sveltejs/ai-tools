@@ -1,5 +1,33 @@
 # @sveltejs/mcp
 
+## 0.1.26
+
+### Patch Changes
+
+- fix: new protocol version ([#249](https://github.com/sveltejs/ai-tools/pull/249))
+
+## 0.1.25
+
+### Patch Changes
+
+- fix: better wording for `desired_svelte_version` ([`59dcbff`](https://github.com/sveltejs/ai-tools/commit/59dcbff136a91efad5a0e978e8208e1b1d277f97))
+
+## 0.1.24
+
+### Patch Changes
+
+- chore: support declaration tags ([#222](https://github.com/sveltejs/ai-tools/pull/222))
+
+## 0.1.23
+
+### Patch Changes
+
+- feat: allow stdio mcp to read the content of the file directly ([#198](https://github.com/sveltejs/ai-tools/pull/198))
+
+- fix: handle non call expressions passed to `is_rune` ([#201](https://github.com/sveltejs/ai-tools/pull/201))
+
+- chore: remove db requirement ([#196](https://github.com/sveltejs/ai-tools/pull/196))
+
 ## 0.1.22
 
 ### Patch Changes

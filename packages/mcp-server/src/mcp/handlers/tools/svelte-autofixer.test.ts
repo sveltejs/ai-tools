@@ -1,24 +1,32 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { writeFileSync, unlinkSync } from 'node:fs';
+import { join } from 'node:path';
+import { tmpdir } from 'node:os';
 import { InMemoryTransport } from '@tmcp/transport-in-memory';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { server } from '../../index.js';
 
 const transport = new InMemoryTransport(server);
 
-let session: ReturnType<typeof transport.session>;
+let client: ReturnType<typeof transport.session> | ReturnType<typeof transport.stateless>;
 
 async function autofixer_tool_call(
 	code: string,
 	is_error = false,
-	desired_svelte_version = 5,
+	desired_svelte_version: number | string = 5,
 	async = false,
+	ctx?: { stdio?: boolean },
 ) {
-	const result = await session.callTool('svelte-autofixer', {
-		code,
-		desired_svelte_version,
-		filename: 'App.svelte',
-		async,
-	});
+	const result = await client.callTool(
+		'svelte-autofixer',
+		{
+			code,
+			desired_svelte_version,
+			filename: 'App.svelte',
+			async,
+		},
+		ctx,
+	);
 
 	expect(result).toBeDefined();
 	if (is_error) {
@@ -28,19 +36,21 @@ async function autofixer_tool_call(
 	return result.structuredContent as any;
 }
 
-describe('svelte-autofixer tool', () => {
+describe.each(['session', 'stateless'])('svelte-autofixer tool - %s', (type) => {
 	beforeEach(async () => {
-		session = transport.session();
-
-		session = transport.session();
-		await session.initialize(
-			'2025-06-18',
-			{},
-			{
-				name: 'test-client',
-				version: '1.0.0',
-			},
-		);
+		if (type === 'session') {
+			client = transport.session();
+			await client.initialize(
+				'2025-06-18',
+				{},
+				{
+					name: 'test-client',
+					version: '1.0.0',
+				},
+			);
+		} else {
+			client = transport.stateless();
+		}
 	});
 
 	it('should add suggestions for js parse errors', async () => {
@@ -143,7 +153,83 @@ describe('svelte-autofixer tool', () => {
 		expect(content.content).toBeDefined();
 		expect(content.content[0]).toBeDefined();
 		expect(content.content[0].text).toContain(
-			'The desired_svelte_version MUST be either 4 or 5 but received "3"',
+			'The desired_svelte_version MUST be a svelte version with major 4 or 5 (e.g. "5.16.0") but received "3"',
 		);
+	});
+
+	it('should error in case the passed in version is not a version', async () => {
+		const content = await autofixer_tool_call(`whatever`, true, 'latest');
+
+		expect(content.content).toBeDefined();
+		expect(content.content[0]).toBeDefined();
+		expect(content.content[0].text).toContain(
+			'The desired_svelte_version MUST be a svelte version with major 4 or 5 (e.g. "5.16.0") but received "latest"',
+		);
+	});
+
+	it('should accept a full svelte version and enable version specific suggestions', async () => {
+		const code = `<script>
+			let cool = $state(true);
+		</script>
+
+		<div class:cool></div>`;
+
+		const content = await autofixer_tool_call(code, false, '5.16.0');
+		expect(content.suggestions).toContain(
+			'Consider using the `class` attribute instead of the `class:` directive for "cool" on the `div` element, e.g. `class={{ cool }}`.',
+		);
+
+		const old_content = await autofixer_tool_call(code, false, '5.15.0');
+		expect(old_content.suggestions).not.toContain(
+			'Consider using the `class` attribute instead of the `class:` directive for "cool" on the `div` element, e.g. `class={{ cool }}`.',
+		);
+	});
+
+	it('should accept a version range like the one found in package.json', async () => {
+		const content = await autofixer_tool_call(
+			`<script>
+				let count = $state(0);
+			</script>`,
+			false,
+			'^5.16.0',
+		);
+
+		expect(content.issues).toEqual([]);
+	});
+
+	it('should read file content from path when stdio context is true', async () => {
+		const tmp_file = join(tmpdir(), `svelte-autofixer-test-${Date.now()}.svelte`);
+		const file_content = `<script>
+			$state count = 0;
+		</script>`;
+
+		writeFileSync(tmp_file, file_content, 'utf-8');
+
+		try {
+			// with stdio: true, the file is read from disk and parsed, producing issues
+			const content = await autofixer_tool_call(tmp_file, false, 5, false, { stdio: true });
+			expect(content.issues.length).toBeGreaterThan(0);
+			expect(content.suggestions.length).toBeGreaterThan(0);
+		} finally {
+			unlinkSync(tmp_file);
+		}
+	});
+
+	it('should treat file path as code when stdio context is not set', async () => {
+		const tmp_file = join(tmpdir(), `svelte-autofixer-test-${Date.now()}.svelte`);
+		const file_content = `<script>
+			$state count = 0;
+		</script>`;
+
+		writeFileSync(tmp_file, file_content, 'utf-8');
+
+		try {
+			// without stdio context, the path string is treated as raw code (plain text), no issues
+			const content = await autofixer_tool_call(tmp_file, false, 5, false);
+			expect(content.issues).toHaveLength(0);
+			expect(content.suggestions).toHaveLength(0);
+		} finally {
+			unlinkSync(tmp_file);
+		}
 	});
 });

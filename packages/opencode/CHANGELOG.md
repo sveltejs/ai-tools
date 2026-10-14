@@ -1,5 +1,59 @@
 # @sveltejs/opencode
 
+## 0.1.16
+
+### Patch Changes
+
+- fix: skill transform for newer opencode versions ([#267](https://github.com/sveltejs/ai-tools/pull/267))
+
+## 0.1.15
+
+### Patch Changes
+
+- feat: support OpenCode V2 ([#258](https://github.com/sveltejs/ai-tools/pull/258))
+
+## 0.1.14
+
+### Patch Changes
+
+- chore: use stdio as default server ([#252](https://github.com/sveltejs/ai-tools/pull/252))
+
+## 0.1.13
+
+### Patch Changes
+
+- fix: links in skill references (for real this time) ([#245](https://github.com/sveltejs/ai-tools/pull/245))
+
+- fix: remove special characters from references ([#247](https://github.com/sveltejs/ai-tools/pull/247))
+
+## 0.1.12
+
+### Patch Changes
+
+- chore: show warning for old versions ([#238](https://github.com/sveltejs/ai-tools/pull/238))
+
+- feat: add `autoupdate` option to reinstall the plugin when a new version is available ([#238](https://github.com/sveltejs/ai-tools/pull/238))
+
+- fix: links within references in SKILLS ([#243](https://github.com/sveltejs/ai-tools/pull/243))
+
+## 0.1.11
+
+### Patch Changes
+
+- fix: ship plugin as js files instead of ts ([#236](https://github.com/sveltejs/ai-tools/pull/236))
+
+## 0.1.10
+
+### Patch Changes
+
+- feat: add tui opencode plugin ([#231](https://github.com/sveltejs/ai-tools/pull/231))
+
+## 0.1.9
+
+### Patch Changes
+
+- fix: remove restrictive permissions from subagent ([#219](https://github.com/sveltejs/ai-tools/pull/219))
+
 ## 0.1.8
 
 ### Patch Changes
