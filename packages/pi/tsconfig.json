@@ -1,0 +1,8 @@
+{
+	"extends": "../../tsconfig.json",
+	"compilerOptions": {
+		"types": ["@types/node"]
+	},
+	"include": ["index.js", "config.js", "mcp.js", "scripts/*"],
+	"exclude": ["node_modules"]
+}
