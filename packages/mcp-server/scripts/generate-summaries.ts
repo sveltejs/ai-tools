@@ -76,7 +76,7 @@ async function main() {
 
 	// Get all sections
 	console.log('📚 Fetching documentation sections...');
-	let sections = await get_sections();
+	let { sections } = await get_sections();
 	console.log(`Found ${sections.length} sections`);
 
 	// Debug mode: limit to 2 sections
