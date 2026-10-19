@@ -1,21 +1,9 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import { sync_skills } from './sync-skills.ts';
 
 const CLAUDE_PLUGIN_DIR = './plugins/claude/svelte';
 const TOOLS_DIR = './tools';
-
-/**
- * Sync skills from tools/ to Claude plugin (direct copy)
- */
-async function sync_skills() {
-	const source = path.join(TOOLS_DIR, 'skills');
-	const dest = path.join(CLAUDE_PLUGIN_DIR, 'skills');
-
-	await fs.rm(dest, { recursive: true, force: true });
-	await fs.cp(source, dest, { recursive: true });
-
-	console.log('Synced skills to Claude plugin');
-}
 
 /**
  * Sync agent definitions from tools/ to Claude plugin,
@@ -49,7 +37,7 @@ async function sync_agents() {
 	console.log('Synced agents to Claude plugin');
 }
 
-await sync_skills();
+await sync_skills(path.join(TOOLS_DIR, 'skills'), path.join(CLAUDE_PLUGIN_DIR, 'skills'));
 await sync_agents();
 
 console.log('Claude plugin sync complete');

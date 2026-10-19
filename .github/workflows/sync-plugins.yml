@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - 'tools/**'
+      - 'scripts/sync-*.ts'
 
 permissions:
   contents: write
@@ -80,7 +81,7 @@ jobs:
             ## Summary
             Automatically synced all plugins from the `tools/` source of truth.
 
-            This PR was triggered by changes to `tools/**`.
+            This PR was triggered by changes to `tools/**` or the plugin sync scripts.
 
             ## Changes
             - Synced `plugins/claude/svelte/` (skills, agents with `permissionMode`)
