@@ -5,9 +5,7 @@ import type { Config } from '@sveltejs/kit';
 import ts from 'typescript-eslint';
 import type { SemVer } from 'verkit';
 
-let svelte_5_linter: ESLint | undefined;
-
-let svelte_4_linter: ESLint | undefined;
+const linters = new Map<string, ESLint>();
 
 function base_config(svelte_config: Config): ESLint.Options['baseConfig'] {
 	return [
@@ -54,25 +52,21 @@ function base_config(svelte_config: Config): ESLint.Options['baseConfig'] {
 }
 
 function get_linter(version: SemVer, async = false) {
-	if (version.major < 5) {
-		return (svelte_4_linter ??= new ESLint({
+	const is_svelte_4 = version.major < 5;
+	// async is only relevant for svelte 5 so we key the cache only on the options
+	// that actually end up in the config
+	const key = is_svelte_4 ? 'svelte_4' : `svelte_5_${async ? 'async' : 'sync'}`;
+	let linter = linters.get(key);
+	if (!linter) {
+		linter = new ESLint({
 			overrideConfigFile: true,
 			baseConfig: base_config({
-				compilerOptions: {
-					runes: false,
-				},
+				compilerOptions: is_svelte_4 ? { runes: false } : { runes: true, experimental: { async } },
 			}),
-		}));
+		});
+		linters.set(key, linter);
 	}
-	return (svelte_5_linter ??= new ESLint({
-		overrideConfigFile: true,
-		baseConfig: base_config({
-			compilerOptions: {
-				runes: true,
-				experimental: { async },
-			},
-		}),
-	}));
+	return linter;
 }
 
 export async function add_eslint_issues(
