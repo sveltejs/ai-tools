@@ -2,7 +2,7 @@ import type { Autofixer } from './index.js';
 
 export const use_app_state_instead_of_app_stores: Autofixer = {
 	ImportDeclaration(node, { state, next }) {
-		if (state.desired_svelte_version !== 5) {
+		if (state.desired_svelte_version.major !== 5) {
 			next();
 			return;
 		}
