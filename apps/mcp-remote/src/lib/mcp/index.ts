@@ -1,5 +1,7 @@
-import { server } from '@sveltejs/mcp-server';
+import { create_server } from '@sveltejs/mcp-server';
 import { HttpTransport } from '@tmcp/transport-http';
+
+export const server = create_server();
 
 export const http_transport = new HttpTransport(server, {
 	cors: true,
@@ -10,5 +12,3 @@ export const http_transport = new HttpTransport(server, {
 	// after 5 minutes making the logs dirty.
 	disableSse: true,
 });
-
-export { server };
