@@ -1,0 +1,53 @@
+{
+	"name": "@sveltejs/pi",
+	"version": "0.0.1",
+	"description": "pi package for Svelte that provides the Svelte MCP server, skills and instructions",
+	"type": "module",
+	"license": "MIT",
+	"homepage": "https://github.com/sveltejs/ai-tools#readme",
+	"bugs": {
+		"url": "https://github.com/sveltejs/ai-tools/issues"
+	},
+	"keywords": [
+		"pi-package",
+		"svelte",
+		"sveltekit",
+		"mcp"
+	],
+	"scripts": {
+		"check": "tsc --noEmit",
+		"generate-schema": "node scripts/generate-schema.js"
+	},
+	"files": [
+		"index.js",
+		"config.js",
+		"mcp.js",
+		"schema.json",
+		"instructions",
+		"skills"
+	],
+	"pi": {
+		"extensions": [
+			"./index.js"
+		]
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/sveltejs/ai-tools.git",
+		"directory": "packages/pi"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"dependencies": {
+		"valibot": "catalog:tooling"
+	},
+	"peerDependencies": {
+		"@earendil-works/pi-coding-agent": ">=0.99.0"
+	},
+	"devDependencies": {
+		"@earendil-works/pi-coding-agent": "catalog:pi",
+		"@types/node": "catalog:tooling",
+		"@valibot/to-json-schema": "catalog:tooling"
+	}
+}
