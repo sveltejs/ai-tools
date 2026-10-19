@@ -1,6 +1,6 @@
 import type { SvelteMcp } from '../../index.js';
 import * as v from 'valibot';
-import { get_sections, fetch_with_timeout, format_sections_list } from '../../utils.js';
+import { get_sections, fetch_with_timeout, format_sections } from '../../utils.js';
 import { SECTIONS_LIST_INTRO, SECTIONS_LIST_OUTRO } from './prompts.js';
 import { icons } from '../../icons/index.js';
 import { tool } from 'tmcp/utils';
@@ -14,9 +14,10 @@ const get_documentation_schema = v.object({
 	),
 });
 
-export async function get_documentation_handler({
-	section,
-}: v.InferInput<typeof get_documentation_schema>) {
+export async function get_documentation_handler(
+	{ section }: v.InferInput<typeof get_documentation_schema>,
+	subdomain?: string,
+) {
 	let sections: string[];
 
 	if (Array.isArray(section)) {
@@ -42,7 +43,7 @@ export async function get_documentation_handler({
 		sections = [];
 	}
 
-	const available_sections = await get_sections();
+	const { sections: available_sections, instructions } = await get_sections(subdomain);
 
 	const settled_results = await Promise.allSettled(
 		sections.map(async (requested_section) => {
@@ -100,7 +101,7 @@ export async function get_documentation_handler({
 	);
 
 	if (successes.length > 0 && failed_sections.length === 0) {
-		return successes.map((r) => r.content).join('\n\n---\n\n');
+		return instructions + successes.map((r) => r.content).join('\n\n---\n\n');
 	}
 
 	const parts: string[] = [];
@@ -125,7 +126,7 @@ export async function get_documentation_handler({
 
 	// Full list only when no successes and no fuzzy matches
 	if (successes.length === 0 && !has_fuzzy) {
-		const formatted_sections = await format_sections_list();
+		const formatted_sections = format_sections(available_sections);
 		parts.push(`${SECTIONS_LIST_INTRO}\n\n${formatted_sections}\n\n${SECTIONS_LIST_OUTRO}`);
 	}
 
@@ -140,7 +141,7 @@ export async function get_documentation_handler({
 		parts.push(`Section not found: "${requested}".`);
 	}
 
-	return parts.join('\n\n---\n\n');
+	return instructions + parts.join('\n\n---\n\n');
 }
 
 export function get_documentation(server: SvelteMcp) {
@@ -163,7 +164,7 @@ export function get_documentation(server: SvelteMcp) {
 				await server.ctx.custom.track(server.ctx.sessionId, 'get-documentation');
 			}
 			try {
-				const content = await get_documentation_handler({ section });
+				const content = await get_documentation_handler({ section }, server.ctx.custom?.subdomain);
 				return tool.text(content);
 			} catch (e) {
 				const error = e as Error;
