@@ -147,6 +147,20 @@ describe.each(['session', 'stateless'])('svelte-autofixer tool - %s', (type) => 
 		);
 	});
 
+	it('should not report animate placement issues for declaration tags in keyed each blocks', async () => {
+		const content = await autofixer_tool_call(`<script>
+				import { flip } from 'svelte/animate';
+				let items = $state([{ id: 1, n: 2 }]);
+			</script>
+
+			{#each items as item (item.id)}
+				{const double = item.n * 2}
+				<p animate:flip>{double}</p>
+			{/each}`);
+
+		expect(content.issues).toHaveLength(0);
+	});
+
 	it('should error in case the passed in version is different from 4 or 5', async () => {
 		const content = await autofixer_tool_call(`whatever`, true, 3);
 
