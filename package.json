@@ -49,6 +49,7 @@
 		"@eslint/js": "catalog:lint",
 		"@modelcontextprotocol/inspector": "catalog:ai",
 		"@sveltejs/adapter-vercel": "catalog:svelte",
+		"@types/node": "catalog:tooling",
 		"eslint": "catalog:lint",
 		"eslint-config-prettier": "catalog:lint",
 		"eslint-plugin-import": "catalog:lint",
