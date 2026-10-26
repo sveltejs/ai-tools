@@ -1,5 +1,13 @@
 # @sveltejs/mcp
 
+## 0.1.28
+
+### Patch Changes
+
+- add autofixer rule suggesting $app/state over deprecated $app/stores ([#266](https://github.com/sveltejs/ai-tools/pull/266))
+
+- chore: bump `svelte` ([#302](https://github.com/sveltejs/ai-tools/pull/302))
+
 ## 0.1.27
 
 ### Patch Changes
