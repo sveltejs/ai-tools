@@ -11,7 +11,7 @@ CLI tools for Svelte 5 documentation lookup and code analysis. MUST be used when
 ````markdown
 ---
 name: svelte-code-writer
-description: CLI tools for Svelte 5 documentation lookup and code analysis. MUST be used whenever creating, editing or analyzing any Svelte component (.svelte) or Svelte module (.svelte.ts/.svelte.js). If possible, this skill should be executed within the svelte-file-editor agent for optimal results.
+description: CLI tools for Svelte 5 documentation lookup and code analysis. MUST be used whenever creating, editing or analyzing any Svelte component (`.svelte`) or Svelte module (`.svelte.ts`/`.svelte.js`). If possible, this skill should be executed within the `svelte-file-editor` subagent for optimal results.
 ---
 
 ## CLI tools
@@ -276,7 +276,7 @@ Always use runes mode for new code, and avoid features that have more modern rep
 
 ## `svelte-mcp-feedback`
 
-Report Svelte MCP autofixer opportunities when the user corrects a Svelte or SvelteKit mistake the agent made while working on a file. Use after corrections to .svelte components, .svelte.ts/.svelte.js modules, or SvelteKit routes, load functions, actions, hooks, and configuration, when a reusable check or fix could prevent the mistake. Do not trigger for initial implementation requests, unrelated bugs, or purely personal style preferences.
+Report Svelte MCP autofixer opportunities when the user corrects a Svelte or SvelteKit mistake the agent made. Use after corrections to .svelte components, .svelte.ts/.svelte.js modules, or SvelteKit features where a reusable check or fix could prevent the mistake. Do not trigger for initial implementation requests, unrelated bugs, or personal style preferences.
 
 <a href="https://github.com/sveltejs/ai-tools/releases?q=svelte-mcp-feedback" target="_blank" rel="noopener noreferrer">Open Releases page</a>
 
@@ -287,7 +287,7 @@ Report Svelte MCP autofixer opportunities when the user corrects a Svelte or Sve
 ````markdown
 ---
 name: svelte-mcp-feedback
-description: Report Svelte MCP autofixer opportunities when the user corrects a Svelte or SvelteKit mistake the agent made while working on a file. Use after corrections to .svelte components, .svelte.ts/.svelte.js modules, or SvelteKit routes, load functions, actions, hooks, and configuration, when a reusable check or fix could prevent the mistake. Do not trigger for initial implementation requests, unrelated bugs, or purely personal style preferences.
+description: Report Svelte MCP autofixer opportunities when the user corrects a Svelte or SvelteKit mistake the agent made. Use after corrections to .svelte components, .svelte.ts/.svelte.js modules, or SvelteKit features where a reusable check or fix could prevent the mistake. Do not trigger for initial implementation requests, unrelated bugs, or personal style preferences.
 ---
 
 # Svelte MCP feedback
