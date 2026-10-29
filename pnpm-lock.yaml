@@ -372,6 +372,9 @@ importers:
       dotenv:
         specifier: catalog:tooling
         version: 17.2.3
+      node-resolve-ts:
+        specifier: catalog:tooling
+        version: 1.0.2
 
   packages/mcp-stdio:
     dependencies:
@@ -414,7 +417,7 @@ importers:
         version: 0.4.3(typescript@5.9.3)(web-tree-sitter@0.25.10)
       '@opentui/keymap':
         specifier: catalog:opencode
-        version: 0.4.3(@opentui/solid@0.4.3(solid-js@1.9.12)(typescript@5.9.3)(web-tree-sitter@0.25.10))(solid-js@1.9.12)(typescript@5.9.3)(web-tree-sitter@0.25.10)
+        version: 0.4.3(@opentui/solid@0.4.3(solid-js@1.9.12)(typescript@5.9.3)(web-tree-sitter@0.25.10))(react@18.3.1)(solid-js@1.9.12)(typescript@5.9.3)(web-tree-sitter@0.25.10)
       '@opentui/solid':
         specifier: catalog:opencode
         version: 0.4.3(solid-js@1.9.12)(typescript@5.9.3)(web-tree-sitter@0.25.10)
@@ -430,7 +433,7 @@ importers:
     devDependencies:
       '@opencode-ai/plugin-v1':
         specifier: catalog:opencode
-        version: '@opencode-ai/plugin@1.17.18(@opentui/core@0.4.3(typescript@5.9.3)(web-tree-sitter@0.25.10))(@opentui/keymap@0.4.3(@opentui/solid@0.4.3(solid-js@1.9.12)(typescript@5.9.3)(web-tree-sitter@0.25.10))(solid-js@1.9.12)(typescript@5.9.3)(web-tree-sitter@0.25.10))(@opentui/solid@0.4.3(solid-js@1.9.12)(typescript@5.9.3)(web-tree-sitter@0.25.10))'
+        version: '@opencode-ai/plugin@1.17.18(@opentui/core@0.4.3(typescript@5.9.3)(web-tree-sitter@0.25.10))(@opentui/keymap@0.4.3(@opentui/solid@0.4.3(solid-js@1.9.12)(typescript@5.9.3)(web-tree-sitter@0.25.10))(react@18.3.1)(solid-js@1.9.12)(typescript@5.9.3)(web-tree-sitter@0.25.10))(@opentui/solid@0.4.3(solid-js@1.9.12)(typescript@5.9.3)(web-tree-sitter@0.25.10))'
       '@opencode/plugin':
         specifier: catalog:opencode
         version: 2.0.5(@opentelemetry/api-logs@0.214.0)(@opentelemetry/resources@2.6.1(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-logs@0.214.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-metrics@2.6.1(@opentelemetry/api@1.9.0))(@opentelemetry/semantic-conventions@1.43.0)(@opentui/core@0.4.3(typescript@5.9.3)(web-tree-sitter@0.25.10))(@opentui/solid@0.4.3(solid-js@1.9.12)(typescript@5.9.3)(web-tree-sitter@0.25.10))(redis@6.2.1(@opentelemetry/api@1.9.0))(solid-js@1.9.12)
@@ -6892,7 +6895,7 @@ snapshots:
       node-gyp: 12.4.0
       proc-log: 6.1.0
 
-  '@opencode-ai/plugin@1.17.18(@opentui/core@0.4.3(typescript@5.9.3)(web-tree-sitter@0.25.10))(@opentui/keymap@0.4.3(@opentui/solid@0.4.3(solid-js@1.9.12)(typescript@5.9.3)(web-tree-sitter@0.25.10))(solid-js@1.9.12)(typescript@5.9.3)(web-tree-sitter@0.25.10))(@opentui/solid@0.4.3(solid-js@1.9.12)(typescript@5.9.3)(web-tree-sitter@0.25.10))':
+  '@opencode-ai/plugin@1.17.18(@opentui/core@0.4.3(typescript@5.9.3)(web-tree-sitter@0.25.10))(@opentui/keymap@0.4.3(@opentui/solid@0.4.3(solid-js@1.9.12)(typescript@5.9.3)(web-tree-sitter@0.25.10))(react@18.3.1)(solid-js@1.9.12)(typescript@5.9.3)(web-tree-sitter@0.25.10))(@opentui/solid@0.4.3(solid-js@1.9.12)(typescript@5.9.3)(web-tree-sitter@0.25.10))':
     dependencies:
       '@ai-sdk/provider': 3.0.8
       '@opencode-ai/sdk': 1.17.18
@@ -6900,7 +6903,7 @@ snapshots:
       zod: 4.1.8
     optionalDependencies:
       '@opentui/core': 0.4.3(typescript@5.9.3)(web-tree-sitter@0.25.10)
-      '@opentui/keymap': 0.4.3(@opentui/solid@0.4.3(solid-js@1.9.12)(typescript@5.9.3)(web-tree-sitter@0.25.10))(solid-js@1.9.12)(typescript@5.9.3)(web-tree-sitter@0.25.10)
+      '@opentui/keymap': 0.4.3(@opentui/solid@0.4.3(solid-js@1.9.12)(typescript@5.9.3)(web-tree-sitter@0.25.10))(react@18.3.1)(solid-js@1.9.12)(typescript@5.9.3)(web-tree-sitter@0.25.10)
       '@opentui/solid': 0.4.3(solid-js@1.9.12)(typescript@5.9.3)(web-tree-sitter@0.25.10)
 
   '@opencode-ai/sdk@1.17.18':
@@ -7116,11 +7119,12 @@ snapshots:
     transitivePeerDependencies:
       - typescript
 
-  '@opentui/keymap@0.4.3(@opentui/solid@0.4.3(solid-js@1.9.12)(typescript@5.9.3)(web-tree-sitter@0.25.10))(solid-js@1.9.12)(typescript@5.9.3)(web-tree-sitter@0.25.10)':
+  '@opentui/keymap@0.4.3(@opentui/solid@0.4.3(solid-js@1.9.12)(typescript@5.9.3)(web-tree-sitter@0.25.10))(react@18.3.1)(solid-js@1.9.12)(typescript@5.9.3)(web-tree-sitter@0.25.10)':
     dependencies:
       '@opentui/core': 0.4.3(typescript@5.9.3)(web-tree-sitter@0.25.10)
     optionalDependencies:
       '@opentui/solid': 0.4.3(solid-js@1.9.12)(typescript@5.9.3)(web-tree-sitter@0.25.10)
+      react: 18.3.1
       solid-js: 1.9.12
     transitivePeerDependencies:
       - typescript
