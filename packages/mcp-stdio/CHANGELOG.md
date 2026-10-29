@@ -1,5 +1,11 @@
 # @sveltejs/mcp
 
+## 0.1.29
+
+### Patch Changes
+
+- chore: generate new `use_cases` summaries ([#306](https://github.com/sveltejs/ai-tools/pull/306))
+
 ## 0.1.28
 
 ### Patch Changes
