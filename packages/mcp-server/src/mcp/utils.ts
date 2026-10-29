@@ -35,9 +35,10 @@ export async function get_sections() {
 		return {
 			title: section.metadata.title,
 			use_cases:
-				section.metadata.use_cases ??
-				summaries[original_slug] ??
-				summaries[cleaned_slug] ??
+				// summaries are empty strings for sections that have not been summarized yet
+				section.metadata.use_cases ||
+				summaries[original_slug] ||
+				summaries[cleaned_slug] ||
 				'use title and path to estimate use case',
 			slug: cleaned_slug,
 			// Use original slug in URL to ensure it still works

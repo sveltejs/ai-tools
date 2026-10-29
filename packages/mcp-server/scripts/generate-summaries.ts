@@ -6,9 +6,14 @@ import { fileURLToPath } from 'url';
 import { get_sections } from '../src/mcp/utils.ts';
 import { AnthropicProvider } from '../src/lib/anthropic.ts';
 import { type AnthropicBatchRequest, type SummaryData } from '../src/lib/schemas.ts';
+import existing_data from '../src/use_cases.json' with { type: 'json' };
 
 const current_filename = fileURLToPath(import.meta.url);
 const current_dirname = path.dirname(current_filename);
+const output_path = path.join(current_dirname, '../src/use_cases.json');
+
+type Section = Awaited<ReturnType<typeof get_sections>>[number];
+type Errors = Array<{ section: string; error: string }>;
 
 const USE_CASES_PROMPT = `
 You are tasked with analyzing Svelte 5 and SvelteKit documentation pages to identify when they would be useful.
@@ -62,38 +67,33 @@ async function fetch_section_content(url: string) {
 	return await response.text();
 }
 
-async function main() {
-	console.log('🚀 Starting use cases generation...');
-
-	// Check for API key
-	const api_key = process.env.ANTHROPIC_API_KEY;
-	if (!api_key) {
-		console.error('❌ Error: ANTHROPIC_API_KEY environment variable is required');
-		console.error('Please set it in packages/mcp-server/.env file or export it:');
-		console.error('export ANTHROPIC_API_KEY=your_api_key_here');
-		process.exit(1);
+/**
+ * Existing entries keep their position and new ones are appended in docs order,
+ * so that regenerating only produces a diff for the summaries that actually changed.
+ */
+function order_summaries(
+	summaries: Record<string, string>,
+	existing_order: string[],
+	sections: Section[],
+) {
+	const ordered: Record<string, string> = {};
+	for (const slug of [...existing_order, ...sections.map((section) => `docs/${section.slug}`)]) {
+		if (slug in summaries && !(slug in ordered)) {
+			ordered[slug] = summaries[slug]!;
+		}
 	}
+	return ordered;
+}
 
-	// Get all sections
-	console.log('📚 Fetching documentation sections...');
-	let sections = await get_sections();
-	console.log(`Found ${sections.length} sections`);
-
-	// Debug mode: limit to 2 sections
-	const debug_mode = process.env.DEBUG_MODE === '1';
-	if (debug_mode) {
-		console.log('🐛 DEBUG_MODE enabled - processing only 2 sections');
-		sections = sections.slice(0, 2);
-	}
-
+async function generate_summaries(sections: Section[], api_key: string) {
 	// Fetch content for each section
 	console.log('📥 Downloading section content...');
 	const sections_with_content: Array<{
-		section: (typeof sections)[number];
+		section: Section;
 		content: string;
 		index: number;
 	}> = [];
-	const download_errors: Array<{ section: string; error: string }> = [];
+	const download_errors: Errors = [];
 
 	for (let i = 0; i < sections.length; i++) {
 		const section = sections[i]!;
@@ -171,7 +171,7 @@ async function main() {
 	// Process results
 	console.log('📊 Processing results...');
 	const summaries: Record<string, string> = {};
-	const errors: Array<{ section: string; error: string }> = [];
+	const errors: Errors = [];
 
 	for (const result of results) {
 		const index = parseInt(result.custom_id.split('-')[1] ?? '0');
@@ -193,39 +193,118 @@ async function main() {
 
 		const output_content = result.result.message.content[0]?.text;
 		if (output_content) {
-			summaries[section.slug] = output_content.trim();
+			summaries[`docs/${section.slug}`] = output_content.trim();
 			console.log(`  ✅ ${section.title}`);
 		}
 	}
 
+	return {
+		summaries,
+		errors,
+		download_errors,
+		model: anthropic.get_model_identifier(),
+	};
+}
+
+async function main() {
+	console.log('🚀 Starting use cases generation...');
+
+	const api_key = process.env.ANTHROPIC_API_KEY;
+	if (!api_key) {
+		console.warn('⚠️  ANTHROPIC_API_KEY is not set, no new summaries will be generated');
+		console.warn(
+			'Summaries for removed sections will be deleted, new sections will be added with empty summaries and the rest kept as they are.',
+		);
+		console.warn('To generate summaries, set it in packages/mcp-server/.env file or export it:');
+		console.warn('export ANTHROPIC_API_KEY=your_api_key_here');
+	}
+
+	const existing_summaries: Record<string, string> = existing_data.summaries;
+
+	// Get all sections
+	console.log('📚 Fetching documentation sections...');
+	let sections = await get_sections();
+	console.log(`Found ${sections.length} sections`);
+
+	if (sections.length === 0) {
+		console.error('❌ No sections found, refusing to overwrite existing summaries');
+		process.exit(1);
+	}
+
+	// Debug mode: limit to 2 sections
+	const debug_mode = process.env.DEBUG_MODE === '1';
+	if (debug_mode) {
+		console.log('🐛 DEBUG_MODE enabled - processing only 2 sections');
+		sections = sections.slice(0, 2);
+	}
+
+	let generated_summaries: Record<string, string> = {};
+	let errors: Errors = [];
+	let download_errors: Errors = [];
+	let generated_at = existing_data.generated_at;
+	let model = existing_data.model;
+
+	if (api_key) {
+		({
+			summaries: generated_summaries,
+			errors,
+			download_errors,
+			model,
+		} = await generate_summaries(sections, api_key));
+		generated_at = new Date().toISOString();
+	}
+
+	// Every current section gets an entry, falling back to the existing summary (or an empty one
+	// for new sections) when it wasn't generated. Sections that no longer exist are dropped.
+	const summaries: Record<string, string> = {};
+	for (const section of sections) {
+		const key = `docs/${section.slug}`;
+		summaries[key] = generated_summaries[key] ?? existing_summaries[key] ?? '';
+	}
+
+	const removed = Object.keys(existing_summaries).filter((slug) => !(slug in summaries));
+	const missing = sections.filter((section) => !summaries[`docs/${section.slug}`]);
+
 	// Write output to JSON file
 	console.log('💾 Writing results to file...');
-	const output_path = path.join(current_dirname, '../src/use_cases.json');
-	const output_dir = path.dirname(output_path);
+	await mkdir(path.dirname(output_path), { recursive: true });
 
-	await mkdir(output_dir, { recursive: true });
+	const ordered_summaries = order_summaries(summaries, Object.keys(existing_summaries), sections);
 
 	const summary_data: SummaryData = {
-		generated_at: new Date().toISOString(),
-		model: anthropic.get_model_identifier(),
+		generated_at,
+		model,
 		total_sections: sections.length,
-		successful_summaries: Object.keys(summaries).length,
+		successful_summaries: Object.values(ordered_summaries).filter(Boolean).length,
 		failed_summaries: errors.length,
-		summaries,
+		summaries: ordered_summaries,
 		errors: errors.length > 0 ? errors : undefined,
 		download_errors: download_errors.length > 0 ? download_errors : undefined,
 	};
 
-	await writeFile(output_path, JSON.stringify(summary_data, null, 2), 'utf-8');
+	await writeFile(output_path, JSON.stringify(summary_data, null, '\t') + '\n', 'utf-8');
 
 	// Print summary
 	console.log('\n📊 Summary:');
 	console.log(`  Total sections: ${sections.length}`);
-	console.log(`  Successfully downloaded: ${sections_with_content.length}`);
-	console.log(`  Download failures: ${download_errors.length}`);
-	console.log(`  Successfully analyzed: ${Object.keys(summaries).length}`);
-	console.log(`  Analysis failures: ${errors.length}`);
+	if (api_key) {
+		console.log(`  Download failures: ${download_errors.length}`);
+		console.log(`  Successfully analyzed: ${Object.keys(generated_summaries).length}`);
+		console.log(`  Analysis failures: ${errors.length}`);
+	}
+	console.log(`  Removed summaries: ${removed.length}`);
+	console.log(`  Sections without summary: ${missing.length}`);
 	console.log(`\n✅ Results written to: ${output_path}`);
+
+	if (removed.length > 0) {
+		console.log('\n🗑️  Removed summaries for sections that no longer exist:');
+		removed.forEach((slug) => console.log(`  - ${slug}`));
+	}
+
+	if (missing.length > 0) {
+		console.log('\n⚠️  Sections without a summary:');
+		missing.forEach((section) => console.log(`  - ${section.slug}`));
+	}
 
 	if (download_errors.length > 0) {
 		console.log('\n⚠️  Some sections failed to download:');
