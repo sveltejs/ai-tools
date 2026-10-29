@@ -1,5 +1,5 @@
 #! /usr/bin/env node
-import { server } from '@sveltejs/mcp-server';
+import { create_server, tool_names } from '@sveltejs/mcp-server';
 import {
 	list_sections_handler,
 	get_documentation_handler,
@@ -15,12 +15,36 @@ const cli = sade('svelte-mcp');
 
 cli.version(pkg.version);
 
-cli.command('__mcp', '', { default: true }).action(() => {
-	const transport = new StdioTransport(server);
-	transport.listen({
-		stdio: true,
+cli.option(
+	'--tools',
+	`Comma separated allow-list of tools the MCP server exposes (${tool_names.join(', ')}). Can also be set with the SVELTE_MCP_TOOLS environment variable. Defaults to all tools`,
+);
+
+cli
+	.command('__mcp', '', { default: true })
+	.action(({ tools }: { tools?: string | number | boolean }) => {
+		// mri parses `--tools ""` as 0 and a bare `--tools` as true: both mean an empty allow-list
+		const allowed =
+			tools === undefined ? process.env.SVELTE_MCP_TOOLS : typeof tools === 'string' ? tools : '';
+
+		let server;
+		try {
+			server = create_server({
+				tools: allowed
+					?.split(',')
+					.map((tool) => tool.trim())
+					.filter(Boolean),
+			});
+		} catch (error) {
+			console.error((error as Error).message);
+			process.exit(1);
+		}
+
+		const transport = new StdioTransport(server);
+		transport.listen({
+			stdio: true,
+		});
 	});
-});
 
 cli
 	.command('list-sections')
