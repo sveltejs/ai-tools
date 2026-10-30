@@ -76,13 +76,13 @@ Run `/reload` after changing the configuration.
 
 ### Configuration Options
 
-| Option                 | Type                                               | Default    | Description                                                                                              |
-| ---------------------- | -------------------------------------------------- | ---------- | -------------------------------------------------------------------------------------------------------- |
-| `mcp.type`             | `"remote" \| "local"`                              | `"local"`  | Run `@sveltejs/mcp` via `npx` (`local`) or use `https://mcp.svelte.dev/mcp` (`remote`).                  |
-| `mcp.enabled`          | `boolean`                                          | `true`     | Enable or disable the Svelte MCP server entry.                                                           |
+| Option                 | Type                                               | Default    | Description                                                                                                     |
+| ---------------------- | -------------------------------------------------- | ---------- | --------------------------------------------------------------------------------------------------------------- |
+| `mcp.type`             | `"remote" \| "local"`                              | `"local"`  | Run `@sveltejs/mcp` via `npx` (`local`) or use `https://mcp.svelte.dev/mcp` (`remote`).                         |
+| `mcp.enabled`          | `boolean`                                          | `true`     | Enable or disable the Svelte MCP server entry.                                                                  |
 | `mcp.exposure`         | `"direct" \| "codemode" \| "deferred" \| "hidden"` | `"direct"` | How the MCP tools reach the model. See [Pi MCP exposure](https://pi.dev/docs/latest/mcp#control-tool-exposure). |
-| `instructions.enabled` | `boolean`                                          | `true`     | Enable or disable the instructions injected in the system prompt.                                        |
-| `skills.enabled`       | `boolean \| string[]`                              | `true`     | Enable all skills (`true`), disable all skills (`false`), or enable only specific skill names.           |
+| `instructions.enabled` | `boolean`                                          | `true`     | Enable or disable the instructions injected in the system prompt.                                               |
+| `skills.enabled`       | `boolean \| string[]`                              | `true`     | Enable all skills (`true`), disable all skills (`false`), or enable only specific skill names.                  |
 
 ### Config File Locations and Precedence
 
