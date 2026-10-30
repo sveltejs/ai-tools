@@ -1,5 +1,25 @@
 # @sveltejs/mcp
 
+## 0.1.28
+
+### Patch Changes
+
+- add autofixer rule suggesting $app/state over deprecated $app/stores ([#266](https://github.com/sveltejs/ai-tools/pull/266))
+
+- chore: bump `svelte` ([#302](https://github.com/sveltejs/ai-tools/pull/302))
+
+## 0.1.27
+
+### Patch Changes
+
+- fix: detect `$derived` with a function argument inside other function calls ([#293](https://github.com/sveltejs/ai-tools/pull/293))
+
+- feat: class directive to clsx attribute fixer ([#269](https://github.com/sveltejs/ai-tools/pull/269))
+
+- fix: cache the svelte 5 linter based on arguments ([#295](https://github.com/sveltejs/ai-tools/pull/295))
+
+- fix: set correct version for mcp cli ([#284](https://github.com/sveltejs/ai-tools/pull/284))
+
 ## 0.1.26
 
 ### Patch Changes

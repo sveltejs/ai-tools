@@ -1,5 +1,15 @@
 # @sveltejs/opencode
 
+## 0.1.17
+
+### Patch Changes
+
+- fix: use files as markers to avoid wiping cache when other instances run ([#276](https://github.com/sveltejs/ai-tools/pull/276))
+
+- fix: wipe the right cache folder to autoupdate the plugin in OpenCode v2 ([#270](https://github.com/sveltejs/ai-tools/pull/270))
+
+- feat: add `#key` block skill section ([#280](https://github.com/sveltejs/ai-tools/pull/280))
+
 ## 0.1.16
 
 ### Patch Changes

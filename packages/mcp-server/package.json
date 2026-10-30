@@ -10,8 +10,8 @@
 	"type": "module",
 	"scripts": {
 		"test": "vitest",
-		"generate-summaries": "node scripts/generate-summaries.ts --experimental-strip-types",
-		"debug:generate-summaries": "DEBUG_MODE=1 node scripts/generate-summaries.ts --experimental-strip-types"
+		"generate-summaries": "node --import node-resolve-ts/register scripts/generate-summaries.ts",
+		"debug:generate-summaries": "DEBUG_MODE=1 node --import node-resolve-ts/register scripts/generate-summaries.ts"
 	},
 	"exports": {
 		".": "./src/index.ts",
@@ -30,6 +30,7 @@
 		"ts-blank-space": "catalog:tooling",
 		"typescript-eslint": "catalog:lint",
 		"valibot": "catalog:tooling",
+		"verkit": "catalog:tooling",
 		"vitest": "catalog:tooling",
 		"zimmerframe": "catalog:tooling"
 	},
@@ -38,6 +39,7 @@
 		"@sveltejs/kit": "catalog:svelte",
 		"@types/estree": "catalog:tooling",
 		"@typescript-eslint/types": "catalog:lint",
-		"dotenv": "catalog:tooling"
+		"dotenv": "catalog:tooling",
+		"node-resolve-ts": "catalog:tooling"
 	}
 }

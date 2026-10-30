@@ -2,7 +2,7 @@ import type { Identifier, PrivateIdentifier } from 'estree';
 import type { Autofixer } from './index.js';
 
 export const derived_with_function: Autofixer = {
-	CallExpression(node, { state, path }) {
+	CallExpression(node, { state, path, next }) {
 		if (
 			node.callee.type === 'Identifier' &&
 			node.callee.name === '$derived' &&
@@ -37,5 +37,6 @@ export const derived_with_function: Autofixer = {
 				`You are passing a function to $derived ${variable_id ? `when declaring "${variable_id.name}" ` : ''}but $derived expects an expression. You can use $derived.by instead.`,
 			);
 		}
+		next();
 	},
 };

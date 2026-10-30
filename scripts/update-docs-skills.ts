@@ -18,16 +18,13 @@ function get_backtick_fence(content: string): string {
 	return '`'.repeat(max_backticks + 1);
 }
 
-function parse_frontmatter(
-	content: string,
-): { frontmatter: SkillFrontmatter; body: string } | null {
+function parse_frontmatter(content: string): SkillFrontmatter | null {
 	const match = content.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
 	if (!match) return null;
 
 	const frontmatter_str = match[1];
-	const body = match[2];
 
-	if (!frontmatter_str || body === undefined) return null;
+	if (!frontmatter_str) return null;
 
 	const frontmatter: Record<string, string> = {};
 
@@ -38,10 +35,7 @@ function parse_frontmatter(
 		}
 	}
 
-	return {
-		frontmatter: frontmatter as unknown as SkillFrontmatter,
-		body: body.trim(),
-	};
+	return frontmatter as unknown as SkillFrontmatter;
 }
 
 let content = '';
@@ -54,15 +48,14 @@ for (const skill_name of skill_dirs) {
 
 	try {
 		const skill_content = await fs.readFile(skill_path, 'utf-8');
-		const parsed = parse_frontmatter(skill_content);
+		const frontmatter = parse_frontmatter(skill_content);
 
-		if (!parsed) {
+		if (!frontmatter) {
 			console.warn(`Warning: Could not parse frontmatter for ${skill_name}`);
 			continue;
 		}
 
-		const { frontmatter, body } = parsed;
-		const fence = get_backtick_fence(body);
+		const fence = get_backtick_fence(skill_content);
 
 		content += `## \`${frontmatter.name}\`
 
@@ -75,7 +68,7 @@ ${frontmatter.description}
 
 <!-- prettier-ignore-start -->
 ${fence}markdown
-${body}
+${skill_content.trim()}
 ${fence}
 <!-- prettier-ignore-end -->
 
