@@ -1,7 +1,7 @@
 {
 	"name": "@sveltejs/pi",
 	"version": "0.0.1",
-	"description": "pi package for Svelte that provides the Svelte MCP server, skills and instructions",
+	"description": "Pi package for Svelte that provides the Svelte MCP server, skills and instructions",
 	"type": "module",
 	"license": "MIT",
 	"homepage": "https://github.com/sveltejs/ai-tools#readme",

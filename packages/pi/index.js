@@ -34,7 +34,7 @@ async function load_instructions(mcp_name, isolated) {
 	);
 	const tools = ['list-sections', 'get-documentation', 'svelte-autofixer', 'playground-link'];
 	const naming = [
-		`In pi the Svelte MCP server is called \`${mcp_name}\` and its tools are named ${tools
+		`In Pi the Svelte MCP server is called \`${mcp_name}\` and its tools are named ${tools
 			.map((tool) => `\`${mcp_tool_name(mcp_name, tool)}\``)
 			.join(', ')}.`,
 		'Depending on the configured exposure they are either declared directly, reachable through `tool_search`, or callable from `codemode` scripts.',

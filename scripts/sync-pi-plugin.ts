@@ -27,7 +27,7 @@ async function sync_agents_md() {
 	await fs.mkdir(path.dirname(dest), { recursive: true });
 	await fs.copyFile(source, dest);
 
-	console.log('Synced AGENTS.md to pi package');
+	console.log('Synced AGENTS.md to Pi package');
 }
 
 await sync_skills();

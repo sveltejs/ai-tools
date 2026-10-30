@@ -1,10 +1,10 @@
 # @sveltejs/pi
 
-[pi](https://pi.dev) package for Svelte that provides the Svelte MCP server, skills and instructions.
+[Pi](https://pi.dev) package for Svelte that provides the Svelte MCP server, skills and instructions.
 
 ## Installation
 
-Requires pi 0.99.0 or newer.
+Requires Pi 0.99.0 or newer.
 
 ```sh
 pi install npm:@sveltejs/pi
@@ -33,7 +33,7 @@ In pi the tools are named `mcp__svelte__<tool>` (e.g. `mcp__svelte__svelte_autof
 
 ### Skills
 
-The `svelte-code-writer` and `svelte-core-bestpractices` skills are added to pi. Use `/skill:svelte-code-writer` to load one explicitly.
+The `svelte-code-writer` and `svelte-core-bestpractices` skills are added to Pi. Use `/skill:svelte-code-writer` to load one explicitly.
 
 ### Agent Instructions
 
@@ -41,7 +41,7 @@ The package injects instructions in the system prompt that teach the agent how t
 
 ### What about subagents?
 
-Unlike the other Svelte plugins, this package doesn't include the `svelte-file-editor` subagent: pi deliberately doesn't ship with subagents. If you want to delegate work to an isolated context, you can ask pi to spawn another instance of itself (e.g. with `pi --print "<task>"`). The spawned instance loads your installed packages too, so it will still have access to the Svelte MCP server, skills and instructions.
+Unlike the other Svelte plugins, this package doesn't include the `svelte-file-editor` subagent, as Pi deliberately doesn't ship with subagents. If you want to delegate work to an isolated context, you can ask Pi to spawn another instance of itself (e.g. with `pi --print "<task>"`). The spawned instance loads your installed packages too, so it will still have access to the Svelte MCP server, skills and instructions.
 
 ## Configuration
 
@@ -80,7 +80,7 @@ Run `/reload` after changing the configuration.
 | ---------------------- | -------------------------------------------------- | ---------- | -------------------------------------------------------------------------------------------------------- |
 | `mcp.type`             | `"remote" \| "local"`                              | `"local"`  | Run `@sveltejs/mcp` via `npx` (`local`) or use `https://mcp.svelte.dev/mcp` (`remote`).                  |
 | `mcp.enabled`          | `boolean`                                          | `true`     | Enable or disable the Svelte MCP server entry.                                                           |
-| `mcp.exposure`         | `"direct" \| "codemode" \| "deferred" \| "hidden"` | `"direct"` | How the MCP tools reach the model. See [pi MCP exposure](https://pi.dev/docs/mcp#control-tool-exposure). |
+| `mcp.exposure`         | `"direct" \| "codemode" \| "deferred" \| "hidden"` | `"direct"` | How the MCP tools reach the model. See [Pi MCP exposure](https://pi.dev/docs/latest/mcp#control-tool-exposure). |
 | `instructions.enabled` | `boolean`                                          | `true`     | Enable or disable the instructions injected in the system prompt.                                        |
 | `skills.enabled`       | `boolean \| string[]`                              | `true`     | Enable all skills (`true`), disable all skills (`false`), or enable only specific skill names.           |
 

@@ -15,7 +15,7 @@ export const config_schema = v.object({
 			}),
 		),
 		v.description(
-			"Configuration for the MCP. You can choose whether it is enabled, which transport to use: 'local' (default) or 'remote', and how the tools are exposed to the model ('direct' by default).",
+			"Configuration for the MCP. You can choose whether it is enabled, which transport to use ('local', which is default, or 'remote'), and how the tools are exposed to the model ('direct' by default).",
 		),
 	),
 	instructions: v.pipe(
@@ -89,7 +89,7 @@ function load_config_file(path, on_warning) {
 		data = JSON.parse(readFileSync(path, 'utf-8'));
 	} catch (error) {
 		on_warning({
-			title: 'Svelte: invalid pi config',
+			title: 'Svelte: invalid Pi config',
 			message: `${error instanceof Error ? error.message : 'Failed to parse config'} (${path}). Skipping this config file.`,
 		});
 		return null;
@@ -97,7 +97,7 @@ function load_config_file(path, on_warning) {
 	const parsed = v.safeParse(config_schema, data);
 	if (!parsed.success) {
 		on_warning({
-			title: 'Svelte: invalid pi config',
+			title: 'Svelte: invalid Pi config',
 			message: `Invalid config schema (${path}). Skipping this config file.`,
 		});
 		return null;
