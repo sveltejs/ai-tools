@@ -29,6 +29,9 @@
 	"pi": {
 		"extensions": [
 			"./index.js"
+		],
+		"skills": [
+			"./skills"
 		]
 	},
 	"repository": {

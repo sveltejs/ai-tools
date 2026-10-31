@@ -22,7 +22,7 @@ If you already configured the Svelte MCP server in your `mcp.json`, the package 
 
 ## Configuration
 
-By default, the MCP server, skills and instructions are enabled. You can customize them by creating a `svelte.json` file:
+By default, the MCP server, skills and instructions are enabled. You can customize the MCP server and the instructions by creating a `svelte.json` file:
 
 - locally, in `.pi/svelte.json` (only read in trusted projects)
 - globally, in `~/.pi/agent/svelte.json`
@@ -37,11 +37,25 @@ By default, the MCP server, skills and instructions are enabled. You can customi
 	},
 	"instructions": {
 		"enabled": true
-	},
-	"skills": {
-		"enabled": true // or an array of skill names, e.g. ["svelte-code-writer"]
 	}
 }
 ```
 
 Run `/reload` after changing the configuration.
+
+### Skills
+
+Skills are managed by Pi itself: you can enable or disable each one with `pi config` (or `pi config --local` for the current project), or filter them in your Pi `settings.json`:
+
+```json
+{
+	"packages": [
+		{
+			"source": "npm:@sveltejs/pi",
+			"skills": ["skills/svelte-code-writer"] // or [] to disable all of them
+		}
+	]
+}
+```
+
+See [Pi package filtering](https://pi.dev/docs/latest/packages#select-package-resources) for more details.

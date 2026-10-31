@@ -35,6 +35,21 @@ In pi the tools are named `mcp__svelte__<tool>` (e.g. `mcp__svelte__svelte_autof
 
 The `svelte-code-writer` and `svelte-core-bestpractices` skills are added to Pi. Use `/skill:svelte-code-writer` to load one explicitly.
 
+You can enable or disable each skill with `pi config` (or `pi config --local` for the current project), or filter them in your Pi `settings.json`:
+
+```json
+{
+	"packages": [
+		{
+			"source": "npm:@sveltejs/pi",
+			"skills": ["skills/svelte-code-writer"]
+		}
+	]
+}
+```
+
+Use `"skills": []` to disable all of them. See [Pi package filtering](https://pi.dev/docs/latest/packages#select-package-resources) for more details.
+
 ### Agent Instructions
 
 The package injects instructions in the system prompt that teach the agent how to effectively use the Svelte MCP tools.
@@ -45,7 +60,7 @@ Unlike the other Svelte plugins, this package doesn't include the `svelte-file-e
 
 ## Configuration
 
-Create `svelte.json` to customize how the package configures MCP, instructions, and skills.
+Create `svelte.json` to customize how the package configures MCP and instructions. Skills are managed by Pi itself (see [Skills](#skills)).
 
 ```json
 {
@@ -57,9 +72,6 @@ Create `svelte.json` to customize how the package configures MCP, instructions, 
 	},
 	"instructions": {
 		"enabled": true
-	},
-	"skills": {
-		"enabled": ["svelte-code-writer", "svelte-core-bestpractices"]
 	}
 }
 ```
@@ -72,7 +84,6 @@ Run `/reload` after changing the configuration.
 - `mcp.enabled`: `true`
 - `mcp.exposure`: `"direct"`
 - `instructions.enabled`: `true`
-- `skills.enabled`: `true`
 
 ### Configuration Options
 
@@ -82,7 +93,6 @@ Run `/reload` after changing the configuration.
 | `mcp.enabled`          | `boolean`                                          | `true`     | Enable or disable the Svelte MCP server entry.                                                                  |
 | `mcp.exposure`         | `"direct" \| "codemode" \| "deferred" \| "hidden"` | `"direct"` | How the MCP tools reach the model. See [Pi MCP exposure](https://pi.dev/docs/latest/mcp#control-tool-exposure). |
 | `instructions.enabled` | `boolean`                                          | `true`     | Enable or disable the instructions injected in the system prompt.                                               |
-| `skills.enabled`       | `boolean \| string[]`                              | `true`     | Enable all skills (`true`), disable all skills (`false`), or enable only specific skill names.                  |
 
 ### Config File Locations and Precedence
 

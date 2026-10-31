@@ -6,22 +6,9 @@ import { mcp_tool_name, setup_mcp } from './mcp.js';
 
 /** @typedef {import('@earendil-works/pi-coding-agent').ExtensionAPI} ExtensionAPI */
 /** @typedef {import('@earendil-works/pi-coding-agent').ExtensionContext} ExtensionContext */
-/** @typedef {import('./config.js').ResolvedConfig} ResolvedConfig */
 
 const current_dir = dirname(fileURLToPath(import.meta.url));
-const skills_dir = join(current_dir, 'skills');
 const instructions_dir = join(current_dir, 'instructions');
-
-/** @param {boolean | string[]} enabled */
-async function get_skill_paths(enabled) {
-	if (enabled === false) return [];
-	const names = Array.isArray(enabled)
-		? enabled
-		: (await readdir(skills_dir, { withFileTypes: true }))
-				.filter((entry) => entry.isDirectory())
-				.map((entry) => entry.name);
-	return names.map((name) => join(skills_dir, name));
-}
 
 /**
  * @param {string} mcp_name
@@ -72,28 +59,13 @@ export default function svelte(pi) {
 		});
 		return;
 	}
-	/** @type {ResolvedConfig | undefined} */
-	let config;
 	/** @type {string | undefined} */
 	let instructions;
 
-	/** @param {ExtensionContext} ctx */
-	function current_config(ctx) {
-		config ??= read_config(ctx);
-		return config;
-	}
-
-	// skills are discovered dynamically so that we can respect the `skills.enabled` option
-	pi.on('resources_discover', async (_event, ctx) => {
-		// re-read the config on startup and on `/reload`
-		config = read_config(ctx);
-		return { skillPaths: await get_skill_paths(config.skills.enabled) };
-	});
-
 	pi.on('session_start', async (_event, ctx) => {
-		const resolved = current_config(ctx);
-		const mcp = setup_mcp(pi, resolved, ctx.cwd, ctx.isProjectTrusted());
-		instructions = resolved.instructions.enabled
+		const config = read_config(ctx);
+		const mcp = setup_mcp(pi, config, ctx.cwd, ctx.isProjectTrusted());
+		instructions = config.instructions.enabled
 			? await load_instructions(mcp.name, mcp.isolated)
 			: undefined;
 	});

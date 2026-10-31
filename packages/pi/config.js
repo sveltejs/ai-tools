@@ -28,21 +28,6 @@ export const config_schema = v.object({
 			'Configuration for the automatic instructions injection in the system prompt. You can choose if it should be enabled or not.',
 		),
 	),
-	skills: v.pipe(
-		v.optional(
-			v.object({
-				enabled: v.pipe(
-					v.optional(v.union([v.boolean(), v.array(v.string())])),
-					v.description(
-						'It can be either a boolean or an array containing the skills that you want to enable',
-					),
-				),
-			}),
-		),
-		v.description(
-			'Configuration for the skills. You can choose if they should be enabled or not, or specify an array of skill names to enable only specific skills.',
-		),
-	),
 });
 
 /** @typedef {v.InferOutput<typeof config_schema>} SvelteConfig */
@@ -52,7 +37,6 @@ export const config_schema = v.object({
  * @typedef {{
  * 	mcp: { type: 'remote' | 'local', enabled: boolean, exposure: Exposure },
  * 	instructions: { enabled: boolean },
- * 	skills: { enabled: boolean | string[] },
  * }} ResolvedConfig
  */
 
@@ -63,7 +47,6 @@ function default_config() {
 	return {
 		mcp: { type: 'local', enabled: true, exposure: 'direct' },
 		instructions: { enabled: true },
-		skills: { enabled: true },
 	};
 }
 
@@ -124,7 +107,6 @@ export function get_config({ cwd, trusted, on_warning = () => {} }) {
 		if (!user_config) continue;
 		Object.assign(config.mcp, strip_undefined(user_config.mcp));
 		Object.assign(config.instructions, strip_undefined(user_config.instructions));
-		Object.assign(config.skills, strip_undefined(user_config.skills));
 	}
 	return config;
 }
