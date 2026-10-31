@@ -30,6 +30,8 @@ catalogs:
     '@opentui/keymap': ^0.4.3
     '@opentui/solid': ^0.4.3
     solid-js: 1.9.12
+  pi:
+    '@earendil-works/pi-coding-agent': ^1.0.0
   svelte:
     '@sveltejs/adapter-vercel': ^6.0.0
     '@sveltejs/kit': ^2.42.2
@@ -67,6 +69,7 @@ minimumReleaseAge: 2880
 minimumReleaseAgeExclude:
   - '@sveltejs/*'
   - '@opencode/*'
+  - '@earendil-works/*'
   - svelte
   - esrap
   - devalue
