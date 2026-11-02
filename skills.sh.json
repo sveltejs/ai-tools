@@ -1,0 +1,16 @@
+{
+	"$schema": "https://skills.sh/schemas/skills.sh.schema.json",
+	"paths": ["./tools/skills"],
+	"groupings": [
+		{
+			"title": "Svelte development",
+			"description": "Write, review, and fix Svelte and SvelteKit code with up-to-date documentation and best practices.",
+			"skills": ["svelte-code-writer", "svelte-core-bestpractices"]
+		},
+		{
+			"title": "Feedback",
+			"description": "Opt-in skills to help improve the Svelte MCP tools.",
+			"skills": ["svelte-mcp-feedback"]
+		}
+	]
+}

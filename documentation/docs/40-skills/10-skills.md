@@ -6,7 +6,7 @@ This is the list of available skills provided by Svelte. Skills are sets of inst
 
 Skills are available in the Claude Code plugin, the Codex CLI plugin, the GitHub Copilot CLI plugin, and the OpenCode plugin (`@sveltejs/opencode`). They can also be manually installed in your `.claude/skills`, `.copilot/skills`, or `.opencode/skills` folder.
 
-You can download the latest skills from the [releases page](https://github.com/sveltejs/ai-tools/releases) of the repo, or find them in the [`tools/skills`](https://github.com/sveltejs/ai-tools/tree/main/tools/skills) folder.
+You can download the latest skills from the [releases page](https://github.com/sveltejs/ai-tools/releases) of the repo, or find them in the [`tools/skills`](https://github.com/sveltejs/ai-tools/tree/main/tools/skills) folder. Each skill below also comes with an [`npx skills`](https://skills.sh) command that you can use to install it for your agent of choice.
 
 ## Opt-in autofixer feedback
 

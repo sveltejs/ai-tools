@@ -61,6 +61,10 @@ for (const skill_name of skill_dirs) {
 
 ${frontmatter.description}
 
+\`\`\`bash
+npx skills add sveltejs/ai-tools --skill ${frontmatter.name}
+\`\`\`
+
 <a href="https://github.com/sveltejs/ai-tools/releases?q=${frontmatter.name}" target="_blank" rel="noopener noreferrer">Open Releases page</a>
 
 <details>
