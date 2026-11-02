@@ -18,6 +18,7 @@
 		"./handlers": "./src/mcp/handlers/tools/handlers.ts"
 	},
 	"dependencies": {
+		"@jridgewell/trace-mapping": "catalog:tooling",
 		"@mcp-ui/server": "catalog:ai",
 		"@tmcp/adapter-valibot": "catalog:tmcp",
 		"@tmcp/transport-in-memory": "catalog:tmcp",
@@ -28,6 +29,7 @@
 		"svelte-eslint-parser": "catalog:lint",
 		"tmcp": "catalog:tmcp",
 		"ts-blank-space": "catalog:tooling",
+		"typescript": "catalog:tooling",
 		"typescript-eslint": "catalog:lint",
 		"valibot": "catalog:tooling",
 		"verkit": "catalog:tooling",
