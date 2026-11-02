@@ -34,7 +34,6 @@ body:
     attributes:
       label: MCP Client
       description: Which MCP client are you using?
-      render: shell
       placeholder: claude-code, codex, opencode
     validations:
       required: true
