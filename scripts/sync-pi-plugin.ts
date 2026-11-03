@@ -1,21 +1,9 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import { sync_skills } from './sync-skills.ts';
 
 const PI_PKG_DIR = './packages/pi';
 const TOOLS_DIR = './tools';
-
-/**
- * Sync skills from tools/ to pi package (direct copy)
- */
-async function sync_skills() {
-	const source = path.join(TOOLS_DIR, 'skills');
-	const dest = path.join(PI_PKG_DIR, 'skills');
-
-	await fs.rm(dest, { recursive: true, force: true });
-	await fs.cp(source, dest, { recursive: true });
-
-	console.log('Synced skills to pi package');
-}
 
 /**
  * Sync AGENTS.md from tools/ to pi package
@@ -30,7 +18,7 @@ async function sync_agents_md() {
 	console.log('Synced AGENTS.md to Pi package');
 }
 
-await sync_skills();
+await sync_skills(path.join(TOOLS_DIR, 'skills'), path.join(PI_PKG_DIR, 'skills'));
 await sync_agents_md();
 
 console.log('pi plugin sync complete');
