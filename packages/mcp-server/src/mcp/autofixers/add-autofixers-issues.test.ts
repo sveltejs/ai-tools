@@ -983,6 +983,43 @@ describe('add_autofixers_issues', () => {
 			);
 		});
 
+		it('should escape quotes in a static class attribute', () => {
+			const content = run(`<script>
+					let cool = $state(true);
+				</script>
+
+				<div class="bg-[url('/hero.png')]" class:cool></div>`);
+
+			expect(content.suggestions).toContain(
+				suggestion('"cool"', 'div', "['bg-[url(\\'/hero.png\\')]', { cool }]"),
+			);
+		});
+
+		it('should escape line breaks in a static class attribute', () => {
+			const content = run(`<script>
+					let cool = $state(true);
+				</script>
+
+				<div class="card\nbig" class:cool></div>`);
+
+			expect(content.suggestions).toContain(
+				suggestion('"cool"', 'div', "['card\\nbig', { cool }]"),
+			);
+		});
+
+		it('should escape backticks in a mixed class attribute', () => {
+			const content = run(`<script>
+					let cool = $state(true);
+					let extra = $state('big');
+				</script>
+
+				<div class="content-['\`'] {extra}" class:cool></div>`);
+
+			expect(content.suggestions).toContain(
+				suggestion('"cool"', 'div', "[`content-['\\`'] ${extra}`, { cool }]"),
+			);
+		});
+
 		it('should add a suggestion for versions newer than 5.16', () => {
 			const content = run(
 				`<script>

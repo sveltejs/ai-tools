@@ -13,6 +13,24 @@ function source_of(code: string, node: { range?: [number, number] | undefined })
 }
 
 /**
+ * Escapes a string so it can be placed inside a single quoted string literal
+ */
+function escape_string(value: string) {
+	return value
+		.replace(/\\/g, '\\\\')
+		.replace(/'/g, "\\'")
+		.replace(/\r/g, '\\r')
+		.replace(/\n/g, '\\n');
+}
+
+/**
+ * Escapes a string so it can be placed inside a template literal
+ */
+function escape_template(value: string) {
+	return value.replace(/\\/g, '\\\\').replace(/`/g, '\\`');
+}
+
+/**
  * Converts a `class:` directive into an object property for the `class` attribute
  * (`class:cool` -> `cool`, `class:lame={!cool}` -> `lame: !cool`)
  */
@@ -40,12 +58,12 @@ function class_attribute_to_expression(code: string, attribute: AST.SvelteAttrib
 		return source_of(code, parts[0].expression);
 	}
 	if (parts.every((part) => part.type === 'SvelteLiteral')) {
-		return `'${parts.map((part) => part.value).join('')}'`;
+		return `'${escape_string(parts.map((part) => part.value).join(''))}'`;
 	}
 	let template = '`';
 	for (const part of parts) {
 		if (part.type === 'SvelteLiteral') {
-			template += part.value;
+			template += escape_template(part.value);
 		} else if (part.type === 'SvelteMustacheTag') {
 			template += `\${${source_of(code, part.expression) ?? ''}}`;
 		}
