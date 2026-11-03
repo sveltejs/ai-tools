@@ -16,13 +16,14 @@ async function autofixer_tool_call(
 	desired_svelte_version: number | string = 5,
 	async = false,
 	ctx?: { stdio?: boolean },
+	filename = 'App.svelte',
 ) {
 	const result = await client.callTool(
 		'svelte-autofixer',
 		{
 			code,
 			desired_svelte_version,
-			filename: 'App.svelte',
+			filename,
 			async,
 		},
 		ctx,
@@ -159,6 +160,50 @@ describe.each(['session', 'stateless'])('svelte-autofixer tool - %s', (type) => 
 			{/each}`);
 
 		expect(content.issues).toHaveLength(0);
+	});
+
+	it('should support non-erasable TypeScript syntax in .svelte.ts modules', async () => {
+		const content = await autofixer_tool_call(
+			`export class Example {
+	count = $state(0);
+
+	constructor(private value: number) {}
+}
+
+export enum Direction {
+	Up,
+	Down,
+}`,
+			false,
+			5,
+			false,
+			undefined,
+			'Example.svelte.ts',
+		);
+
+		expect(content.issues).toEqual([]);
+	});
+
+	it('should report issues at the original position for .svelte.ts modules with non-erasable syntax', async () => {
+		const content = await autofixer_tool_call(
+			`import type { Foo } from './foo';
+
+export class Example {
+
+	constructor(private value: Foo) {}
+
+
+}
+
+export const props = $props();`,
+			false,
+			5,
+			false,
+			undefined,
+			'Example.svelte.ts',
+		);
+
+		expect(content.issues).toEqual([expect.stringContaining('at line 10, column 21')]);
 	});
 
 	it('should error in case the passed in version is different from 4 or 5', async () => {
