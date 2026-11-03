@@ -1,5 +1,13 @@
 # @sveltejs/mcp
 
+## 0.1.29
+
+### Patch Changes
+
+- chore: generate new `use_cases` summaries ([#306](https://github.com/sveltejs/ai-tools/pull/306))
+
+- fix: support non-erasable TS syntax in `.svelte.ts` modules ([#310](https://github.com/sveltejs/ai-tools/pull/310))
+
 ## 0.1.28
 
 ### Patch Changes
