@@ -1,5 +1,11 @@
 # @sveltejs/mcp
 
+## 0.1.30
+
+### Patch Changes
+
+- fix: escape quotes, backticks and line breaks from the `class` attribute in the `class:` directive suggestion ([#315](https://github.com/sveltejs/ai-tools/pull/315))
+
 ## 0.1.29
 
 ### Patch Changes
