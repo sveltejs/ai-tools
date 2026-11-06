@@ -4,9 +4,9 @@ import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { InMemoryTransport } from '@tmcp/transport-in-memory';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { server } from '../../index.js';
+import { create_server } from '../../index.js';
 
-const transport = new InMemoryTransport(server);
+const transport = new InMemoryTransport(create_server());
 
 let client: ReturnType<typeof transport.session> | ReturnType<typeof transport.stateless>;
 
