@@ -164,6 +164,194 @@ describe('add_autofixers_issues', () => {
 				`You are calling a function inside an $effect. Please check if the function is reassigning a stateful variable because that's considered malpractice and check if it could use  \`$derived\` instead. Ignore this suggestion if you are sure this function is not assigning any stateful variable or if you can't check if it does.`,
 			);
 		});
+
+		it('should not add suggestions when assigning to a stateful variable inside a callback invoked later', () => {
+			const content = run_autofixers_on_code(`
+			<script>
+				let count = $state(0);
+				$effect(() => {
+					const interval = setInterval(() => {
+						count++;
+					}, 1000);
+					fetch('/api').then((response) => {
+						count = response.status;
+					});
+				});
+			</script>`);
+
+			expect(content.suggestions).not.toContain(
+				'The stateful variable "count" is assigned inside an $effect which is generally consider a malpractice. Consider using $derived if possible.',
+			);
+		});
+
+		it('should not add suggestions when assigning to a stateful variable inside the teardown function', () => {
+			const content = run_autofixers_on_code(`
+			<script>
+				let count = $state(0);
+				$effect(() => {
+					return () => {
+						count = 0;
+					};
+				});
+			</script>`);
+
+			expect(content.suggestions).not.toContain(
+				'The stateful variable "count" is assigned inside an $effect which is generally consider a malpractice. Consider using $derived if possible.',
+			);
+		});
+
+		it('should not add suggestions when calling a function inside a callback invoked later', () => {
+			const content = run_autofixers_on_code(`
+			<script>
+				import { fetch_data } from './data.js';
+				$effect(() => {
+					const timeout = setTimeout(() => fetch_data(), 1000);
+					return () => clearTimeout(timeout);
+				});
+			</script>`);
+
+			expect(content.suggestions).toEqual([]);
+		});
+
+		it('should add suggestions when assigning to a stateful variable inside an untrack callback', () => {
+			const content = run_autofixers_on_code(`
+			<script>
+				import { untrack } from 'svelte';
+				let count = $state(0);
+				$effect(() => {
+					untrack(() => {
+						count++;
+					});
+				});
+			</script>`);
+
+			expect(content.suggestions).toEqual([
+				'The stateful variable "count" is assigned inside an $effect which is generally consider a malpractice. Consider using $derived if possible.',
+			]);
+		});
+
+		it('should add suggestions when calling a function inside an untrack callback', () => {
+			const content = run_autofixers_on_code(`
+			<script>
+				import { untrack as u } from 'svelte';
+				import { fetch_data } from './data.js';
+				$effect(() => {
+					u(() => fetch_data());
+				});
+			</script>`);
+
+			expect(content.suggestions).toEqual([
+				`You are calling the function \`fetch_data\` inside an $effect. Please check if the function is reassigning a stateful variable because that's considered malpractice and check if it could use  \`$derived\` instead. Ignore this suggestion if you are sure this function is not assigning any stateful variable or if you can't check if it does.`,
+			]);
+		});
+
+		it('should add suggestions when assigning to a stateful variable inside a nested $effect', () => {
+			const content = run_autofixers_on_code(`
+			<script>
+				let count = $state(0);
+				$effect(() => {
+					$effect.root(() => {
+						$effect(() => {
+							count++;
+						});
+					});
+				});
+			</script>`);
+
+			expect(content.suggestions).toContain(
+				'The stateful variable "count" is assigned inside an $effect which is generally consider a malpractice. Consider using $derived if possible.',
+			);
+		});
+
+		describe.each([
+			{ call: 'setTimeout(() => {}, 100)' },
+			{ call: 'clearTimeout(timeout)' },
+			{ call: 'setInterval(() => {}, 100)' },
+			{ call: 'clearInterval(interval)' },
+			{ call: 'requestAnimationFrame(() => {})' },
+			{ call: 'cancelAnimationFrame(frame)' },
+			{ call: 'queueMicrotask(() => {})' },
+			{ call: 'console.log(count)' },
+		])('harmless globals ($call)', ({ call }) => {
+			it(`should not add suggestions when calling ${call} inside an effect`, () => {
+				const content = run_autofixers_on_code(`
+				<script>
+					let count = $state(0);
+					$effect(() => {
+						${call};
+					});
+				</script>`);
+
+				expect(content.suggestions).toEqual([]);
+			});
+		});
+
+		it('should add suggestions when calling a local function shadowing a harmless global inside an effect', () => {
+			const content = run_autofixers_on_code(`
+			<script>
+				function setTimeout() {}
+				$effect(() => {
+					setTimeout();
+				});
+			</script>`);
+
+			expect(content.suggestions).toEqual([
+				`You are calling the function \`setTimeout\` inside an $effect. Please check if the function is reassigning a stateful variable because that's considered malpractice and check if it could use  \`$derived\` instead. Ignore this suggestion if you are sure this function is not assigning any stateful variable or if you can't check if it does.`,
+			]);
+		});
+
+		describe.each([{ name: 'untrack' }, { name: 'tick' }])(
+			'harmless svelte imports ($name)',
+			({ name }) => {
+				it(`should not add suggestions when calling ${name} imported from svelte inside an effect`, () => {
+					const content = run_autofixers_on_code(`
+					<script>
+						import { ${name} } from 'svelte';
+						$effect(() => {
+							${name}(() => {});
+						});
+					</script>`);
+
+					expect(content.suggestions).toEqual([]);
+				});
+
+				it(`should add suggestions when calling ${name} imported from another package inside an effect`, () => {
+					const content = run_autofixers_on_code(`
+					<script>
+						import { ${name} } from 'some-package';
+						$effect(() => {
+							${name}(() => {});
+						});
+					</script>`);
+
+					expect(content.suggestions).toEqual([
+						`You are calling the function \`${name}\` inside an $effect. Please check if the function is reassigning a stateful variable because that's considered malpractice and check if it could use  \`$derived\` instead. Ignore this suggestion if you are sure this function is not assigning any stateful variable or if you can't check if it does.`,
+					]);
+				});
+			},
+		);
+
+		it('should not add suggestions for state assigned asynchronously from a timer', () => {
+			const content = run_autofixers_on_code(`
+			<script>
+				import { untrack } from 'svelte';
+				let { loading } = $props();
+				let visible = $state(false);
+
+				$effect(() => {
+					if (!loading) return;
+					const timer = setTimeout(() => (visible = true), 150);
+					return () => {
+						clearTimeout(timer);
+						if (untrack(() => visible)) visible = false;
+					};
+				});
+			</script>
+
+			{#if visible}<div role="progressbar"></div>{/if}`);
+
+			expect(content.suggestions).toEqual([]);
+		});
 	});
 
 	with_possible_inits('($init)', ({ init }) => {
