@@ -59,7 +59,7 @@ catalogs:
     ts-blank-space: ^0.7.0
     tsdown: ^0.20.0
     typescript: ^5.0.0
-    valibot: ^1.2.0
+    valibot: ^1.5.0
     verkit: ^0.4.0
     vite: ^7.0.4
     vite-plugin-devtools-json: ^1.0.0
