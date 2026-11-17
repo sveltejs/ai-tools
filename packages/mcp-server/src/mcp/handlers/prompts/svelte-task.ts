@@ -1,4 +1,5 @@
 import type { SvelteMcp } from '../../index.js';
+import type { ToolName } from '../tools/index.js';
 import * as v from 'valibot';
 import { format_sections_list } from '../../utils.js';
 import { icons } from '../../icons/index.js';
@@ -8,8 +9,8 @@ import { prompt } from 'tmcp/utils';
  *  Function that actually generates the prompt string. You can use this in the MCP server handler to generate the prompt, it can accept arguments
  *  if needed (it will always be invoked manually so it's up to you to provide the arguments).
  */
-function svelte_task(available_docs: string, task: string) {
-	return `You are a Svelte expert tasked to build components and utilities for Svelte developers. If you need documentation for anything related to Svelte you can invoke the tool \`get-documentation\` with one of the following paths. However: before invoking the \`get-documentation\` tool, try to answer the users query using your own knowledge and the \`svelte-autofixer\` tool. Be mindful of how many section you request, since it is token-intensive!
+function svelte_task(available_docs: string, task: string, include_playground = true) {
+	const task_prompt = `You are a Svelte expert tasked to build components and utilities for Svelte developers. If you need documentation for anything related to Svelte you can invoke the tool \`get-documentation\` with one of the following paths. However: before invoking the \`get-documentation\` tool, try to answer the users query using your own knowledge and the \`svelte-autofixer\` tool. Be mindful of how many section you request, since it is token-intensive!
 <available-docs>
 
 ${available_docs}
@@ -24,7 +25,11 @@ This is the task you will work on:
 
 <task>
 ${task}
-</task>
+</task>`;
+
+	if (!include_playground) return task_prompt;
+
+	return `${task_prompt}
 
 If you are not writing the code into a file, once you have the final version of the code ask the user if it wants to generate a playground link to quickly check the code in it and if it answer yes call the \`playground-link\` tool and return the url to the user nicely formatted. The playground link MUST be generated only once you have the final version of the code and you are ready to share it, it MUST include an entry point file called \`App.svelte\` where the main component should live. If you have multiple files to include in the playground link you can include them all at the root.`;
 }
@@ -49,7 +54,7 @@ export async function generate_for_docs() {
 export const docs_description =
 	'This prompt should be used whenever you are asking the model to work on a Svelte-related task. It will instruct the LLM which documentation sections are available, which tools to invoke, when to invoke them, and how to interpret the results.';
 
-export function setup_svelte_task(server: SvelteMcp) {
+export function setup_svelte_task(server: SvelteMcp, enabled_tools: Set<ToolName>) {
 	server.prompt(
 		{
 			name: 'svelte-task',
@@ -76,7 +81,7 @@ export function setup_svelte_task(server: SvelteMcp) {
 			}
 			const available_docs = await format_sections_list();
 
-			return prompt.text(svelte_task(available_docs, task));
+			return prompt.text(svelte_task(available_docs, task, enabled_tools.has('playground-link')));
 		},
 	);
 }
