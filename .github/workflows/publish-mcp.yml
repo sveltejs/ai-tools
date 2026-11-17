@@ -15,6 +15,26 @@ jobs:
       - name: checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 
+      - name: Wait for package to be available on npm
+        working-directory: packages/mcp-stdio
+        run: |
+          PACKAGE=$(jq -r '.packages[] | select(.registryType == "npm") | .identifier' server.json)
+          VERSION=$(jq -r '.packages[] | select(.registryType == "npm") | .version' server.json)
+          MCP_NAME=$(jq -r '.name' server.json)
+
+          # The MCP Registry validates the package against this exact endpoint, so wait until it's served
+          for i in $(seq 1 30); do
+            if curl -fsSL "https://registry.npmjs.org/${PACKAGE}/${VERSION}" | jq -e --arg name "$MCP_NAME" '.mcpName == $name' > /dev/null; then
+              echo "${PACKAGE}@${VERSION} is available on npm"
+              exit 0
+            fi
+            echo "Attempt $i: ${PACKAGE}@${VERSION} not yet available on npm, retrying in 20s..."
+            sleep 20
+          done
+
+          echo "Timed out waiting for ${PACKAGE}@${VERSION} to be available on npm"
+          exit 1
+
       - name: Publish to MCP Registry
         working-directory: packages/mcp-stdio
         env:
@@ -34,8 +54,15 @@ jobs:
           # Install the MCP Publisher binary
           install -m 0755  tmp/mcp-publisher .
 
-          # Login using DNS
-          ./mcp-publisher login dns --domain svelte.dev --private-key "${MCP_KEY}"
+          # Login using DNS and publish to MCP Registry, retrying in case the registry still sees a stale npm cache
+          # (login is repeated on each attempt since registry tokens are short-lived)
+          for i in $(seq 1 5); do
+            if ./mcp-publisher login dns --domain svelte.dev --private-key "${MCP_KEY}" && ./mcp-publisher publish; then
+              exit 0
+            fi
+            echo "Attempt $i: publish failed, retrying in $((i * 30))s..."
+            sleep $((i * 30))
+          done
 
-          # Publish to MCP Registry
-          ./mcp-publisher publish
+          echo "Failed to publish to MCP Registry"
+          exit 1
