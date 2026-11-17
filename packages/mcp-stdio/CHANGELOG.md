@@ -1,5 +1,11 @@
 # @sveltejs/mcp
 
+## 0.1.31
+
+### Patch Changes
+
+- chore: refresh lock ([#322](https://github.com/sveltejs/ai-tools/pull/322))
+
 ## 0.1.30
 
 ### Patch Changes
