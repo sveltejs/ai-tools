@@ -1,7 +1,7 @@
 import { createUIResource } from '@mcp-ui/server';
 import { tool } from 'tmcp/utils';
 import * as v from 'valibot';
-import { icons } from '../../icons/index.js';
+import { remote_icons } from '../../icons/index.js';
 import type { SvelteMcp } from '../../index.js';
 
 async function compress_and_encode_text(input: string) {
@@ -188,7 +188,7 @@ export function playground_link(server: SvelteMcp) {
 			name: 'playground-link-ui',
 			description: 'UI resource for the Svelte Playground widget',
 			uri: playground_ui_resource.resource.uri,
-			icons,
+			icons: remote_icons,
 		},
 		() => {
 			return {
@@ -200,6 +200,7 @@ export function playground_link(server: SvelteMcp) {
 	server.tool(
 		{
 			name: 'playground-link',
+			title: 'Playground Link',
 			description:
 				'Generates a Playground link given a Svelte code snippet. Once you have the final version of the code you want to send to the user, ALWAYS ask the user if it wants a playground link to allow it to quickly check the code in the playground before calling this tool. NEVER use this tool if you have written the component to a file in the user project. The playground accept multiple files so if are importing from other files just include them all at the root level.',
 			schema: playground_link_schema,
@@ -210,7 +211,7 @@ export function playground_link(server: SvelteMcp) {
 				readOnlyHint: true,
 				openWorldHint: false,
 			},
-			icons,
+			icons: remote_icons,
 			// For MCP Apps hosts - points to the registered resource
 			_meta: {
 				ui: {

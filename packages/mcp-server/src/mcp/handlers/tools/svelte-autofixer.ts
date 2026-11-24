@@ -4,7 +4,7 @@ import * as v from 'valibot';
 import { add_autofixers_issues } from '../../autofixers/add-autofixers-issues.js';
 import { add_compile_issues } from '../../autofixers/add-compile-issues.js';
 import { add_eslint_issues } from '../../autofixers/add-eslint-issues.js';
-import { icons } from '../../icons/index.js';
+import { remote_icons } from '../../icons/index.js';
 import { type SvelteMcp } from '../../index.js';
 import { parse_svelte_version } from '../../version.js';
 
@@ -132,7 +132,7 @@ export function svelte_autofixer(server: SvelteMcp) {
 				readOnlyHint: true,
 				openWorldHint: false,
 			},
-			icons,
+			icons: remote_icons,
 		},
 		async ({
 			code,

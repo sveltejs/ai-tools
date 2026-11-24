@@ -1,6 +1,6 @@
 import type { SvelteMcp } from '../../index.js';
 import { get_sections, fetch_with_timeout } from '../../utils.js';
-import { icons } from '../../icons/index.js';
+import { remote_icons } from '../../icons/index.js';
 import { resource } from 'tmcp/utils';
 
 export async function list_sections(server: SvelteMcp) {
@@ -44,7 +44,7 @@ export async function list_sections(server: SvelteMcp) {
 				},
 			},
 			uri: 'svelte://{/slug*}.md',
-			icons,
+			icons: remote_icons,
 		},
 		async (uri, { slug }) => {
 			if (server.ctx.custom?.track) {

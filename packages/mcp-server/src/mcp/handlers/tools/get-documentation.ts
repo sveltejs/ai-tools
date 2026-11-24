@@ -2,7 +2,7 @@ import type { SvelteMcp } from '../../index.js';
 import * as v from 'valibot';
 import { get_sections, fetch_with_timeout, format_sections_list } from '../../utils.js';
 import { SECTIONS_LIST_INTRO, SECTIONS_LIST_OUTRO } from './prompts.js';
-import { icons } from '../../icons/index.js';
+import { remote_icons } from '../../icons/index.js';
 import { tool } from 'tmcp/utils';
 
 const get_documentation_schema = v.object({
@@ -147,6 +147,7 @@ export function get_documentation(server: SvelteMcp) {
 	server.tool(
 		{
 			name: 'get-documentation',
+			title: 'Get Documentation',
 			description:
 				'Retrieves full documentation content for Svelte 5 or SvelteKit sections. Supports flexible search by title (e.g., "$state", "routing") or file path (e.g., "cli/overview"). Can accept a single section name or an array of sections. Before running this, make sure to analyze the users query, as well as the output from list-sections (which should be called first). Then ask for ALL relevant sections the user might require. For example, if the user asks to build anything interactive, you will need to fetch all relevant runes, and so on. Before calling this tool, try to implement Svelte components using your own knowledge and the `svelte-autofixer` tool, since calling this tool is token intensive.',
 			schema: get_documentation_schema,
@@ -156,7 +157,7 @@ export function get_documentation(server: SvelteMcp) {
 				readOnlyHint: true,
 				openWorldHint: false,
 			},
-			icons,
+			icons: remote_icons,
 		},
 		async ({ section }) => {
 			if (server.ctx.custom?.track) {

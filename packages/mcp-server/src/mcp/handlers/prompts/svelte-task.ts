@@ -1,7 +1,7 @@
 import type { SvelteMcp } from '../../index.js';
 import * as v from 'valibot';
 import { format_sections_list } from '../../utils.js';
-import { icons } from '../../icons/index.js';
+import { remote_icons } from '../../icons/index.js';
 import { prompt } from 'tmcp/utils';
 
 /**
@@ -68,7 +68,7 @@ export function setup_svelte_task(server: SvelteMcp) {
 					};
 				},
 			},
-			icons,
+			icons: remote_icons,
 		},
 		async ({ task }) => {
 			if (server.ctx.custom?.track) {

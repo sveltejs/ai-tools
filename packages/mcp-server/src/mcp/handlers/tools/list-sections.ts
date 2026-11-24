@@ -1,7 +1,7 @@
 import type { SvelteMcp } from '../../index.js';
 import { format_sections_list } from '../../utils.js';
 import { SECTIONS_LIST_INTRO, SECTIONS_LIST_OUTRO } from './prompts.js';
-import { icons } from '../../icons/index.js';
+import { remote_icons } from '../../icons/index.js';
 import { tool } from 'tmcp/utils';
 
 export async function list_sections_handler() {
@@ -14,6 +14,7 @@ export function list_sections(server: SvelteMcp) {
 	server.tool(
 		{
 			name: 'list-sections',
+			title: 'List Sections',
 			description:
 				'Lists all available Svelte 5 and SvelteKit documentation sections in a structured format. Each section includes a "use_cases" field that describes WHEN this documentation would be useful. You should carefully analyze the use_cases field to determine which sections are relevant for the user\'s query. The use_cases contain comma-separated keywords describing project types (e.g., "e-commerce", "blog"), features (e.g., "authentication", "forms"), components (e.g., "slider", "modal"), development stages (e.g., "deployment", "testing"), or "always" for fundamental concepts. Match these use_cases against the user\'s intent - for example, if building an e-commerce site, fetch sections with use_cases containing "e-commerce", "product listings", "shopping cart", etc. If building a slider, look for "slider", "carousel", "animation", etc. Returns sections as "* title: [section_title], use_cases: [use_cases], path: [file_path]". Always run list-sections FIRST for any Svelte query, then analyze ALL use_cases to identify relevant sections, and finally use get-documentation to fetch ALL relevant sections at once.',
 			annotations: {
@@ -22,7 +23,7 @@ export function list_sections(server: SvelteMcp) {
 				readOnlyHint: true,
 				openWorldHint: false,
 			},
-			icons,
+			icons: remote_icons,
 		},
 		async () => {
 			if (server.ctx.custom?.track) {
