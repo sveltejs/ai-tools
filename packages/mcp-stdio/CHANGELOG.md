@@ -1,5 +1,11 @@
 # @sveltejs/mcp
 
+## 0.1.32
+
+### Patch Changes
+
+- fix(mcp-server): add explicit short titles for tool descriptors ([#325](https://github.com/sveltejs/ai-tools/pull/325))
+
 ## 0.1.31
 
 ### Patch Changes
