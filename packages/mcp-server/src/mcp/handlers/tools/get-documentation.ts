@@ -2,7 +2,7 @@ import type { SvelteMcp } from '../../index.js';
 import * as v from 'valibot';
 import { get_sections, fetch_with_timeout, format_sections_list } from '../../utils.js';
 import { SECTIONS_LIST_INTRO, SECTIONS_LIST_OUTRO } from './prompts.js';
-import { icons } from '../../icons/index.js';
+import { remote_icons } from '../../icons/index.js';
 import { tool } from 'tmcp/utils';
 
 const get_documentation_schema = v.object({
@@ -157,7 +157,7 @@ export function get_documentation(server: SvelteMcp) {
 				readOnlyHint: true,
 				openWorldHint: false,
 			},
-			icons,
+			icons: remote_icons,
 		},
 		async ({ section }) => {
 			if (server.ctx.custom?.track) {

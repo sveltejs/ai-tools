@@ -1,7 +1,7 @@
 import { createUIResource } from '@mcp-ui/server';
 import { tool } from 'tmcp/utils';
 import * as v from 'valibot';
-import { icons } from '../../icons/index.js';
+import { remote_icons } from '../../icons/index.js';
 import type { SvelteMcp } from '../../index.js';
 
 async function compress_and_encode_text(input: string) {
@@ -188,7 +188,7 @@ export function playground_link(server: SvelteMcp) {
 			name: 'playground-link-ui',
 			description: 'UI resource for the Svelte Playground widget',
 			uri: playground_ui_resource.resource.uri,
-			icons,
+			icons: remote_icons,
 		},
 		() => {
 			return {
@@ -211,7 +211,7 @@ export function playground_link(server: SvelteMcp) {
 				readOnlyHint: true,
 				openWorldHint: false,
 			},
-			icons,
+			icons: remote_icons,
 			// For MCP Apps hosts - points to the registered resource
 			_meta: {
 				ui: {

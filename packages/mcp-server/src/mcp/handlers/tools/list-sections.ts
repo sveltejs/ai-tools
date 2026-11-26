@@ -1,7 +1,7 @@
 import type { SvelteMcp } from '../../index.js';
 import { format_sections_list } from '../../utils.js';
 import { SECTIONS_LIST_INTRO, SECTIONS_LIST_OUTRO } from './prompts.js';
-import { icons } from '../../icons/index.js';
+import { remote_icons } from '../../icons/index.js';
 import { tool } from 'tmcp/utils';
 
 export async function list_sections_handler() {
@@ -23,7 +23,7 @@ export function list_sections(server: SvelteMcp) {
 				readOnlyHint: true,
 				openWorldHint: false,
 			},
-			icons,
+			icons: remote_icons,
 		},
 		async () => {
 			if (server.ctx.custom?.track) {
