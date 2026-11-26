@@ -9,6 +9,7 @@ export async function list_sections(server: SvelteMcp) {
 	server.template(
 		{
 			name: 'Svelte-Doc-Section',
+			title: 'Svelte-Doc-Section',
 			description: 'A single documentation section',
 			list() {
 				return sections.map((section) => {
