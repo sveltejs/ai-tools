@@ -200,6 +200,7 @@ export function playground_link(server: SvelteMcp) {
 	server.tool(
 		{
 			name: 'playground-link',
+			title: 'Playground Link',
 			description:
 				'Generates a Playground link given a Svelte code snippet. Once you have the final version of the code you want to send to the user, ALWAYS ask the user if it wants a playground link to allow it to quickly check the code in the playground before calling this tool. NEVER use this tool if you have written the component to a file in the user project. The playground accept multiple files so if are importing from other files just include them all at the root level.',
 			schema: playground_link_schema,
