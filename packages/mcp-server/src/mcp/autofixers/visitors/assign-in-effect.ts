@@ -10,18 +10,102 @@ import { left_most_id } from '../ast/utils.js';
 import type { AST } from 'svelte-eslint-parser';
 import type { Context } from 'zimmerframe';
 
+/**
+ * Global functions that can't reassign a stateful variable when they are invoked
+ */
+const harmless_globals = new Set([
+	'setTimeout',
+	'clearTimeout',
+	'setInterval',
+	'clearInterval',
+	'requestAnimationFrame',
+	'cancelAnimationFrame',
+	'queueMicrotask',
+]);
+
+/**
+ * Global objects whose methods can't reassign a stateful variable when they are invoked
+ */
+const harmless_global_objects = new Set(['console']);
+
+/**
+ * Functions exported from `svelte` that can't reassign a stateful variable when they are invoked
+ */
+const harmless_svelte_imports = new Set(['untrack', 'tick']);
+
+function is_global(id: Identifier, state: AutofixerState) {
+	const reference = state.parsed.find_reference_by_id(id);
+	if (!reference) return false;
+	return !reference.resolved || reference.resolved.defs.length === 0;
+}
+
+/**
+ * Returns the name of the export if `id` references an import from `svelte`
+ */
+function get_svelte_import_name(id: Identifier, state: AutofixerState) {
+	const definition = state.parsed.find_reference_by_id(id)?.resolved?.defs[0];
+	if (
+		definition?.type !== 'ImportBinding' ||
+		definition.parent.source.value !== 'svelte' ||
+		definition.node.type !== 'ImportSpecifier'
+	) {
+		return null;
+	}
+	const imported = definition.node.imported;
+	return imported.type === 'Identifier' ? imported.name : String(imported.value);
+}
+
+function is_harmless_call(node: CallExpression, state: AutofixerState) {
+	const { callee } = node;
+	if (callee.type === 'Identifier') {
+		if (harmless_globals.has(callee.name) && is_global(callee, state)) return true;
+		const svelte_import = get_svelte_import_name(callee, state);
+		return svelte_import !== null && harmless_svelte_imports.has(svelte_import);
+	}
+	return (
+		callee.type === 'MemberExpression' &&
+		callee.object.type === 'Identifier' &&
+		harmless_global_objects.has(callee.object.name) &&
+		is_global(callee.object, state)
+	);
+}
+
+function is_function(node: Node | AST.SvelteNode) {
+	return (
+		node.type === 'ArrowFunctionExpression' ||
+		node.type === 'FunctionExpression' ||
+		node.type === 'FunctionDeclaration'
+	);
+}
+
+/**
+ * Runs `to_run` if the current node is executed synchronously by an `$effect`. The search stops at the
+ * first function boundary because we can't know when a nested function is invoked (e.g. a `setTimeout`
+ * callback or the teardown function run later), except for the callback of `untrack` that is invoked
+ * synchronously.
+ */
 function run_if_in_effect(
 	path: (Node | AST.SvelteNode)[],
 	state: AutofixerState,
 	to_run: () => void,
 ) {
-	const in_effect = path.findLast(
-		(node) =>
-			node.type === 'CallExpression' && state.parsed.is_rune(node, ['$effect', '$effect.pre']),
-	);
-
-	if (in_effect) {
-		to_run();
+	for (let i = path.length - 1; i >= 0; i--) {
+		const node = path[i];
+		if (!node || !is_function(node)) continue;
+		const parent = path[i - 1];
+		if (parent?.type === 'CallExpression' && parent.arguments[0] === node) {
+			if (state.parsed.is_rune(parent, ['$effect', '$effect.pre'])) {
+				to_run();
+				return;
+			}
+			if (
+				parent.callee.type === 'Identifier' &&
+				get_svelte_import_name(parent.callee, state) === 'untrack'
+			) {
+				continue;
+			}
+		}
+		return;
 	}
 }
 
@@ -64,6 +148,7 @@ function call_expression_visitor(
 	{ state, path, next }: Context<Node | AST.SvelteNode, AutofixerState>,
 ) {
 	run_if_in_effect(path, state, () => {
+		if (is_harmless_call(node, state)) return;
 		const function_name =
 			node.callee.type === 'Identifier' ? `the function \`${node.callee.name}\`` : 'a function';
 		state.output.suggestions.push(
